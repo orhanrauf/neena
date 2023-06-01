@@ -1,7 +1,5 @@
 <script>
 import Drawflow from "drawflow";
-import styleDrawflow from "drawflow/dist/drawflow.min.css";
-import style from "../styles/drawflow.css";
 import {
   onMounted,
   shallowRef,
@@ -193,9 +191,6 @@ export default {
   },
 };
 </script>
-<script setup>
-const isAddTaskModalVisible = ref(false);
-</script>
 
 <template>
   <div>
@@ -307,3 +302,4 @@ const isAddTaskModalVisible = ref(false);
   text-align: initial;
 }
 </style>
+<style src="drawflow/dist/drawflow.min.css"></style>
