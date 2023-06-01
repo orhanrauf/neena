@@ -12,14 +12,8 @@ export default [
     icon: { icon: "tabler:file" },
   },
   {
-    title: "Second page",
-    icon: { icon: "tabler-file" },
-    children: [
-      {
-        title: "Second Page",
-        icon: { icon: "material-symbols:10k-outline" },
-        to: { name: "second-page" },
-      },
-    ],
+    title: "Task",
+    to: { name: "tasks" },
+    icon: { icon: "tabler:file-description" },
   },
 ] as VerticalNavItems;
