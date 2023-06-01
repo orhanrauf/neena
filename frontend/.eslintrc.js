@@ -132,7 +132,6 @@ module.exports = {
     // ESLint plugin vue
     'vue/block-tag-newline': 'error',
     'vue/component-api-style': 'error',
-    'vue/component-name-in-template-casing': ['error', 'PascalCase' | 'kebab-case', { registeredComponentsOnly: false }],
     'vue/custom-event-name-casing': ['error', 'camelCase', {
       ignores: [
         '/^(click):[a-z]+((\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?/',

@@ -1,20 +1,25 @@
-import type { VerticalNavItems } from '@/@layouts/types'
+import type { VerticalNavItems } from "@/@layouts/types";
 
 export default [
   {
-    title: 'Home',
-    to: { name: 'index' },
-    icon: { icon: 'tabler-smart-home' },
+    title: "Home",
+    to: { name: "index" },
+    icon: { icon: "tabler-smart-home" },
   },
   {
-    title: 'Second page',
-    icon: { icon: 'tabler-file' },
+    title: "Create Flow",
+    to: { name: "workflow-create" },
+    icon: { icon: "tabler:file" },
+  },
+  {
+    title: "Second page",
+    icon: { icon: "tabler-file" },
     children: [
       {
-        title: 'Second Page',
-        icon: { icon: 'material-symbols:10k-outline' },
-        to: { name: 'second-page' },
+        title: "Second Page",
+        icon: { icon: "material-symbols:10k-outline" },
+        to: { name: "second-page" },
       },
     ],
   },
-] as VerticalNavItems
+] as VerticalNavItems;
