@@ -33,19 +33,14 @@ const isDialogVisible = ref(false);
                 <VCardText>
                   Some quick example text to build on the card title and make up
                   the bulk of the card's content.
+
+                  <div class="mt-4 d-flex gap-3">
+                    <VBtn prepend-icon="tabler:circle-plus"> Add task </VBtn>
+                    <VBtn prepend-icon="tabler:info-circle" color="secondary">
+                      Info
+                    </VBtn>
+                  </div>
                 </VCardText>
-                <VCardActions>
-                  <VBtn variant="flat" prepend-icon="tabler:circle-plus">
-                    Add task
-                  </VBtn>
-                  <VBtn
-                    variant="flat"
-                    prepend-icon="tabler:info-circle"
-                    color="secondary"
-                  >
-                    Info
-                  </VBtn>
-                </VCardActions>
               </VCard>
             </VCol>
 
@@ -55,19 +50,14 @@ const isDialogVisible = ref(false);
                 <VCardText>
                   Some quick example text to build on the card title and make up
                   the bulk of the card's content.
+
+                  <div class="mt-4 d-flex gap-3">
+                    <VBtn prepend-icon="tabler:circle-plus"> Add task </VBtn>
+                    <VBtn prepend-icon="tabler:info-circle" color="secondary">
+                      Info
+                    </VBtn>
+                  </div>
                 </VCardText>
-                <VCardActions>
-                  <VBtn variant="flat" prepend-icon="tabler:circle-plus">
-                    Add task
-                  </VBtn>
-                  <VBtn
-                    variant="flat"
-                    prepend-icon="tabler:info-circle"
-                    color="secondary"
-                  >
-                    Info
-                  </VBtn>
-                </VCardActions>
               </VCard>
             </VCol>
 
@@ -77,19 +67,14 @@ const isDialogVisible = ref(false);
                 <VCardText>
                   Some quick example text to build on the card title and make up
                   the bulk of the card's content.
+
+                  <div class="mt-4 d-flex gap-3">
+                    <VBtn prepend-icon="tabler:circle-plus"> Add task </VBtn>
+                    <VBtn prepend-icon="tabler:info-circle" color="secondary">
+                      Info
+                    </VBtn>
+                  </div>
                 </VCardText>
-                <VCardActions>
-                  <VBtn variant="flat" prepend-icon="tabler:circle-plus">
-                    Add task
-                  </VBtn>
-                  <VBtn
-                    variant="flat"
-                    prepend-icon="tabler:info-circle"
-                    color="secondary"
-                  >
-                    Info
-                  </VBtn>
-                </VCardActions>
               </VCard>
             </VCol>
           </VRow>
@@ -101,19 +86,14 @@ const isDialogVisible = ref(false);
                 <VCardText>
                   Some quick example text to build on the card title and make up
                   the bulk of the card's content.
+
+                  <div class="mt-4 d-flex gap-3">
+                    <VBtn prepend-icon="tabler:circle-plus"> Add task </VBtn>
+                    <VBtn prepend-icon="tabler:info-circle" color="secondary">
+                      Info
+                    </VBtn>
+                  </div>
                 </VCardText>
-                <VCardActions>
-                  <VBtn variant="flat" prepend-icon="tabler:circle-plus">
-                    Add task
-                  </VBtn>
-                  <VBtn
-                    variant="flat"
-                    prepend-icon="tabler:info-circle"
-                    color="secondary"
-                  >
-                    Info
-                  </VBtn>
-                </VCardActions>
               </VCard>
             </VCol>
 
@@ -123,19 +103,14 @@ const isDialogVisible = ref(false);
                 <VCardText>
                   Some quick example text to build on the card title and make up
                   the bulk of the card's content.
+
+                  <div class="mt-4 d-flex gap-3">
+                    <VBtn prepend-icon="tabler:circle-plus"> Add task </VBtn>
+                    <VBtn prepend-icon="tabler:info-circle" color="secondary">
+                      Info
+                    </VBtn>
+                  </div>
                 </VCardText>
-                <VCardActions>
-                  <VBtn variant="flat" prepend-icon="tabler:circle-plus">
-                    Add task
-                  </VBtn>
-                  <VBtn
-                    variant="flat"
-                    prepend-icon="tabler:info-circle"
-                    color="secondary"
-                  >
-                    Info
-                  </VBtn>
-                </VCardActions>
               </VCard>
             </VCol>
 
@@ -145,19 +120,14 @@ const isDialogVisible = ref(false);
                 <VCardText>
                   Some quick example text to build on the card title and make up
                   the bulk of the card's content.
+
+                  <div class="mt-4 d-flex gap-3">
+                    <VBtn prepend-icon="tabler:circle-plus"> Add task </VBtn>
+                    <VBtn prepend-icon="tabler:info-circle" color="secondary">
+                      Info
+                    </VBtn>
+                  </div>
                 </VCardText>
-                <VCardActions>
-                  <VBtn variant="flat" prepend-icon="tabler:circle-plus">
-                    Add task
-                  </VBtn>
-                  <VBtn
-                    variant="flat"
-                    prepend-icon="tabler:info-circle"
-                    color="secondary"
-                  >
-                    Info
-                  </VBtn>
-                </VCardActions>
               </VCard>
             </VCol>
           </VRow>

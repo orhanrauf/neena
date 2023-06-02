@@ -147,7 +147,7 @@ export default {
                 id: 5,
                 name: "Node2",
                 data: { script: "(req,res) => {\n console.log(req);\n}" },
-                class: "Node2",
+                class: "node",
                 html: "Node2",
                 typenode: "vue",
                 inputs: {
@@ -164,7 +164,7 @@ export default {
                 id: 6,
                 name: "Node1",
                 data: { url: "localhost/add", method: "post" },
-                class: "Node1",
+                class: "node",
                 html: "Node1",
                 typenode: "vue",
                 inputs: {},
@@ -216,22 +216,22 @@ export default {
       </el-header>
 
       <el-container class="container">
-        <el-aside width="250px" class="column">
-          <ul>
-            <li
-              v-for="n in listNodes"
-              :key="n"
-              draggable="true"
-              :data-node="n.item"
-              @dragstart="drag($event)"
-              class="drag-drawflow"
-            >
-              <div class="node" :style="`background: ${n.color}`">
-                {{ n.name }}
-              </div>
-            </li>
-          </ul>
-        </el-aside>
+        <!--        <el-aside width="250px" class="column">-->
+        <!--          <ul>-->
+        <!--            <li-->
+        <!--              v-for="n in listNodes"-->
+        <!--              :key="n"-->
+        <!--              draggable="true"-->
+        <!--              :data-node="n.item"-->
+        <!--              @dragstart="drag($event)"-->
+        <!--              class="drag-drawflow"-->
+        <!--            >-->
+        <!--              <div class="node" :style="`background: ${n.color}`">-->
+        <!--                {{ n.name }}-->
+        <!--              </div>-->
+        <!--            </li>-->
+        <!--          </ul>-->
+        <!--        </el-aside>-->
         <el-main>
           <div
             id="drawflow"
@@ -264,10 +264,52 @@ export default {
 }
 
 .container {
-  min-block-size: calc(100vh - 100px);
+  min-block-size: calc(100vh - 250px);
+}
+</style>
+<style>
+.el-main {
+  padding: 0;
 }
 
-.column {
+.drawflow .drawflow-node.node {
+  background: #fff;
+  border: 2px solid #4b465c;
+}
+
+.drawflow .drawflow-node.node.selected {
+  background: #f1f1f1;
+}
+
+.drawflow .drawflow-node.node .header {
+  background: rgba(103, 182, 240, 0.4);
+}
+
+.drawflow .drawflow-node.node .input,
+.drawflow .drawflow-node.node .output {
+  background: #d9d9d9;
+  border: 1px solid #4b465c;
+}
+
+#drawflow {
+  background: #494949;
+  background-image: radial-gradient(transparent 1px, #f8f7fa 1px);
+  background-size: 20px 20px;
+  block-size: 100%;
+  inline-size: 100%;
+  text-align: initial;
+}
+
+.drawflow .connection .main-path {
+  stroke-width: 2px !important;
+  stroke: #4b465c !important;
+}
+
+.drawflow .connection .main-path.selected {
+  stroke: #5b4d80 !important;
+}
+
+/*.column {
   border-inline-end: 1px solid #494949;
 }
 
@@ -279,27 +321,6 @@ export default {
 
 .column li {
   background: transparent;
-}
-
-.node {
-  display: block;
-  padding: 10px;
-  border: 2px solid #494949;
-  border-radius: 8px;
-  block-size: 60px;
-  cursor: move;
-  line-height: 40px;
-  margin-block: 10px;
-  margin-inline: 0;
-}
-
-#drawflow {
-  background: #2b2c30;
-  background-image: radial-gradient(#494949 1px, transparent 1px);
-  background-size: 20px 20px;
-  block-size: 100%;
-  inline-size: 100%;
-  text-align: initial;
-}
+}*/
 </style>
 <style src="drawflow/dist/drawflow.min.css"></style>
