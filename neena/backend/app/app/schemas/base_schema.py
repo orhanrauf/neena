@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import json
-from datetime import date, datetime
+from datetime import date
 from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
-
-from app.schema_types import BaseEnum
 
 
 class BaseSchema(BaseModel):
@@ -17,23 +14,6 @@ class BaseSchema(BaseModel):
         for key in ["id", "identifier"]:
             if key in self.dict().keys():
                 to_db[key] = self.dict()[key].hex
-        return to_db
-
-    @property
-    def as_neo_dict(self):
-        to_db = self.json(exclude_defaults=True, exclude_none=True, exclude={"identifier, id"})
-        to_db = json.loads(to_db)
-        self_dict = self.dict()
-        for key in self_dict.keys():
-            if isinstance(self_dict[key], BaseEnum):
-                # Uppercase the Enum values
-                to_db[key] = to_db[key].upper()
-            if isinstance(self_dict[key], datetime):
-                to_db[key] = datetime.fromisoformat(to_db[key])
-            if isinstance(self_dict[key], date):
-                to_db[key] = date.fromisoformat(to_db[key])
-            if key in ["id", "identifier"]:
-                to_db[key] = self_dict[key].hex
         return to_db
 
 

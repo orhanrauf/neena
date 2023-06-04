@@ -31,7 +31,6 @@ class Token(BaseModel):
 class TokenPayload(BaseModel):
     sub: Optional[UUID] = None
     refresh: Optional[bool] = False
-    totp: Optional[bool] = False
 
 
 class MagicTokenPayload(BaseModel):

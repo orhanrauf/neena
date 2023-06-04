@@ -40,7 +40,6 @@ class UserInDBBase(UserBase):
 # Additional properties to return via API
 class User(UserInDBBase):
     hashed_password: bool = Field(default=False, alias="password")
-    totp_secret: bool = Field(default=False, alias="totp")
 
     class Config:
         allow_population_by_field_name = True
@@ -51,15 +50,7 @@ class User(UserInDBBase):
             return True
         return False
 
-    @validator("totp_secret", pre=True)
-    def evaluate_totp_secret(cls, totp_secret):
-        if totp_secret:
-            return True
-        return False
-
 
 # Additional properties stored in DB
 class UserInDB(UserInDBBase):
     hashed_password: Optional[str] = None
-    totp_secret: Optional[str] = None
-    totp_counter: Optional[int] = None
