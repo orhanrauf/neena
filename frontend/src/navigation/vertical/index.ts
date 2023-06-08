@@ -13,6 +13,11 @@ export default [
   },
   {
     title: "Task",
+    to: { name: "task" },
+    icon: { icon: "tabler:file-description" },
+  },
+  {
+    title: "Tasks",
     to: { name: "tasks" },
     icon: { icon: "tabler:file-description" },
   },
