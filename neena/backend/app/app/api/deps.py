@@ -35,8 +35,8 @@ def get_token_payload(token: str) -> schemas.TokenPayload:
 
 def get_current_user(db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)) -> models.User:
     token_data = get_token_payload(token)
-    if token_data.refresh or token_data.totp:
-        # Refresh token is not a valid access token and TOTP True can only be used to validate TOTP
+    if token_data.refresh:
+        # Refresh token is not a valid access token 
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
@@ -45,32 +45,6 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(reusabl
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
-
-
-def get_totp_user(db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)) -> models.User:
-    token_data = get_token_payload(token)
-    if token_data.refresh or not token_data.totp:
-        # Refresh token is not a valid access token and TOTP False cannot be used to validate TOTP
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials",
-        )
-    user = crud.user.get(db, id=token_data.sub)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
-
-
-def get_magic_token(token: str = Depends(reusable_oauth2)) -> schemas.MagicTokenPayload:
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGO])
-        token_data = schemas.MagicTokenPayload(**payload)
-    except (jwt.JWTError, ValidationError):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials",
-        )
-    return token_data
 
 
 def get_refresh_user(db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)) -> models.User:

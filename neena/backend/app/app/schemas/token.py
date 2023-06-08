@@ -33,10 +33,5 @@ class TokenPayload(BaseModel):
     refresh: Optional[bool] = False
 
 
-class MagicTokenPayload(BaseModel):
-    sub: Optional[UUID] = None
-    fingerprint: Optional[UUID] = None
-
-
 class WebToken(BaseModel):
     claim: str

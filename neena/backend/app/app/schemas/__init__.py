@@ -2,7 +2,6 @@ from .base_schema import BaseSchema, MetadataBaseCreate, MetadataBaseInDBBase, M
 from .emails import EmailValidation
 from .msg import Msg
 from .token import (
-    MagicTokenPayload,
     RefreshToken,
     RefreshTokenCreate,
     RefreshTokenUpdate,
