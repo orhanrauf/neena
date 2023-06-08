@@ -21,4 +21,9 @@ export default [
     to: { name: "tasks" },
     icon: { icon: "tabler:file-description" },
   },
+  {
+    title: "Task names",
+    to: { name: "tasknames-create" },
+    icon: { icon: "tabler:file-description" },
+  },
 ] as VerticalNavItems;
