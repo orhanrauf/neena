@@ -112,8 +112,14 @@
                     >
                   </VCol>
 
-                  <VCol cols="12" md="9">
-                    <VCheckbox />
+                  <VCol class="d-flex justify-end" cols="12" md="9">
+                    <VSwitch
+                      :label="null"
+                      color="primary"
+                      hide-details
+                      :inset="false"
+                      :model-value="true"
+                    />
                   </VCol>
                 </VRow>
               </VCol>
