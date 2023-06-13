@@ -1,18 +1,20 @@
-from typing import Any, List
+from typing import Any, Dict, List
 
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from pydantic.networks import EmailStr
 from sqlalchemy.orm import Session
 
+
 from app import crud, models, schemas
 from app.api import deps
+from app.core import security
 from app.core.config import settings
+
 
 router = APIRouter()
 
-
-@router.post("/", response_model=schemas.User)
+@router.post("/", response_model=schemas.FlowRequestCreate)
 def create_user_profile(
     *,
     db: Session = Depends(deps.get_db),
@@ -23,7 +25,7 @@ def create_user_profile(
     """
     Create new user without the need to be logged in.
     """
-    user = crud.user.get_by_email(db, email=email)
+    user = crud.flo
     if user:
         raise HTTPException(
             status_code=400,

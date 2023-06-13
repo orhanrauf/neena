@@ -36,6 +36,7 @@ services:
       - "5555:5555"
 
   backend:
+    stdin_open: true
     ports:
       - "8888:8888"
     volumes:

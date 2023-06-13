@@ -1,5 +1,6 @@
 from .crud_token import token
 from .crud_user import user
+from .crud_flow_request import flow_request
 
 # For a new basic set of CRUD operations you could just do
 

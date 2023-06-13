@@ -3,39 +3,33 @@ from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field, constr, validator
 
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
-
-
 # Shared properties
 class UserBase(BaseModel):
-    email: Optional[EmailStr] = None
-    email_validated: Optional[bool] = False
+    email: EmailStr
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
-    full_name: Optional[str] = None
+    full_name: str
 
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):
     email: EmailStr
-    password: Optional[constr(min_length=8, max_length=64)] = None
+    password: constr(min_length=8, max_length=64)
 
 
 # Properties to receive via API on update
 class UserUpdate(UserBase):
-    original: Optional[constr(min_length=8, max_length=64)] = None
-    password: Optional[constr(min_length=8, max_length=64)] = None
+    original: constr(min_length=8, max_length=64) = None
+    password: constr(min_length=8, max_length=64) = None
 
 
 class UserInDBBase(UserBase):
-    id: Optional[UUID] = None
+    id: UUID
+    created_by_email: EmailStr
+    modified_by_email: EmailStr
 
     class Config:
         orm_mode = True
-
 
 # Additional properties to return via API
 class User(UserInDBBase):

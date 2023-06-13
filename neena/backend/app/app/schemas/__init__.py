@@ -1,6 +1,7 @@
 from .base_schema import BaseSchema, MetadataBaseCreate, MetadataBaseInDBBase, MetadataBaseSchema, MetadataBaseUpdate
 from .emails import EmailValidation
 from .msg import Msg
+from .flow_request import FlowRequest, FlowRequestCreate, FlowRequestInDB, FlowRequestUpdate 
 from .token import (
     RefreshToken,
     RefreshTokenCreate,
@@ -9,4 +10,4 @@ from .token import (
     TokenPayload,
     WebToken,
 )
-from .user import User, UserCreate, UserInDB, UserLogin, UserUpdate
+from .user import User, UserCreate, UserInDB, UserUpdate
