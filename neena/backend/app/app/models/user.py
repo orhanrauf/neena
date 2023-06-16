@@ -14,6 +14,7 @@ from app.db.base_class import Base
 if TYPE_CHECKING:
     from . import Token  # noqa: F401
     from . import FlowRequest # noqa: F401
+    from . import TaskDefinition
 
 class User(Base):
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
@@ -27,5 +28,8 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(default=True)
     is_superuser: Mapped[bool] = mapped_column(default=False)
     refresh_tokens: Mapped[list["Token"]] = relationship(back_populates="authenticates", lazy="dynamic")
+    
     created_flow_requests: Mapped[list["FlowRequest"]] = relationship(back_populates="created_by", lazy="dynamic", foreign_keys='FlowRequest.created_by_email')
     modified_flow_requests: Mapped[list["FlowRequest"]] = relationship(back_populates="modified_by", lazy="dynamic", foreign_keys='FlowRequest.modified_by_email')
+    created_task_definitions: Mapped[list["TaskDefinition"]] = relationship(back_populates="created_by", lazy="dynamic", foreign_keys='TaskDefinition.created_by_email')
+    modified_task_definitions: Mapped[list["TaskDefinition"]] = relationship(back_populates="modified_by", lazy="dynamic", foreign_keys='TaskDefinition.modified_by_email')

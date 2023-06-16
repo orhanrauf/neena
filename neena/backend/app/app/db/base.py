@@ -4,3 +4,4 @@ from app.db.base_class import Base  # noqa
 from app.models.token import Token  # noqa
 from app.models.user import User  # noqa
 from app.models.flow_request import FlowRequest #noqa
+from app.models.task_definition import TaskDefinition

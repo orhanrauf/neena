@@ -25,8 +25,6 @@ class CRUDToken(CRUDBase[Token, RefreshTokenCreate, RefreshTokenUpdate]):
             raise ValueError("Token mismatch between key and user.")
         db_obj = Token(token=obj_in)
         db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
         user_obj.refresh_tokens.append(db_obj)
         db.commit()
         db.refresh(db_obj)

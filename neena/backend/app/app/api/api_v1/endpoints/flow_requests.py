@@ -1,8 +1,6 @@
 from typing import Any, List
 
-from fastapi import APIRouter, Body, Depends, HTTPException
-from fastapi.encoders import jsonable_encoder
-from pydantic.networks import EmailStr
+from fastapi import APIRouter, Body, Depends
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
@@ -12,125 +10,66 @@ from app.core.config import settings
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.FlowRequestCreate)
-def create_user_profile(
+@router.post("/", response_model=schemas.FlowRequest)
+def create_flow_request(
     *,
     db: Session = Depends(deps.get_db),
     request_metadata: dict = Body(...),
     request_instructions: str = Body(...),
     request_body: str = Body(None),
+    current_user: models.User = Depends(deps.get_current_user),
 ) -> Any:
     """
     Create flow request.
     """
 
-    # Create user auth
     flow_request_in = schemas.FlowRequestCreate(request_metadata=request_metadata, 
-                                                             request_instructions=request_instructions, 
-                                                             request_body=request_body)
-    flow_request = crud.flow_request.create(db, obj_in=flow_request_in)
+                                                request_instructions=request_instructions, 
+                                                request_body=request_body)
+    
+    flow_request = crud.flow_request.create(db, obj_in=flow_request_in, current_user=current_user)
+    
     return flow_request
 
-
-# @router.put("/", response_model=schemas.User)
-# def update_user(
-#     *,
-#     db: Session = Depends(deps.get_db),
-#     obj_in: schemas.UserUpdate,
-#     current_user: models.User = Depends(deps.get_current_active_user),
-# ) -> Any:
-#     """
-#     Update user.
-#     """
-#     if current_user.hashed_password:
-#         user = crud.user.authenticate(db, email=current_user.email, password=obj_in.original)
-#         if not obj_in.original or not user:
-#             raise HTTPException(status_code=400, detail="Unable to authenticate this update.")
-#     current_user_data = jsonable_encoder(current_user)
-#     user_in = schemas.UserUpdate(**current_user_data)
-#     if obj_in.password is not None:
-#         user_in.password = obj_in.password
-#     if obj_in.full_name is not None:
-#         user_in.full_name = obj_in.full_name
-#     if obj_in.email is not None:
-#         check_user = crud.user.get_by_email(db, email=obj_in.email)
-#         if check_user and check_user.email != current_user.email:
-#             raise HTTPException(
-#                 status_code=400,
-#                 detail="This username is not available.",
-#             )
-#         user_in.email = obj_in.email
-#     user = crud.user.update(db, db_obj=current_user, obj_in=user_in)
-#     return user
-
-
-# @router.get("/", response_model=schemas.User)
-# def read_user(
-#     *,
-#     current_user: models.User = Depends(deps.get_current_active_user),
-# ) -> Any:
-#     """
-#     Get current user.
-#     """
-#     return current_user
-
-
-# @router.get("/all", response_model=List[schemas.User])
-# def read_all_users(
-#     *,
-#     db: Session = Depends(deps.get_db),
-#     skip: int = 0,
-#     limit: int = 100,
-#     current_user: models.User = Depends(deps.get_current_active_superuser),
-# ) -> Any:
-#     """
-#     Retrieve all current users.
-#     """
-#     return crud.user.get_multi(db=db, skip=skip, limit=limit)
-
-
-# @router.post("/toggle-state", response_model=schemas.Msg)
-# def toggle_state(
-#     *,
-#     db: Session = Depends(deps.get_db),
-#     user_in: schemas.UserUpdate,
-#     current_user: models.User = Depends(deps.get_current_active_superuser),
-# ) -> Any:
-#     """
-#     Toggle user state (moderator function)
-#     """
-#     response = crud.user.toggle_user_state(db=db, obj_in=user_in)
-#     if not response:
-#         raise HTTPException(
-#             status_code=400,
-#             detail="Invalid request.",
-#         )
-#     return {"msg": "User state toggled successfully."}
-
-
-# @router.post("/create", response_model=schemas.User)
-# def create_user(
-#     *,
-#     db: Session = Depends(deps.get_db),
-#     user_in: schemas.UserCreate,
-#     current_user: models.User = Depends(deps.get_current_active_superuser),
-# ) -> Any:
-#     """
-#     Create new user (moderator function).
-#     """
-#     user = crud.user.get_by_email(db, email=user_in.email)
-#     if user:
-#         raise HTTPException(
-#             status_code=400,
-#             detail="The user with this username already exists in the system.",
-#         )
-#     user = crud.user.create(db, obj_in=user_in)
-#     return user
-
-
-@router.get("/tester", response_model=schemas.Msg)
-def test_endpoint() -> Any:
+@router.get("/all", response_model=List[schemas.FlowRequest])
+def read_all_flow_requests(
+    *,
+    db: Session = Depends(deps.get_db),
+    skip: int = 0,
+    limit: int = 100,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
     """
-    Test current endpoint.
+    Retrieve all flow requests.
     """
-    return {"msg": "Message returned ok."}
+    
+    response = crud.flow_request.get_multi(db=db, skip=skip, limit=limit)
+    print(response)
+    return response
+
+
+@router.get("/", response_model=schemas.FlowRequest)
+def read_flow_request(
+    *,
+    db: Session = Depends(deps.get_db),
+    id: str,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Get flow request by id.
+    """
+    
+    return crud.flow_request.get(db, id)
+
+@router.delete("/", response_model=schemas.FlowRequest)
+def remove_flow_request(
+    *,
+    db: Session = Depends(deps.get_db),
+    id: str,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Delete flow request by id.
+    """
+    
+    return crud.flow_request.remove(db=db, id=id)

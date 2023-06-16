@@ -2,6 +2,7 @@ from .base_schema import BaseSchema, MetadataBaseCreate, MetadataBaseInDBBase, M
 from .emails import EmailValidation
 from .msg import Msg
 from .flow_request import FlowRequest, FlowRequestCreate, FlowRequestInDB, FlowRequestUpdate 
+from .task_definition import TaskParameter, TaskDefinition, TaskDefinitionCreate, TaskDefinitionInDB, TaskDefinitionUpdate
 from .token import (
     RefreshToken,
     RefreshTokenCreate,
