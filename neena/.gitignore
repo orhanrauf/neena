@@ -2,6 +2,6 @@
 .mypy_cache
 docker-stack.yml
 *.txt
-.env
+# .env
 *.code-workspace
 .s3cfg
