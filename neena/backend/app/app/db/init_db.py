@@ -176,12 +176,14 @@ def init_db_task_definitions(db: Session) -> None:
     task_definition = crud.task_definition.create(db, obj_in=task_definition_in)  # noqa: F841
 
 
+
 def init_db_flow_request(db: Session) -> list[UUID]:
     flow_request_in = schemas.FlowRequestCreate(
         request_metadata={
             "city": "New York",
             "email": "johndoe@mail.com"
         },
+        request_body="I would like to see if I am eligible for the discount given to customers in the Netherlands."
         
     )
 
