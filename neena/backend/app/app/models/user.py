@@ -15,6 +15,8 @@ if TYPE_CHECKING:
     from . import Token  # noqa: F401
     from . import FlowRequest # noqa: F401
     from . import TaskDefinition
+    from . import Flow
+    from . import TaskOperation
 
 class User(Base):
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
@@ -33,3 +35,8 @@ class User(Base):
     modified_flow_requests: Mapped[list["FlowRequest"]] = relationship(back_populates="modified_by", lazy="dynamic", foreign_keys='FlowRequest.modified_by_email')
     created_task_definitions: Mapped[list["TaskDefinition"]] = relationship(back_populates="created_by", lazy="dynamic", foreign_keys='TaskDefinition.created_by_email')
     modified_task_definitions: Mapped[list["TaskDefinition"]] = relationship(back_populates="modified_by", lazy="dynamic", foreign_keys='TaskDefinition.modified_by_email')
+    created_flows: Mapped[list["Flow"]] = relationship(back_populates="created_by", lazy="dynamic", foreign_keys='Flow.created_by_email')
+    modified_flows: Mapped[list["Flow"]] = relationship(back_populates="modified_by", lazy="dynamic", foreign_keys='Flow.modified_by_email')
+    created_task_operations: Mapped[list["TaskOperation"]] = relationship(back_populates="created_by", lazy="dynamic", foreign_keys='TaskOperation.created_by_email')
+    modified_task_operations: Mapped[list["TaskOperation"]] = relationship(back_populates="modified_by", lazy="dynamic", foreign_keys='TaskOperation.modified_by_email')
+    

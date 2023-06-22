@@ -30,7 +30,7 @@ class TaskDefinitionUpdate(TaskDefinitionBase):
 
 
 class TaskDefinitionInDBBase(TaskDefinitionBase):
-    id: Optional[UUID] = None
+    id: UUID
     created_date: datetime
     modified_date: datetime
     created_by_email: EmailStr

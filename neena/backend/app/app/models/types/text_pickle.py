@@ -2,11 +2,9 @@ import json
 import sqlalchemy
 from sqlalchemy.types import TypeDecorator
 
-SIZE = 4096
-
 class TextPickleType(TypeDecorator):
 
-    impl = sqlalchemy.Text(SIZE)
+    impl = sqlalchemy.Text()
 
     def process_bind_param(self, value, dialect):
         if value is not None:
