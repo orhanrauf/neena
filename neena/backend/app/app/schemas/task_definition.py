@@ -11,7 +11,7 @@ class TaskParameter(BaseModel):
 
 # Shared properties
 class TaskDefinitionBase(BaseModel):
-    task_name: constr(min_length=6, max_length=32)
+    task_name: constr(min_length=6, max_length=64)
     parameters: list[TaskParameter]
     output_type: str
     output_name: str
@@ -27,7 +27,6 @@ class TaskDefinitionCreate(TaskDefinitionBase):
 # Properties to receive via API on update
 class TaskDefinitionUpdate(TaskDefinitionBase):
     pass
-
 
 class TaskDefinitionInDBBase(TaskDefinitionBase):
     id: UUID

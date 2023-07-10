@@ -4,13 +4,14 @@ from sqlalchemy.orm import Session
 from app import crud, schemas
 from app.core.config import settings
 from app.db import base  # noqa: F401
+from app.models.user import User
 
 # make sure all SQL Alchemy models are imported (app.db.base) before initializing DB
 # otherwise, SQL Alchemy might fail to initialize relationships properly
 # for more details: https://github.com/tiangolo/full-stack-fastapi-postgresql/issues/28
 
 
-def init_db_task_definitions(db: Session) -> None:
+def init_db_task_definitions(db: Session, user: User) -> None:
   
     task_definition_in = schemas.TaskDefinitionCreate(
         task_name="look_up_acc_number_by_email",
@@ -26,7 +27,7 @@ def init_db_task_definitions(db: Session) -> None:
         description="Looks up account number in the customer database by email.",
         python_code="@neena.task()\ndef look_up_acc_number_by_email(acc_number: str) -> str:\n    return db.select(f'SELECT * FROM dbo.Customers WHERE email={acc_number}')"
     )
-    task_definition = crud.task_definition.create(db, obj_in=task_definition_in)  # noqa: F841
+    task_definition = crud.task_definition.create(db, obj_in=task_definition_in, current_user=user)  # noqa: F841
 
     task_definition_in = schemas.TaskDefinitionCreate(
         task_name="look_up_customer_detail_by_acc_number",
@@ -47,7 +48,7 @@ def init_db_task_definitions(db: Session) -> None:
         description="Looks up a specific detail of a customer by account number.",
         python_code="@neena.task()\ndef look_up_customer_detail_by_acc_number(detail_name: str, acc_number: str) -> str:\n    return customer_db.get_customer_detail(detail_name, acc_number)"
     )
-    task_definition = crud.task_definition.create(db, obj_in=task_definition_in)  # noqa: F841
+    task_definition = crud.task_definition.create(db, obj_in=task_definition_in, current_user=user) # noqa: F841
 
     task_definition_in = schemas.TaskDefinitionCreate(
         task_name="update_customer_address",
@@ -68,7 +69,7 @@ def init_db_task_definitions(db: Session) -> None:
         description="Updates the address of a customer with the specified customer ID to the new address.",
         python_code="@neena.task()\ndef update_customer_address(customer_id: int, new_address: str) -> bool:\n    # Logic to update customer address\n    return success"
     )
-    task_definition = crud.task_definition.create(db, obj_in=task_definition_in)  # noqa: F841
+    task_definition = crud.task_definition.create(db, obj_in=task_definition_in, current_user=user) # noqa: F841
 
 
     task_definition_in = schemas.TaskDefinitionCreate(
@@ -90,7 +91,7 @@ def init_db_task_definitions(db: Session) -> None:
         description="Processes a return request for the specified order ID with the given reason.",
         python_code="@neena.task()\ndef process_return_request(order_id: str, reason: str) -> bool:\n    # Logic to process return request\n    return success"
     )
-    task_definition = crud.task_definition.create(db, obj_in=task_definition_in)  # noqa: F841
+    task_definition = crud.task_definition.create(db, obj_in=task_definition_in, current_user=user) # noqa: F841
 
 
     task_definition_in = schemas.TaskDefinitionCreate(
@@ -112,7 +113,7 @@ def init_db_task_definitions(db: Session) -> None:
         description="Escalates a support ticket with the specified ticket ID and provides the reason for escalation.",
         python_code="@neena.task()\ndef escalate_support_ticket(ticket_id: str, escalation_reason: str) -> bool:\n    # Logic to escalate support ticket\n    return success"
     )
-    task_definition = crud.task_definition.create(db, obj_in=task_definition_in)  # noqa: F841
+    task_definition = crud.task_definition.create(db, obj_in=task_definition_in, current_user=user) # noqa: F841
 
 
     task_definition_in = schemas.TaskDefinitionCreate(
@@ -134,7 +135,7 @@ def init_db_task_definitions(db: Session) -> None:
         description="Sends a notification SMS to the specified phone number with the given message.",
         python_code="@neena.task()\ndef send_notification_sms(phone_number: str, message: str) -> bool:\n    # Logic to send notification SMS\n    return success"
     )
-    task_definition = crud.task_definition.create(db, obj_in=task_definition_in)  # noqa: F841
+    task_definition = crud.task_definition.create(db, obj_in=task_definition_in, current_user=user) # noqa: F841
 
 
     task_definition_in = schemas.TaskDefinitionCreate(
@@ -156,7 +157,7 @@ def init_db_task_definitions(db: Session) -> None:
         description="Updates the profile of the user with the specified user ID using the provided profile data.",
         python_code="@neena.task()\ndef update_profile(user_id: int, profile_data: dict) -> bool:\n    # Logic to update user profile\n    return success"
     )
-    task_definition = crud.task_definition.create(db, obj_in=task_definition_in)  # noqa: F841
+    task_definition = crud.task_definition.create(db, obj_in=task_definition_in, current_user=user) # noqa: F841
 
 
     task_definition_in = schemas.TaskDefinitionCreate(
@@ -173,7 +174,7 @@ def init_db_task_definitions(db: Session) -> None:
         description="Calculates the total cost based on the provided items.",
         python_code="@neena.task()\ndef calculate_total(items: list) -> float:\n    # Logic to calculate total\n    return total"
     )
-    task_definition = crud.task_definition.create(db, obj_in=task_definition_in)  # noqa: F841
+    task_definition = crud.task_definition.create(db, obj_in=task_definition_in, current_user=user) # noqa: F841
 
 
 
@@ -193,7 +194,7 @@ def init_db(db: Session) -> None:
     # the tables un-commenting the next line
     # Base.metadata.create_all(bind=engine)
     
-    init_db_task_definitions(db)
+    
 
     user = crud.user.get_by_email(db, email=settings.FIRST_SUPERUSER)
     if not user:
@@ -204,3 +205,5 @@ def init_db(db: Session) -> None:
             is_superuser=True,
         )
         user = crud.user.create(db, obj_in=user_in)  # noqa: F841
+    
+    init_db_task_definitions(db, user)
