@@ -25,8 +25,6 @@ class UserUpdate(UserBase):
 
 class UserInDBBase(UserBase):
     id: UUID
-    created_by_email: EmailStr
-    modified_by_email: EmailStr
 
     class Config:
         orm_mode = True
