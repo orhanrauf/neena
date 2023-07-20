@@ -1,7 +1,17 @@
 <script setup lang="ts">
-import { useTheme } from "vuetify";
+const props = defineProps<{
+  modelValue: object;
+}>();
+const emit = defineEmits(["update:modelValue"]);
 
-const vuetifyTheme = useTheme();
+const value = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(value) {
+    emit("update:modelValue", value);
+  },
+});
 </script>
 
 <template>
@@ -12,27 +22,53 @@ const vuetifyTheme = useTheme();
     <VCardText>
       <VRow>
         <VCol cols="12" md="6">
-          <AppTextField label="Parameter name" placeholder="city" />
+          <AppTextField
+            name="paramater name 1"
+            label="Parameter name"
+            v-model="value[0].name"
+            required
+          />
         </VCol>
 
         <VCol cols="12" md="6">
-          <AppTextField label="Parameter value" placeholder="New York" />
+          <AppTextField
+            name="paramater value 1"
+            label="Parameter value"
+            v-model="value[0].value"
+            required
+          />
         </VCol>
 
         <VCol cols="12" md="6">
-          <AppTextField placeholder="email" />
+          <AppTextField
+            name="paramater name 2"
+            v-model="value[1].name"
+            required
+          />
         </VCol>
 
         <VCol cols="12" md="6">
-          <AppTextField placeholder="johndoe@gmail.com" />
+          <AppTextField
+            name="paramater value 2"
+            v-model="value[1].value"
+            required
+          />
         </VCol>
 
         <VCol cols="12" md="6">
-          <AppTextField />
+          <AppTextField
+            name="paramater name 3"
+            v-model="value[2].name"
+            required
+          />
         </VCol>
 
         <VCol cols="12" md="6">
-          <AppTextField />
+          <AppTextField
+            name="paramater value 3"
+            v-model="value[2].value"
+            required
+          />
         </VCol>
       </VRow>
     </VCardText>
