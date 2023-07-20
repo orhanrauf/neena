@@ -3,7 +3,10 @@
 <template>
   <VCard title="View Task">
     <VCardText>
-      <p>Task definition (Python)</p>
+      <div>
+        <VLabel for="python" class="mb-1" text="Task definition (Python)" />
+        <VTextarea id="python" rows="6" />
+      </div>
     </VCardText>
   </VCard>
 </template>
