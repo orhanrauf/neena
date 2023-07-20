@@ -8,7 +8,7 @@ from pydantic.datetime_parse import date
 
 # Shared properties
 class FlowRequestBase(BaseModel):
-    request_metadata: dict = None
+    request_metadata: list[dict] = []
     request_instructions : constr(max_length=512) = None
     request_body: constr(min_length=8, max_length=512)
 # Properties to receive via API on creation

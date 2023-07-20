@@ -26,7 +26,7 @@ class FlowRequest(Base):
     modified_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), server_onupdate=func.now(), nullable=False
     )
-    request_metadata: Mapped[Optional[dict]] = mapped_column(TextPickleType)
+    request_metadata: Mapped[Optional[list[dict]]] = mapped_column(TextPickleType)
     request_instructions: Mapped[str]
     request_body: Mapped[str]
     
