@@ -3,6 +3,7 @@ import { VForm } from "vuetify/components/VForm";
 import { requiredValidator } from "@validators";
 import { computed } from "vue";
 import axios from "@axios";
+import PythonCode from "@/components/PythonCode.vue";
 
 const refVForm = ref<VForm>();
 const showError = ref(false);
@@ -32,7 +33,7 @@ const getInitialForm = () => ({
   output: "bool : verified",
   description:
     "This is a long description of this task. In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available.",
-  python: "",
+  python: `import math\nimport random\n\ndef generate_multiplication_table(n):\n    for i in range(1, n+1):\n        for j in range(1, n+1):\n            result = i * j\n            print(f"{i} x {j} = {result}")\n\ndef calculate_circle_area(radius):\n    area = math.pi * radius**2\n    return area\n\ndef roll_dice():\n    return random.randint(1, 6)\n\nif __name__ == "__main__":\n    try:\n        num = int(input("Enter a number to generate its multiplication table: "))\n        generate_multiplication_table(num)\n\n        radius = float(input("Enter the radius of a circle to calculate its area: "))\n        area = calculate_circle_area(radius)\n        print(f"The area of the circle with radius {radius} is: {area:.2f}")\n\n        roll_result = roll_dice()\n        print(f"The dice rolled and got: {roll_result}")\n    except ValueError:\n        print("Invalid input. Please enter a valid integer or float.")`,
 });
 
 const form = reactive(getInitialForm());
@@ -157,22 +158,16 @@ const createTaskDefinition = () => {
                 class="mb-1"
                 text="Task definition (Python)"
               />
-              <VTextarea
-                v-model="form.python"
-                id="python"
-                rows="6"
-                :rules="[requiredValidator]"
-                :error-messages="errors.body"
-              />
+              <PythonCode :code="form.python" />
             </div>
           </VCardText>
         </VCard>
       </VCol>
 
       <!-- Buttons -->
-      <VCol cols="12" md="12" class="d-flex gap-4 justify-end">
-        <VBtn type="submit" color="primary"> Create</VBtn>
-      </VCol>
+      <!--      <VCol cols="12" md="12" class="d-flex gap-4 justify-end">-->
+      <!--        <VBtn type="submit" color="primary"> Create</VBtn>-->
+      <!--      </VCol>-->
     </VRow>
   </VForm>
 </template>
