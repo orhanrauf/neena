@@ -11,9 +11,9 @@ class FlowRequestBase(BaseModel):
     request_metadata: list[dict] = []
     request_instructions : constr(max_length=512) = None
     request_body: constr(min_length=8, max_length=512)
+
 # Properties to receive via API on creation
 class FlowRequestCreate(FlowRequestBase):
-    # created_by_email: EmailStr
     pass
 
 # Properties to receive via API on update

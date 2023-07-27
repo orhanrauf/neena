@@ -20,6 +20,7 @@ class TaskParameter:
     name: str
     data_type: str
     position: int
+    nullable: bool
 
 class TaskDefinition(Base):
     
@@ -27,7 +28,7 @@ class TaskDefinition(Base):
     
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
     task_name: Mapped[str] = mapped_column(String)
-    parameters: Mapped[Optional[list]] = mapped_column(TextPickleType)
+    parameters: Mapped[list[TaskParameter]] = mapped_column(TextPickleType)
     output_type: Mapped[str] = mapped_column(String)
     output_name: Mapped[str] = mapped_column(String)
     description: Mapped[str] = mapped_column(String)

@@ -36,9 +36,5 @@ class FlowRequest(Base):
 
     flow = relationship("Flow", back_populates="created_for")
     
-    # created_for: Mapped["Flow"] = relationship(back_populates="created_for", foreign_keys='FlowRequest.flow', 
-    #                                            cascade="all, delete-orphan", single_parent=True)
-    
     created_by: Mapped["User"]  = relationship(back_populates="created_flow_requests", foreign_keys='FlowRequest.created_by_email')
     modified_by: Mapped["User"]  = relationship(back_populates="modified_flow_requests", foreign_keys='FlowRequest.modified_by_email')
-    

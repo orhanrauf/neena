@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from .flow import Flow
     from .task_definition import TaskDefinition
 
-class TaskOperationParameterValue:
+class Argument:
     name: str
     data_type: str
     value: str
@@ -33,7 +33,7 @@ class TaskOperation(Base):
     name: Mapped[str] = mapped_column(String)
     flow: Mapped[UUID] = mapped_column(UUID, ForeignKey("flow.id"), nullable=False)
     task_definition: Mapped[UUID] = mapped_column(UUID, ForeignKey("task_definition.id"), nullable=False)
-    arguments: Mapped[Optional[list]] = mapped_column(TextPickleType)
+    arguments: Mapped[list[Argument]] = mapped_column(TextPickleType)
     explanation: Mapped[Optional[str]] = mapped_column(String)
     
     x: Mapped[float] = mapped_column(Float)
