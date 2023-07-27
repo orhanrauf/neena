@@ -6,32 +6,26 @@ import { VForm } from "vuetify/components/VForm";
 const refVForm = ref<VForm>();
 const showError = ref(false);
 
-const errors = ref({
+const errors = reactive({
   body: undefined,
   instructions: undefined,
   metadata: [
-    { name: undefined, value: undefined },
     { name: undefined, value: undefined },
     { name: undefined, value: undefined },
   ],
 });
 
 const getInitialForm = () => ({
-  body: "I would like to make use of the discount that is given for customers under the age of 30.",
-  instructions:
-    "It's important that the customer is first verified with us. Check if their email is actually in the system. Do not give any details without verifying that the email is coupled to an account in our database.",
+  body: "",
+  instructions: "",
   metadata: [
     {
-      name: "city",
-      value: "New York",
+      name: "",
+      value: "",
     },
     {
-      name: "email",
-      value: "johdoe@gmail.com",
-    },
-    {
-      name: "test",
-      value: "test",
+      name: "",
+      value: "",
     },
   ],
 });
@@ -62,6 +56,13 @@ const createFlow = () => {
       console.error(error);
     });
 };
+
+const handleInput = (index, event) => {
+  if (index === form.metadata.length - 1 && event.target.value) {
+    errors.metadata.push({ name: undefined, value: undefined });
+    form.metadata.push({ name: "", value: "" });
+  }
+};
 </script>
 
 <template>
@@ -80,6 +81,7 @@ const createFlow = () => {
               name="body"
               rows="10"
               required
+              placeholder="I would like to make use of the discount that is given for customers under the age of 30."
               :rules="[requiredValidator]"
               :error-messages="errors.body"
             />
@@ -96,6 +98,7 @@ const createFlow = () => {
               name="instructions"
               rows="10"
               required
+              placeholder="It's important that the customer is first verified with us. Check if their email is actually in the system. Do not give any details without verifying that the email is coupled to an account in our database."
               :rules="[requiredValidator]"
               :error-messages="errors.instructions"
             />
@@ -114,19 +117,22 @@ const createFlow = () => {
               <template v-for="(meta, index) in form.metadata" :key="index">
                 <VCol cols="12" md="6">
                   <AppTextField
+                    v-model="form.metadata[index].name"
                     :name="`parameter name ${index + 1}`"
                     :label="index === 0 ? 'Parameter name' : ''"
-                    v-model="form.metadata[index].name"
+                    :placeholder="index === 0 ? 'city' : ''"
                     :rules="[requiredValidator]"
                     :error-messages="errors.metadata[index].name"
+                    @input="handleInput(index, $event)"
                   />
                 </VCol>
 
                 <VCol cols="12" md="6">
                   <AppTextField
+                    v-model="form.metadata[index].value"
                     :name="`parameter value ${index + 1}`"
                     :label="index === 0 ? 'Parameter value' : ''"
-                    v-model="form.metadata[index].value"
+                    :placeholder="index === 0 ? 'New York' : ''"
                     :rules="[requiredValidator]"
                     :error-messages="errors.metadata[index].value"
                   />
