@@ -18,9 +18,9 @@ const itemsPerPage = [5, 10, 25, 50, 100];
 
 // Headers
 const headers = [
-  { title: "NAME", key: "task_name" },
-  { title: "PARAMETERS", key: "parameters_formatted" },
-  { title: "CREATED DATE", key: "created_date_formatted" },
+  { title: "NAME", key: "name" },
+  { title: "PARAMETERS", key: "parameters" },
+  { title: "CREATED DATE", key: "created_date" },
   { title: "TAGS", key: "tags" },
   { title: "", key: "actions", sortable: false },
 ];
@@ -30,14 +30,38 @@ let items = ref([]);
 
 const taskDefinitions = computed(() => {
   return items.value.map((item) => ({
-    ...item,
-    parameters_formatted: item.parameters
-      .map((param) => `${param.data_type}: ${param.name}`)
+    name: item.task_name,
+    parameters: item.parameters
+      .map(
+        (param) =>
+          `<span class="${dataTypeClass(param.data_type)}">${
+            param.data_type
+          }</span>: ${param.name}`
+      )
       .join(", "),
-    created_date_formatted: dayjs(item.created_date).format("D MMM YYYY"),
+    created_date: dayjs(item.created_date).format("D MMM YYYY"),
+    tags: "-",
   }));
 });
 
+const tags = computed(() => {
+  return [];
+});
+
+const dataTypeClass = (type: "str" | "int" | "list" | "object" | "bool") => {
+  switch (type) {
+    case "str":
+      return "text-green";
+    case "int":
+      return "text-blue";
+    case "list":
+    case "object":
+    case "bool":
+      return "text-purple";
+  }
+};
+
+// Get the tasks from the API
 const getTasks = () => {
   loading.value = true;
 
@@ -45,7 +69,7 @@ const getTasks = () => {
     .get("/v1/task_definitions/all", {
       params: {
         skip: 0,
-        limit: 10,
+        limit: 200,
       },
     })
     .then((response) => {
@@ -76,7 +100,7 @@ onMounted(() => getTasks());
         </VCol>
 
         <VCol cols="12" offset-md="4" md="2">
-          <VSelect label="Select tags" />
+          <VSelect :items="tags" multiple label="Select tags" />
         </VCol>
         <VCol cols="12" md="2">
           <VSelect :items="itemsPerPage" v-model="options.itemsPerPage" />
@@ -120,13 +144,18 @@ onMounted(() => getTasks());
       <template #bottom>
         <VCardText class="pt-4">
           <VRow>
-            <VCol lg="2" cols="3">
-              <p style="font-size: 14px">
-                Showing 1 to 10 of {{ items.length }} entries
+            <VCol lg="3">
+              <p style="font-size: 14px; margin-top: 10px; margin-bottom: 0">
+                Showing
+                {{
+                  options.page * options.itemsPerPage - options.itemsPerPage + 1
+                }}
+                to {{ options.page * options.itemsPerPage }} of
+                {{ items.length }} entries
               </p>
             </VCol>
 
-            <VCol lg="10" cols="9" class="d-flex justify-end">
+            <VCol lg="9" class="d-flex justify-end">
               <VPagination
                 v-model="options.page"
                 total-visible="5"
