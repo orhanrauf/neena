@@ -9,37 +9,11 @@ import {
   readonly,
   ref,
 } from "vue";
-import Node1 from "./nodes/node1.vue";
-import Node2 from "./nodes/node2.vue";
-import Node3 from "./nodes/node3.vue";
+import Node from "./nodes/Node.vue";
 
 export default {
   name: "drawflow",
   setup() {
-    const listNodes = readonly([
-      {
-        name: "Get/Post",
-        color: "#49494970",
-        item: "Node1",
-        input: 0,
-        output: 1,
-      },
-      {
-        name: "Script",
-        color: "blue",
-        item: "Node2",
-        input: 1,
-        output: 2,
-      },
-      {
-        name: "console.log",
-        color: "#ff9900",
-        item: "Node3",
-        input: 1,
-        output: 0,
-      },
-    ]);
-
     const editor = shallowRef({});
     const dialogVisible = ref(false);
     const dialogData = ref({});
@@ -106,19 +80,6 @@ export default {
         editor.value.precanvas.getBoundingClientRect().y *
           (editor.value.precanvas.clientHeight /
             (editor.value.precanvas.clientHeight * editor.value.zoom));
-
-      const nodeSelected = listNodes.find((ele) => ele.item == name);
-      editor.value.addNode(
-        name,
-        nodeSelected.input,
-        nodeSelected.output,
-        pos_x,
-        pos_y,
-        name,
-        {},
-        name,
-        "vue"
-      );
     }
     onMounted(() => {
       var elements = document.getElementsByClassName("drag-drawflow");
@@ -136,19 +97,17 @@ export default {
       );
       editor.value.start();
 
-      editor.value.registerNode("Node1", Node1, {}, {});
-      editor.value.registerNode("Node2", Node2, {}, {});
-      editor.value.registerNode("Node3", Node3, {}, {});
+      editor.value.registerNode("Node", Node, {}, {});
       editor.value.import({
         drawflow: {
           Home: {
             data: {
               5: {
                 id: 5,
-                name: "Node2",
+                name: "Node",
                 data: { script: "(req,res) => {\n console.log(req);\n}" },
                 class: "node",
-                html: "Node2",
+                html: "Node",
                 typenode: "vue",
                 inputs: {
                   input_1: { connections: [{ node: "6", input: "output_1" }] },
@@ -162,10 +121,10 @@ export default {
               },
               6: {
                 id: 6,
-                name: "Node1",
+                name: "Node",
                 data: { url: "localhost/add", method: "post" },
                 class: "node",
-                html: "Node1",
+                html: "Node",
                 typenode: "vue",
                 inputs: {},
                 outputs: {
@@ -174,6 +133,22 @@ export default {
                 pos_x: 137,
                 pos_y: 89,
               },
+              7: {
+                id: 7,
+                name: "Node",
+                data: { url: "localhost/add", method: "post" },
+                class: "node",
+                html: "Node",
+                typenode: "vue",
+                inputs: {
+                  input_1: { connections: [] },
+                },
+                outputs: {
+                  output_1: { connections: [] },
+                },
+                pos_x: 0,
+                pox_y: 0,
+              },
             },
           },
         },
@@ -181,7 +156,6 @@ export default {
     });
     return {
       exportEditor,
-      listNodes,
       drag,
       drop,
       allowDrop,
@@ -216,22 +190,6 @@ export default {
       </el-header>
 
       <el-container class="container">
-        <!--        <el-aside width="250px" class="column">-->
-        <!--          <ul>-->
-        <!--            <li-->
-        <!--              v-for="n in listNodes"-->
-        <!--              :key="n"-->
-        <!--              draggable="true"-->
-        <!--              :data-node="n.item"-->
-        <!--              @dragstart="drag($event)"-->
-        <!--              class="drag-drawflow"-->
-        <!--            >-->
-        <!--              <div class="node" :style="`background: ${n.color}`">-->
-        <!--                {{ n.name }}-->
-        <!--              </div>-->
-        <!--            </li>-->
-        <!--          </ul>-->
-        <!--        </el-aside>-->
         <el-main>
           <div
             id="drawflow"
@@ -272,18 +230,28 @@ export default {
   padding: 0;
 }
 
+.drawflow .drawflow-node {
+  width: 346px !important;
+  padding: 0 !important;
+}
+
+.header {
+  margin-block: 0 !important;
+  margin-inline: 0 !important;
+}
+
 .drawflow .drawflow-node.node {
   background: #fff;
   border: 2px solid #4b465c;
 }
 
 .drawflow .drawflow-node.node.selected {
-  background: #f1f1f1;
+  background: #fff;
 }
 
-.drawflow .drawflow-node.node .header {
-  background: rgba(103, 182, 240, 0.4);
-}
+/*.drawflow .drawflow-node.node .header {
+//  background: rgba(103, 182, 240, 0.4);
+/}*/
 
 .drawflow .drawflow-node.node .input,
 .drawflow .drawflow-node.node .output {
