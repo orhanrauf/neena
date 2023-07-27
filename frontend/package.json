@@ -23,6 +23,7 @@
     "axios": "1.4.0",
     "axios-mock-adapter": "1.21.4",
     "chart.js": "4.3.0",
+    "dayjs": "^1.11.9",
     "drawflow": "0.0.59",
     "element-plus": "2.3.4",
     "jwt-decode": "3.1.2",
