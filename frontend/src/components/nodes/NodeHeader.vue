@@ -1,23 +1,27 @@
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  props: ['title'],
-})
+  props: ["title"],
+});
 </script>
 
 <template>
   <div class="header">
-    {{ title }}
+    <slot />
   </div>
 </template>
 
 <style scoped>
 div {
-  background: #494949;
+  background: #d5ebf8;
+
   margin-block: -15px 15px;
   margin-inline: -15px;
   padding-block: 10px;
   padding-inline: 15px;
+
+  font-size: 18px;
+  color: #6f6b7d;
 }
 </style>
