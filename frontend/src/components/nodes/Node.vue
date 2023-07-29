@@ -22,6 +22,8 @@ export default defineComponent({
     const method = ref("get");
     const dataNode = ref({});
 
+    const showDrawer = ref(false);
+
     const options = readonly([
       {
         value: "get",
@@ -55,15 +57,18 @@ export default defineComponent({
       method,
       options,
       updateSelect,
+      showDrawer,
     };
   },
 });
 </script>
 
 <template>
-  <div ref="el">
+  <div ref="el" @dblclick="showDrawer = true">
     <NodeHeader> look_up_acc_number_by_email </NodeHeader>
     <NodeBody>Looks up account number based on given email.</NodeBody>
     <NodeFooter name="acc_number" type="string" :is-output="true" />
+
+    <Drawer v-model="showDrawer" />
   </div>
 </template>
