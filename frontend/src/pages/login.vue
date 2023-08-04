@@ -53,9 +53,11 @@ const login = () => {
     .then((response) => {
       const { access_token } = response.data;
 
-      localStorage.setItem("accessToken", JSON.stringify(access_token));
+      if (access_token) {
+        localStorage.setItem("accessToken", JSON.stringify(access_token));
 
-      getUserData();
+        getUserData();
+      }
     })
     .catch((error) => {
       console.log(error);
@@ -76,13 +78,15 @@ const getUserData = () => {
       router.replace(route.query.to ? String(route.query.to) : "/");
     })
     .catch((error) => {
-      console.error(error.response.data);
+      console.error(error);
     });
 };
 
 const onSubmit = () => {
   refVForm.value?.validate().then(({ valid: isValid }) => {
-    if (isValid) login();
+    if (isValid) {
+      login();
+    }
   });
 };
 </script>
@@ -94,12 +98,12 @@ const onSubmit = () => {
         <div class="d-flex align-center justify-center w-100 h-100">
           <VImg
             max-width="505"
-            :src="authThemeImg"
+            :src="authThemeImg as string"
             class="auth-illustration mt-16 mb-2"
           />
         </div>
 
-        <VImg :src="authThemeMask" class="auth-footer-mask" />
+        <VImg :src="authThemeMask as string" class="auth-footer-mask" />
       </div>
     </VCol>
 

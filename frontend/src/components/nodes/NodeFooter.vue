@@ -38,7 +38,15 @@ p {
   color: #b7b5be;
 }
 
-.text-string {
+.text-str {
   color: #28c76f;
+}
+.text-int {
+  color: #67b6f0;
+}
+.text-list,
+.text-object,
+.text-bool {
+  color: #7367f0;
 }
 </style>
