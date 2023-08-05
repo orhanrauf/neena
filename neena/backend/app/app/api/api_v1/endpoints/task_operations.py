@@ -17,7 +17,6 @@ def create_task_operation(
     name: str = Body(...),
     task_definition: str = Body(...),
     arguments: list[schemas.Argument] = Body(...),
-    output_name: str = Body(...),
     flow: str = Body(...),
     explanation: str = Body(...),
     current_user: models.User = Depends(deps.get_current_user),
@@ -29,7 +28,6 @@ def create_task_operation(
     task_operation_in = schemas.TaskOperationCreate(name=name, 
                                                    task_definition=task_definition, 
                                                    arguments=arguments,
-                                                   output_name=output_name,
                                                    flow=flow,
                                                    explanation=explanation
                                                    )

@@ -11,7 +11,6 @@ class Argument(BaseModel):
     source: str
     value: str
     data_type: str
-    nullable: bool
 
     class Config:
         orm_mode = True

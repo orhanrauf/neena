@@ -17,7 +17,6 @@ def create_task_definition(
     task_name: str = Body(...),
     parameters: list[schemas.TaskParameter] = Body(...),
     output_type: str = Body(...),
-    output_name: str = Body(...),
     description: str = Body(...),
     python_code: str = Body(...),
     current_user: models.User = Depends(deps.get_current_user),
@@ -29,7 +28,6 @@ def create_task_definition(
     task_definition_in = schemas.TaskDefinitionCreate(task_name=task_name, 
                                                    parameters=parameters, 
                                                    output_type=output_type,
-                                                   output_name=output_name,
                                                    description=description,
                                                    python_code=python_code
                                                    )

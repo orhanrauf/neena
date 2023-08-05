@@ -1,5 +1,3 @@
-
-
 from app import schemas
 
 
@@ -35,16 +33,42 @@ class Graph:
                 if self.is_cyclic_util(node, visited, rec_stack):
                     return True
         return False
+    
+    def topological_sort_util(self, node, visited, stack):
+        visited[node] = True
+
+        # Visit all the neighbors
+        for neighbor in self.graph[node]:
+            if not visited[neighbor]:
+                self.topological_sort_util(neighbor, visited, stack)
+
+        # Push current node to stack which stores the result
+        stack.insert(0, node)
+
+    def topological_sort(self):
+        # Return None for a cyclic graph
+        if self.is_cyclic():
+            return None
+
+        visited = [False] * self.num_vertices
+        stack = []
+
+        for node in range(self.num_vertices):
+            if not visited[node]:
+                self.topological_sort_util(node, visited, stack)
+
+        return stack
 
 def flow_to_graph(flow: schemas.FlowBase) -> Graph:
     num_vertices = len(flow.task_operations)
     graph = Graph(num_vertices)
     task_to_node = {task.name: i for i, task in enumerate(flow.task_operations)}
+    node_to_task = {i: task for task, i in task_to_node.items()}
 
     for task in flow.task_operations:
         for arg in task.arguments:
             if arg.source == "@tasks()":
-                source_task_name = arg.value.split('.')[1]
+                source_task_name = arg.value.split('.')[0]
                 graph.add_edge(task_to_node[source_task_name], task_to_node[task.name])
 
-    return graph
+    return graph, node_to_task

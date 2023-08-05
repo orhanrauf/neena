@@ -1,29 +1,57 @@
 from __future__ import annotations
-
+from dataclasses import dataclass
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
-from uuid import uuid4
+import json
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
+from uuid import uuid4
+from attr import asdict
+from pydantic import BaseModel
+
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, TEXT
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.db.base_class import Base
-from app.models.types.text_pickle import TextPickleType
+from sqlalchemy.types import TypeDecorator, Text
 
 if TYPE_CHECKING:
     from .user import User  # noqa: F401
     from .flow import Flow
     from .task_definition import TaskDefinition
 
-class Argument:
+
+class Argument(BaseModel):
     name: str
     data_type: str
     value: str
-    position: int
     source: str
-    nullable: bool
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+    @staticmethod
+    def from_dict(data: Dict[str, Any]) -> Argument:
+        return Argument(**data)
+
+
+class ArgumentType(TypeDecorator):
+    impl = TEXT
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            if all(isinstance(param, dict) for param in value):
+                return json.dumps(value)
+            else:
+                return json.dumps([param.to_dict() for param in value])
+        return None
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            return [Argument.from_dict(data) for data in json.loads(value)]
+        return None
+
 
 class TaskOperation(Base):
     
@@ -33,7 +61,7 @@ class TaskOperation(Base):
     name: Mapped[str] = mapped_column(String)
     flow: Mapped[UUID] = mapped_column(UUID, ForeignKey("flow.id"), nullable=False)
     task_definition: Mapped[UUID] = mapped_column(UUID, ForeignKey("task_definition.id"), nullable=False)
-    arguments: Mapped[list[Argument]] = mapped_column(TextPickleType)
+    arguments: Mapped[list[Argument]] = mapped_column(ArgumentType)
     explanation: Mapped[Optional[str]] = mapped_column(String)
     
     x: Mapped[float] = mapped_column(Float)

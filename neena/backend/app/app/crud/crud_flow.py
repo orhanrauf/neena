@@ -22,6 +22,8 @@ class CRUDFlow(CRUDBase[Flow, FlowCreate, FlowUpdate]):
         db_flow = Flow(**flow_data)
         db_flow.created_by_email = current_user.email
         db_flow.modified_by_email = current_user.email
+        db_flow.created_by_human = True
+        db_flow.modified_by_human = True
         
         db.add(db_flow)
         db.commit()
