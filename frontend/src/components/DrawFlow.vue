@@ -97,7 +97,10 @@ const addTask = (taskDefinition) => {
     100 /* pos_x */,
     100 /* pos_y */,
     "node" /* class */,
-    { ...taskDefinition } /* data */,
+    {
+      name: taskDefinition.task_name,
+      task_definition: taskDefinition,
+    } /* data */,
     "Node" /* html */,
     "vue" /* typenode */
   );
@@ -147,9 +150,9 @@ const addTask = (taskDefinition) => {
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="dialogVisible = false"
-            >Confirm</el-button
-          >
+          <el-button type="primary" @click="dialogVisible = false">
+            Confirm
+          </el-button>
         </span>
       </template>
     </el-dialog>
