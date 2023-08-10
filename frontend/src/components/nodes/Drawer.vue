@@ -1,16 +1,19 @@
 <script setup lang="ts">
 const props = defineProps<{
   modelValue: boolean;
-  dataNode: object;
+  df: any;
+  nodeId: string;
 }>();
 
 const emit = defineEmits<{
   (e: "update:modelValue", v: boolean): void;
-  (e: "update:dataNode", v: object): void;
+  (e: "update"): void;
 }>();
 
 const show = computed({
   get() {
+    localDataNode.value = getDataNode();
+
     return props.modelValue;
   },
   set(value) {
@@ -18,12 +21,64 @@ const show = computed({
   },
 });
 
-const dataNode = Object.assign({}, props.dataNode); // Create a local copy
-const taskOperation = ref(dataNode);
+let df = props.df;
+const getDataNode = () => {
+  return df.getNodeFromId(props.nodeId);
+};
+
+let localDataNode = ref(getDataNode());
 
 const save = () => {
-  emit("update:dataNode", taskOperation);
+  update();
+  emit("update");
+
   show.value = false;
+};
+
+const getNodeIdByTaskName = (taskName) => {
+  const nodes = df.export().drawflow.Home.data;
+  let nodeId = null;
+
+  Object.keys(nodes).forEach((key) => {
+    const node = nodes[key];
+    if (node.data.task_definition.task_name === taskName) {
+      nodeId = node.id;
+    }
+  });
+
+  return nodeId;
+};
+
+const update = () => {
+  createConnections(localDataNode.value.data.task_definition.parameters);
+
+  df.updateNodeDataFromId(props.nodeId, localDataNode.value.data);
+
+  localDataNode.value = getDataNode();
+};
+
+const createConnections = (parameters) => {
+  // Add connections for each of the parameters
+  parameters.forEach((parameter, index) => {
+    if (!parameter.value || parameter.source !== "@tasks()") {
+      return;
+    }
+
+    const splitValue = parameter.value.split(".");
+
+    if (splitValue[1] === "output") {
+      const outputNode = getNodeIdByTaskName(splitValue[0]);
+
+      if (outputNode) {
+        df.addConnection(
+          outputNode,
+          props.nodeId,
+          "output_1",
+          `input_${index + 1}`
+        );
+      }
+    }
+  });
 };
 
 const sources = ["@tasks()", "@metadata()"];
@@ -44,7 +99,7 @@ const sources = ["@tasks()", "@metadata()"];
             id="name"
             placeholder="Name"
             persistent-placeholder
-            v-model="taskOperation.name"
+            v-model="localDataNode.data.task_definition.task_name"
           />
         </div>
       </template>
@@ -52,13 +107,14 @@ const sources = ["@tasks()", "@metadata()"];
       <!-- DESCRIPTION -->
       <h2 class="fs-2 font-weight-medium mb-2">Description</h2>
       <p class="px-0 font-weight-light text-sm-body-1">
-        {{ taskOperation.task_definition.description }}
+        {{ localDataNode.data.task_definition.description }}
       </p>
 
       <!-- PARAMETERS -->
       <h2 class="fs-2 font-weight-medium mb-0 mt-8">Parameters</h2>
       <VCard
-        v-for="(parameter, index) in taskOperation.task_definition.parameters"
+        v-for="(parameter, index) in localDataNode.data.task_definition
+          .parameters"
         :key="index"
         flat
         border
@@ -174,9 +230,11 @@ const sources = ["@tasks()", "@metadata()"];
         <div>
           <h2 class="fs-2 font-weight-medium">Output</h2>
           <p class="px-0 mb-0">
-            {{ taskOperation.task_definition.output_name }}:
-            <span :class="`text-${taskOperation.task_definition.output_type}`">
-              {{ taskOperation.task_definition.output_type }}
+            {{ localDataNode.data.task_definition.output_name }}:
+            <span
+              :class="`text-${localDataNode.data.task_definition.output_type}`"
+            >
+              {{ localDataNode.data.task_definition.output_type }}
             </span>
           </p>
         </div>

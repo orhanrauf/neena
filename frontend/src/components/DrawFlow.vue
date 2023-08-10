@@ -87,23 +87,67 @@ onMounted(() => {
   editor.value.start();
 
   editor.value.registerNode("Node", Node, {}, {});
+
+  editor.value.on("connectionCreated", function (connection) {
+    connectionCreated(connection);
+  });
+
+  editor.value.on("connectionRemoved", function (connection) {
+    connectionRemoved(connection);
+  });
 });
 
 const addTask = (taskDefinition) => {
+  const inputCount = taskDefinition.parameters.length;
+
   editor.value.addNode(
-    "Node" /* name */,
-    1 /* inputs */,
+    taskDefinition.task_name /* name */,
+    inputCount /* inputs */,
     1 /* outputs */,
     100 /* pos_x */,
     100 /* pos_y */,
     "node" /* class */,
     {
-      name: taskDefinition.task_name,
       task_definition: taskDefinition,
     } /* data */,
     "Node" /* html */,
     "vue" /* typenode */
   );
+};
+
+const connectionCreated = (connection) => {
+  const inputNode = editor.value.getNodeFromId(connection.input_id);
+  const outputNode = editor.value.getNodeFromId(connection.output_id);
+
+  const inputClassSplit = connection.input_class.split("_");
+  const inputIndex = parseInt(inputClassSplit[1]) - 1;
+
+  const parameters = inputNode.data.task_definition.parameters;
+  parameters[inputIndex].source = "@tasks()";
+  parameters[
+    inputIndex
+  ].value = `${outputNode.data.task_definition.task_name}.output`;
+
+  editor.value.updateNodeDataFromId(connection.input_id, {
+    ...inputNode.data,
+    parameters: parameters,
+  });
+};
+
+const connectionRemoved = (connection) => {
+  const inputNode = editor.value.getNodeFromId(connection.input_id);
+
+  const inputClassSplit = connection.input_class.split("_");
+  const inputIndex = parseInt(inputClassSplit[1]) - 1;
+
+  const parameters = inputNode.data.task_definition.parameters;
+  parameters[inputIndex].source = null;
+  parameters[inputIndex].value = "";
+
+  editor.value.updateNodeDataFromId(connection.input_id, {
+    ...inputNode.data,
+    parameters: parameters,
+  });
 };
 </script>
 
@@ -115,7 +159,7 @@ const addTask = (taskDefinition) => {
           <!-- Add task button -->
           <AddTaskModal @addTask="addTask" />
 
-          <!-- Action butotns -->
+          <!-- Action buttons -->
           <div class="d-flex gap-4">
             <VBtn prepend-icon="tabler:adjustments-code" color="success">
               Run Flow
