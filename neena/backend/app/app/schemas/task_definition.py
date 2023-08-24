@@ -1,13 +1,9 @@
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
+from app.core.shared_models import TaskParameter
 
-from pydantic import BaseModel, EmailStr, Field, constr, validator, conint
-
-class TaskParameter(BaseModel):
-    name: str
-    data_type: str
-    position: conint(gt=-1)
+from pydantic import BaseModel, EmailStr, constr
 
 # Shared properties
 class TaskDefinitionBase(BaseModel):

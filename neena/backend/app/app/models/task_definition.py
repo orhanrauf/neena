@@ -5,6 +5,7 @@ from datetime import datetime
 import json
 from typing import TYPE_CHECKING, Any, Dict
 from uuid import uuid4
+from app.core.shared_models import TaskParameter
 from pydantic import BaseModel
 
 from sqlalchemy import TEXT, DateTime, ForeignKey, String, TypeDecorator
@@ -18,18 +19,6 @@ if TYPE_CHECKING:
     from .user import User  # noqa: F401
     from .task_operation import TaskOperation
 
-class TaskParameter(BaseModel):
-    name: str
-    data_type: str
-    position: int
-
-    def to_dict(self) -> Dict[str, Any]:
-        return self.dict()
-
-    @staticmethod
-    def from_dict(data: Dict[str, Any]) -> TaskParameter:
-        return TaskParameter(**data)
-    
 
 class TaskParameterType(TypeDecorator):
     impl = TEXT

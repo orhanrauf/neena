@@ -5,6 +5,7 @@ import json
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from uuid import uuid4
+from app.core.shared_models import Argument
 from attr import asdict
 from pydantic import BaseModel
 
@@ -20,21 +21,8 @@ if TYPE_CHECKING:
     from .user import User  # noqa: F401
     from .flow import Flow
     from .task_definition import TaskDefinition
-
-
-class Argument(BaseModel):
-    name: str
-    data_type: str
-    value: str
-    source: str
+    from .task_run import TaskRun
     
-    def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
-
-    @staticmethod
-    def from_dict(data: Dict[str, Any]) -> Argument:
-        return Argument(**data)
-
 
 class ArgumentType(TypeDecorator):
     impl = TEXT
@@ -81,4 +69,4 @@ class TaskOperation(Base):
 
     created_by: Mapped["User"] = relationship(back_populates="created_task_operations", foreign_keys='TaskOperation.created_by_email')
     modified_by: Mapped["User"]  = relationship(back_populates="modified_task_operations", foreign_keys='TaskOperation.modified_by_email')
-    
+    task_runs: Mapped[list["TaskRun"]] = relationship("TaskRun", back_populates="task_operation")

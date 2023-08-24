@@ -10,3 +10,4 @@ api_router.include_router(flow_requests.router, prefix="/flow_requests", tags=["
 api_router.include_router(task_definitions.router, prefix="/task_definitions", tags=["task_definitions"])
 api_router.include_router(task_operations.router, prefix="/task_operations", tags=["task_operations"])
 api_router.include_router(flows.router, prefix="/flows", tags=["flows"])
+api_router.include_router(flows.router, prefix="/flow_runs", tags=["flow_runs"])

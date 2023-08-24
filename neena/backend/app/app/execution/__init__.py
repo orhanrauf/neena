@@ -1,1 +1,1 @@
-from .decorators import Task
+from .decorators import task

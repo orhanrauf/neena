@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
-from app.core.config import settings
 
 router = APIRouter()
 
@@ -36,7 +35,6 @@ def create_flow(
         # the request data has validation errors
         errors = [str(error) for error in validation_messages]
         return JSONResponse(status_code=422, content={"user_error": True, "errors": errors})
-
     
     flow = crud.flow.create(db=db, flow=flow_in, current_user=current_user)
     return flow

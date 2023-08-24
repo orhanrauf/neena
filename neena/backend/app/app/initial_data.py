@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def init() -> None:
     db = SessionLocal()
-    update_task_definitions_from_directory("app/task_definitions/", db)
+    # update_task_definitions_from_directory("app/task_definitions/", db)
     init_db(db)
 
 

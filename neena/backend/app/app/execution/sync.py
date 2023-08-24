@@ -1,11 +1,10 @@
 import os
 import importlib
 import sys
-from datetime import datetime
 from inspect import getfullargspec, getsource
 from typing import Tuple, Callable, get_type_hints
-from app.models.task_definition import TaskDefinition
-from app.schemas import TaskDefinitionCreate, TaskDefinitionBase, TaskParameter
+from app.schemas import TaskDefinitionBase, TaskParameter
+from app import crud
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -58,61 +57,9 @@ def construct_task_definitions_from_task_methods(functions: List[Tuple[str, Call
     
     return task_definitions
 
-
-def update_task_definitions_in_database(
-    task_definitions: List[TaskDefinitionCreate],
-    db: Session
-) -> None:
-    # Create a dictionary for quick lookup
-    task_definitions_dict = {
-        td.task_name: td 
-        for td in task_definitions
-    }
-
-    # Fetch all existing task definitions from database
-    existing_task_definitions = db.query(TaskDefinition).filter(TaskDefinition.deleted_at == None).all()
-
-    # Update or soft-delete task definitions
-    for td in existing_task_definitions:
-        if td.task_name in task_definitions_dict:  # Potential update to existing task definition
-            task_def = task_definitions_dict.pop(td.task_name)
-            
-            # Check if non-PK fields are changed
-            if td.parameters != task_def.parameters or td.output_type != task_def.output_type or \
-                or td.description != task_def.description or \
-            td.python_code != task_def.python_code:
-                # Non-PK fields have changed, soft delete old task definition
-                td.deleted_at = datetime.now()
-
-                # Create new task definition
-                new_td = TaskDefinition(
-                    task_name=task_def.task_name,
-                    parameters=task_def.parameters,
-                    output_type=task_def.output_type,
-                    description=task_def.description,
-                    python_code=task_def.python_code
-                )
-                db.add(new_td)
-        else:  # Soft-delete task definition that no longer exists
-            td.deleted_at = datetime.now()
-    
-    # Insert new task definitions
-    for task_name, task_def in task_definitions_dict.items():
-        new_td = TaskDefinition(
-            task_name=task_name,
-            parameters=task_def.parameters,
-            output_type=task_def.output_type,
-            description=task_def.description,
-            python_code=task_def.python_code
-        )
-        db.add(new_td)
-    
-    db.commit()
-
-
     
 def update_task_definitions_from_directory(directory: str, db: Session) -> None:
     task_methods = get_task_methods_from_directory(directory)
     task_definitions = construct_task_definitions_from_task_methods(task_methods)
-    update_task_definitions_in_database(task_definitions, db)
+    crud.task_definition.sync(task_definitions, db)
     

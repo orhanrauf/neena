@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from .user import User  # noqa: F401
     from .flow_request import FlowRequest
     from .task_operation import TaskOperation
-    
+    from .flow_run import FlowRun
 
 class Flow(Base):
     
@@ -38,4 +38,4 @@ class Flow(Base):
     created_for: Mapped["FlowRequest"] = relationship(back_populates="flow", uselist=False, foreign_keys='Flow.flow_request')
     created_by: Mapped["User"]  = relationship(back_populates="created_flows", foreign_keys='Flow.created_by_email')
     modified_by: Mapped["User"]  = relationship(back_populates="modified_flows", foreign_keys='Flow.modified_by_email')
-    
+    flow_runs: Mapped[list["FlowRun"]] = relationship("FlowRun", back_populates="flow")

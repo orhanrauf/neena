@@ -10,7 +10,7 @@ from app.api import deps
 router = APIRouter()
 
 """
-A proxy for the frontend client when hitting cors issues with axios requests. Adjust as required. This version has
+A proxy for the frontend client when hitting cors issues with axios requests. This version has
 a user-login dependency to reduce the risk of leaking the server as a random proxy.
 """
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, List, Optional
 
 from app.crud.base import CRUDBase
@@ -24,5 +25,53 @@ class CRUDTaskDefinition(CRUDBase[TaskDefinition, TaskDefinitionCreate, TaskDefi
             db.add(obj)
             db.commit()
         return obj
+    
+    def sync(task_definitions: List[TaskDefinitionCreate], db: Session) -> None:
+        
+        # Create a dictionary for quick lookup
+        task_definitions_dict = {
+            td.task_name: td 
+            for td in task_definitions
+        }
+
+        # Fetch all existing task definitions from database
+        existing_task_definitions = db.query(TaskDefinition).filter(TaskDefinition.deleted_at == None).all()
+
+        # Update or soft-delete task definitions
+        for td in existing_task_definitions:
+            if td.task_name in task_definitions_dict:  # Potential update to existing task definition
+                task_def = task_definitions_dict.pop(td.task_name)
+                
+                # Check if non-PK fields are changed
+                if td.parameters != task_def.parameters or td.output_type != task_def.output_type \
+                    or td.description != task_def.description or \
+                td.python_code != task_def.python_code:
+                    # Non-PK fields have changed, soft delete old task definition
+                    td.deleted_at = datetime.now()
+
+                    # Create new task definition
+                    new_td = TaskDefinition(
+                        task_name=task_def.task_name,
+                        parameters=task_def.parameters,
+                        output_type=task_def.output_type,
+                        description=task_def.description,
+                        python_code=task_def.python_code
+                    )
+                    db.add(new_td)
+            else:  # Soft-delete task definition that no longer exists
+                td.deleted_at = datetime.now()
+        
+        # Insert new task definitions
+        for task_name, task_def in task_definitions_dict.items():
+            new_td = TaskDefinition(
+                task_name=task_name,
+                parameters=task_def.parameters,
+                output_type=task_def.output_type,
+                description=task_def.description,
+                python_code=task_def.python_code
+            )
+            db.add(new_td)
+        
+        db.commit()
 
 task_definition = CRUDTaskDefinition(TaskDefinition)

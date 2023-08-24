@@ -1,9 +1,8 @@
 from dataclasses import dataclass
-from app.execution.decorators import Task
+from app.execution.decorators import task
 import requests
 from urllib.parse import quote
 import datetime
-
 
 @dataclass
 class Coordinates:
@@ -11,7 +10,7 @@ class Coordinates:
     long: float
 
 
-@Task
+@task
 def get_temperature(coords: Coordinates) -> float:
     """Gets current temperature in Celsius"""
     
@@ -35,7 +34,7 @@ def get_temperature(coords: Coordinates) -> float:
     return temperature_data_current_day
 
 
-@Task
+@task
 def get_lat_lon_for_city(city: str) -> Coordinates:
     """Gets latitude and longtitude for given city"""
     base_url = f"https://nominatim.openstreetmap.org/search?city={quote(city)}&format=json"
@@ -51,7 +50,7 @@ def get_lat_lon_for_city(city: str) -> Coordinates:
         return None
 
 
-@Task
+@task
 def addition(a: float, b: float) -> float:
     """Adds two floats together.
     """
