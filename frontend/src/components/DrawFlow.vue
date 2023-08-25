@@ -1,7 +1,12 @@
 <script setup>
+import axios from "@axios"
 import Drawflow from "drawflow";
 import { onMounted, shallowRef, h, getCurrentInstance, render, ref } from "vue";
 import Node from "./nodes/Node.vue";
+
+const props = defineProps({
+  flowRequestId: String,
+});
 
 const editor = shallowRef({});
 const dialogVisible = ref(false);
@@ -10,10 +15,6 @@ const Vue = { version: 3, h, render };
 const internalInstance = getCurrentInstance();
 internalInstance.appContext.app._context.config.globalProperties.$df = editor;
 
-function exportEditor() {
-  dialogData.value = editor.value.export();
-  dialogVisible.value = true;
-}
 const drag = (ev) => {
   if (ev.type === "touchstart") {
     mobile_item_selec = ev.target
@@ -149,6 +150,9 @@ const connectionRemoved = (connection) => {
     parameters: parameters,
   });
 };
+
+const saveWorkflow = () => {
+}
 </script>
 
 <template>
@@ -167,7 +171,7 @@ const connectionRemoved = (connection) => {
             <VBtn
               prepend-icon="tabler:device-floppy"
               color="secondary"
-              @click="exportEditor"
+              @click="saveWorkflow"
             >
               Save Flow
             </VBtn>
