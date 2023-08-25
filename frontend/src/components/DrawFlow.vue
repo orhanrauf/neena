@@ -1,168 +1,153 @@
-<script>
+<script setup>
 import Drawflow from "drawflow";
-import {
-  onMounted,
-  shallowRef,
-  h,
-  getCurrentInstance,
-  render,
-  readonly,
-  ref,
-} from "vue";
+import { onMounted, shallowRef, h, getCurrentInstance, render, ref } from "vue";
 import Node from "./nodes/Node.vue";
 
-export default {
-  name: "drawflow",
-  setup() {
-    const editor = shallowRef({});
-    const dialogVisible = ref(false);
-    const dialogData = ref({});
-    const Vue = { version: 3, h, render };
-    const internalInstance = getCurrentInstance();
-    internalInstance.appContext.app._context.config.globalProperties.$df =
-      editor;
+const editor = shallowRef({});
+const dialogVisible = ref(false);
+const dialogData = ref({});
+const Vue = { version: 3, h, render };
+const internalInstance = getCurrentInstance();
+internalInstance.appContext.app._context.config.globalProperties.$df = editor;
 
-    function exportEditor() {
-      dialogData.value = editor.value.export();
-      dialogVisible.value = true;
-    }
-    const drag = (ev) => {
-      if (ev.type === "touchstart") {
-        mobile_item_selec = ev.target
-          .closest(".drag-drawflow")
-          .getAttribute("data-node");
-      } else {
-        ev.dataTransfer.setData("node", ev.target.getAttribute("data-node"));
-      }
-    };
-    const drop = (ev) => {
-      if (ev.type === "touchend") {
-        var parentdrawflow = document
-          .elementFromPoint(
-            mobile_last_move.touches[0].clientX,
-            mobile_last_move.touches[0].clientY
-          )
-          .closest("#drawflow");
-        if (parentdrawflow != null) {
-          addNodeToDrawFlow(
-            mobile_item_selec,
-            mobile_last_move.touches[0].clientX,
-            mobile_last_move.touches[0].clientY
-          );
-        }
-        mobile_item_selec = "";
-      } else {
-        ev.preventDefault();
-        var data = ev.dataTransfer.getData("node");
-        addNodeToDrawFlow(data, ev.clientX, ev.clientY);
-      }
-    };
-    const allowDrop = (ev) => {
-      ev.preventDefault();
-    };
-    let mobile_item_selec = "";
-    let mobile_last_move = null;
-    function positionMobile(ev) {
-      mobile_last_move = ev;
-    }
-    function addNodeToDrawFlow(name, pos_x, pos_y) {
-      pos_x =
-        pos_x *
-          (editor.value.precanvas.clientWidth /
-            (editor.value.precanvas.clientWidth * editor.value.zoom)) -
-        editor.value.precanvas.getBoundingClientRect().x *
-          (editor.value.precanvas.clientWidth /
-            (editor.value.precanvas.clientWidth * editor.value.zoom));
-      pos_y =
-        pos_y *
-          (editor.value.precanvas.clientHeight /
-            (editor.value.precanvas.clientHeight * editor.value.zoom)) -
-        editor.value.precanvas.getBoundingClientRect().y *
-          (editor.value.precanvas.clientHeight /
-            (editor.value.precanvas.clientHeight * editor.value.zoom));
-    }
-    onMounted(() => {
-      var elements = document.getElementsByClassName("drag-drawflow");
-      for (var i = 0; i < elements.length; i++) {
-        elements[i].addEventListener("touchend", drop, false);
-        elements[i].addEventListener("touchmove", positionMobile, false);
-        elements[i].addEventListener("touchstart", drag, false);
-      }
-
-      const id = document.getElementById("drawflow");
-      editor.value = new Drawflow(
-        id,
-        Vue,
-        internalInstance.appContext.app._context
+function exportEditor() {
+  dialogData.value = editor.value.export();
+  dialogVisible.value = true;
+}
+const drag = (ev) => {
+  if (ev.type === "touchstart") {
+    mobile_item_selec = ev.target
+      .closest(".drag-drawflow")
+      .getAttribute("data-node");
+  } else {
+    ev.dataTransfer.setData("node", ev.target.getAttribute("data-node"));
+  }
+};
+const drop = (ev) => {
+  if (ev.type === "touchend") {
+    var parentdrawflow = document
+      .elementFromPoint(
+        mobile_last_move.touches[0].clientX,
+        mobile_last_move.touches[0].clientY
+      )
+      .closest("#drawflow");
+    if (parentdrawflow != null) {
+      addNodeToDrawFlow(
+        mobile_item_selec,
+        mobile_last_move.touches[0].clientX,
+        mobile_last_move.touches[0].clientY
       );
-      editor.value.start();
+    }
+    mobile_item_selec = "";
+  } else {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("node");
+    addNodeToDrawFlow(data, ev.clientX, ev.clientY);
+  }
+};
+const allowDrop = (ev) => {
+  ev.preventDefault();
+};
+let mobile_item_selec = "";
+let mobile_last_move = null;
+function positionMobile(ev) {
+  mobile_last_move = ev;
+}
+function addNodeToDrawFlow(name, pos_x, pos_y) {
+  pos_x =
+    pos_x *
+      (editor.value.precanvas.clientWidth /
+        (editor.value.precanvas.clientWidth * editor.value.zoom)) -
+    editor.value.precanvas.getBoundingClientRect().x *
+      (editor.value.precanvas.clientWidth /
+        (editor.value.precanvas.clientWidth * editor.value.zoom));
+  pos_y =
+    pos_y *
+      (editor.value.precanvas.clientHeight /
+        (editor.value.precanvas.clientHeight * editor.value.zoom)) -
+    editor.value.precanvas.getBoundingClientRect().y *
+      (editor.value.precanvas.clientHeight /
+        (editor.value.precanvas.clientHeight * editor.value.zoom));
+}
 
-      editor.value.registerNode("Node", Node, {}, {});
-      editor.value.import({
-        drawflow: {
-          Home: {
-            data: {
-              5: {
-                id: 5,
-                name: "Node",
-                data: { script: "(req,res) => {\n console.log(req);\n}" },
-                class: "node",
-                html: "Node",
-                typenode: "vue",
-                inputs: {
-                  input_1: { connections: [{ node: "6", input: "output_1" }] },
-                },
-                outputs: {
-                  output_1: { connections: [] },
-                  output_2: { connections: [] },
-                },
-                pos_x: 1000,
-                pos_y: 117,
-              },
-              6: {
-                id: 6,
-                name: "Node",
-                data: { url: "localhost/add", method: "post" },
-                class: "node",
-                html: "Node",
-                typenode: "vue",
-                inputs: {},
-                outputs: {
-                  output_1: { connections: [{ node: "5", output: "input_1" }] },
-                },
-                pos_x: 137,
-                pos_y: 89,
-              },
-              7: {
-                id: 7,
-                name: "Node",
-                data: { url: "localhost/add", method: "post" },
-                class: "node",
-                html: "Node",
-                typenode: "vue",
-                inputs: {
-                  input_1: { connections: [] },
-                },
-                outputs: {
-                  output_1: { connections: [] },
-                },
-                pos_x: 0,
-                pox_y: 0,
-              },
-            },
-          },
-        },
-      });
-    });
-    return {
-      exportEditor,
-      drag,
-      drop,
-      allowDrop,
-      dialogVisible,
-      dialogData,
-    };
-  },
+onMounted(() => {
+  const elements = document.getElementsByClassName("drag-drawflow");
+  for (let i = 0; i < elements.length; i++) {
+    elements[i].addEventListener("touchend", drop, false);
+    elements[i].addEventListener("touchmove", positionMobile, false);
+    elements[i].addEventListener("touchstart", drag, false);
+  }
+
+  const id = document.getElementById("drawflow");
+  editor.value = new Drawflow(
+    id,
+    Vue,
+    internalInstance.appContext.app._context
+  );
+  editor.value.start();
+
+  editor.value.registerNode("Node", Node, {}, {});
+
+  editor.value.on("connectionCreated", function (connection) {
+    connectionCreated(connection);
+  });
+
+  editor.value.on("connectionRemoved", function (connection) {
+    connectionRemoved(connection);
+  });
+});
+
+const addTask = (taskDefinition) => {
+  const inputCount = taskDefinition.parameters.length;
+
+  editor.value.addNode(
+    taskDefinition.task_name /* name */,
+    inputCount /* inputs */,
+    1 /* outputs */,
+    100 /* pos_x */,
+    100 /* pos_y */,
+    "node" /* class */,
+    {
+      task_definition: taskDefinition,
+    } /* data */,
+    "Node" /* html */,
+    "vue" /* typenode */
+  );
+};
+
+const connectionCreated = (connection) => {
+  const inputNode = editor.value.getNodeFromId(connection.input_id);
+  const outputNode = editor.value.getNodeFromId(connection.output_id);
+
+  const inputClassSplit = connection.input_class.split("_");
+  const inputIndex = parseInt(inputClassSplit[1]) - 1;
+
+  const parameters = inputNode.data.task_definition.parameters;
+  parameters[inputIndex].source = "@tasks()";
+  parameters[
+    inputIndex
+  ].value = `${outputNode.data.task_definition.task_name}.output`;
+
+  editor.value.updateNodeDataFromId(connection.input_id, {
+    ...inputNode.data,
+    parameters: parameters,
+  });
+};
+
+const connectionRemoved = (connection) => {
+  const inputNode = editor.value.getNodeFromId(connection.input_id);
+
+  const inputClassSplit = connection.input_class.split("_");
+  const inputIndex = parseInt(inputClassSplit[1]) - 1;
+
+  const parameters = inputNode.data.task_definition.parameters;
+  parameters[inputIndex].source = null;
+  parameters[inputIndex].value = "";
+
+  editor.value.updateNodeDataFromId(connection.input_id, {
+    ...inputNode.data,
+    parameters: parameters,
+  });
 };
 </script>
 
@@ -172,8 +157,9 @@ export default {
       <el-header class="header">
         <VRow class="d-flex gap-4 justify-space-between">
           <!-- Add task button -->
-          <AddTaskModal />
+          <AddTaskModal @addTask="addTask" />
 
+          <!-- Action buttons -->
           <div class="d-flex gap-4">
             <VBtn prepend-icon="tabler:adjustments-code" color="success">
               Run Flow
@@ -189,6 +175,7 @@ export default {
         </VRow>
       </el-header>
 
+      <!-- Actual Drawflow container -->
       <el-container class="container">
         <el-main>
           <div
@@ -199,20 +186,23 @@ export default {
         </el-main>
       </el-container>
     </el-container>
+
+    <!-- Export dialog -->
     <el-dialog v-model="dialogVisible" title="Export" width="50%">
       <span>Data:</span>
-      <pre><code>{{dialogData}}</code></pre>
+      <pre><code>{{ dialogData }}</code></pre>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="dialogVisible = false"
-            >Confirm</el-button
-          >
+          <el-button type="primary" @click="dialogVisible = false">
+            Confirm
+          </el-button>
         </span>
       </template>
     </el-dialog>
   </div>
 </template>
+
 <style scoped>
 .header {
   display: flex;
@@ -225,6 +215,7 @@ export default {
   min-block-size: calc(100vh - 250px);
 }
 </style>
+
 <style>
 .el-main {
   padding: 0;
@@ -249,10 +240,6 @@ export default {
   background: #fff;
 }
 
-/*.drawflow .drawflow-node.node .header {
-//  background: rgba(103, 182, 240, 0.4);
-/}*/
-
 .drawflow .drawflow-node.node .input,
 .drawflow .drawflow-node.node .output {
   background: #d9d9d9;
@@ -276,19 +263,5 @@ export default {
 .drawflow .connection .main-path.selected {
   stroke: #5b4d80 !important;
 }
-
-/*.column {
-  border-inline-end: 1px solid #494949;
-}
-
-.column ul {
-  padding-block: 10px;
-  padding-inline: 10px;
-  padding-inline-start: 0;
-}
-
-.column li {
-  background: transparent;
-}*/
 </style>
 <style src="drawflow/dist/drawflow.min.css"></style>
