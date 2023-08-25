@@ -26,9 +26,9 @@ class FlowRequest(Base):
     modified_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), server_onupdate=func.now(), nullable=False
     )
-    request_metadata: Mapped[Optional[list[dict]]] = mapped_column(TextPickleType)
-    request_instructions: Mapped[str]
-    request_body: Mapped[str]
+    request_metadata: Mapped[Optional[list[dict]]] = mapped_column(TextPickleType, nullable=True)
+    request_instructions: Mapped[str] = mapped_column(String, nullable=True)  # corrected this line
+    request_body: Mapped[str] = mapped_column(String, nullable=False)  # Should not be null or empty
     
     flow: Mapped[UUID] = mapped_column(UUID, ForeignKey("flow.id"), nullable=True)
     created_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=False)
@@ -36,9 +36,5 @@ class FlowRequest(Base):
 
     flow = relationship("Flow", back_populates="created_for")
     
-    # created_for: Mapped["Flow"] = relationship(back_populates="created_for", foreign_keys='FlowRequest.flow', 
-    #                                            cascade="all, delete-orphan", single_parent=True)
-    
     created_by: Mapped["User"]  = relationship(back_populates="created_flow_requests", foreign_keys='FlowRequest.created_by_email')
     modified_by: Mapped["User"]  = relationship(back_populates="modified_flow_requests", foreign_keys='FlowRequest.modified_by_email')
-    

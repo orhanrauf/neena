@@ -1,8 +1,7 @@
 from typing import Any
 
 from app.crud.base import CRUDBase
-from sqlalchemy.orm import joinedload, Session
-
+from sqlalchemy.orm import Session
 
 from app.models.flow import Flow
 from app.schemas.flow import FlowCreate, FlowUpdate
@@ -22,6 +21,8 @@ class CRUDFlow(CRUDBase[Flow, FlowCreate, FlowUpdate]):
         db_flow = Flow(**flow_data)
         db_flow.created_by_email = current_user.email
         db_flow.modified_by_email = current_user.email
+        db_flow.created_by_human = True
+        db_flow.modified_by_human = True
         
         db.add(db_flow)
         db.commit()

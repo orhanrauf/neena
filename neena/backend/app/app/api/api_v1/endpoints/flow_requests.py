@@ -14,22 +14,17 @@ router = APIRouter()
 def create_flow_request(
     *,
     db: Session = Depends(deps.get_db),
-    request_metadata: dict = Body(...),
-    request_instructions: str = Body(...),
-    request_body: str = Body(None),
+    flow_request_in: schemas.FlowRequestCreate = Body(...),
     current_user: models.User = Depends(deps.get_current_user),
 ) -> Any:
     """
     Create flow request.
     """
 
-    flow_request_in = schemas.FlowRequestCreate(request_metadata=request_metadata, 
-                                                request_instructions=request_instructions, 
-                                                request_body=request_body)
-    
     flow_request = crud.flow_request.create(db, obj_in=flow_request_in, current_user=current_user)
     
     return flow_request
+
 
 @router.get("/all", response_model=List[schemas.FlowRequest])
 def read_all_flow_requests(

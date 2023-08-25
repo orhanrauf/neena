@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, List, Optional, Union
 from uuid import UUID
 from datetime import datetime
 
@@ -8,12 +8,12 @@ from pydantic.datetime_parse import date
 
 # Shared properties
 class FlowRequestBase(BaseModel):
-    request_metadata: list[dict] = []
+    request_metadata: Optional[List[Dict]] = None
     request_instructions : constr(max_length=512) = None
     request_body: constr(min_length=8, max_length=512)
+
 # Properties to receive via API on creation
 class FlowRequestCreate(FlowRequestBase):
-    # created_by_email: EmailStr
     pass
 
 # Properties to receive via API on update

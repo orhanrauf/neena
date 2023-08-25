@@ -1,20 +1,15 @@
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
+from app.core.shared_models import TaskParameter
 
-from pydantic import BaseModel, EmailStr, Field, constr, validator, conint
-
-class TaskParameter(BaseModel):
-    name: str
-    data_type: str
-    position: conint(gt=-1)
+from pydantic import BaseModel, EmailStr, constr
 
 # Shared properties
 class TaskDefinitionBase(BaseModel):
     task_name: constr(min_length=6, max_length=64)
     parameters: list[TaskParameter]
     output_type: str
-    output_name: str
     description: str
     python_code: str
     
@@ -32,9 +27,10 @@ class TaskDefinitionInDBBase(TaskDefinitionBase):
     id: UUID
     created_date: datetime
     modified_date: datetime
-    created_by_email: EmailStr
-    modified_by_email: EmailStr
-
+    created_by_email: EmailStr = None
+    modified_by_email: EmailStr = None
+    deleted_at: Optional[datetime] = None  # New field to support soft deletes
+    
     class Config:
         orm_mode = True
 

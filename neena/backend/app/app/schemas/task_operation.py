@@ -1,20 +1,10 @@
 from typing import Optional
 from uuid import UUID
 from datetime import datetime
+from app.core.shared_models import Argument
 
 from pydantic import BaseModel, EmailStr
 from pydantic.datetime_parse import date
-
-
-class Argument(BaseModel):
-    name: str
-    source: str
-    value: str
-    data_type: str
-    nullable: bool
-
-    class Config:
-        orm_mode = True
 
 
 # Shared properties

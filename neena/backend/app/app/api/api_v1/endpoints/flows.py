@@ -1,12 +1,13 @@
 from typing import Any, List
 from uuid import UUID
+from app.core.utils.flow_validation import validate_flow
 
 from fastapi import APIRouter, Body, Depends
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
-from app.core.config import settings
 
 router = APIRouter()
 
@@ -28,9 +29,14 @@ def create_flow(
                                 name=name,
                                 task_operations=task_operations)
     
+    # perform the complex validations
+    validation_messages = validate_flow(flow_in, db)
+    if validation_messages:
+        # the request data has validation errors
+        errors = [str(error) for error in validation_messages]
+        return JSONResponse(status_code=422, content={"user_error": True, "errors": errors})
+    
     flow = crud.flow.create(db=db, flow=flow_in, current_user=current_user)
-    
-    
     return flow
 
 @router.get("/all", response_model=List[schemas.Flow])
