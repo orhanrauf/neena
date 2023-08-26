@@ -152,6 +152,49 @@ const connectionRemoved = (connection) => {
 };
 
 const saveWorkflow = () => {
+  // Get all the nodes from the workflow
+  const exportData = editor.value.export();
+  const nodes = exportData.drawflow.Home.data;
+  const nodeKeys = Object.keys(nodes);
+
+  const flowRequestId = props.flowRequestId;
+
+  // Create task operations object
+  const taskOperations = nodeKeys.map((key) => {
+    const node = nodes[key];
+
+    return {
+      name: node.data.task_definition.task_name,
+      task_definition: node.data.task_definition.id,
+      arguments: node.data.task_definition.parameters.map((parameter) => {
+        return {
+          name: parameter.name,
+          data_type: parameter.data_type,
+          value: parameter.value,
+          source: parameter.source,
+        }
+      }),
+      explanation: node.data.task_definition.description,
+      x: node.pos_x,
+      y: node.pos_y,
+      z: 0,
+    }
+  });
+
+  // Create the flow
+  axios
+    .post('/v1/flows', {
+      flow_request: flowRequestId,
+      name: 'No name',
+      task_operations: taskOperations,
+    })
+      .then((response) => {
+        // Clear the drawflow
+        editor.value.clear();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 }
 </script>
 
