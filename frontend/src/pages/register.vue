@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useToast } from "vue-toastification"
 import { VForm } from "vuetify/components/VForm";
 import authV2RegisterIllustrationBorderedDark from "@images/pages/auth-v2-register-illustration-bordered-dark.png";
 import authV2RegisterIllustrationBorderedLight from "@images/pages/auth-v2-register-illustration-bordered-light.png";
@@ -24,6 +25,8 @@ const imageVariant = useGenerateImageVariant(
   authV2RegisterIllustrationBorderedDark,
   true
 );
+
+const toast = useToast();
 
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark);
 
@@ -56,6 +59,8 @@ const register = () => {
 
       localStorage.setItem("userData", JSON.stringify(userData));
       localStorage.setItem("accessToken", JSON.stringify(accessToken));
+
+      toast.success('Successfully registered!');
 
       // Redirect to `to` query if exist or redirect to index route
       router.replace(route.query.to ? String(route.query.to) : "/");

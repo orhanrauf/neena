@@ -2,11 +2,14 @@
 import axios from "@axios"
 import Drawflow from "drawflow";
 import { onMounted, shallowRef, h, getCurrentInstance, render, ref } from "vue";
+import { useToast } from "vue-toastification"
 import Node from "./nodes/Node.vue";
 
 const props = defineProps({
   flowRequestId: String,
 });
+
+const toast = useToast();
 
 const editor = shallowRef({});
 const dialogVisible = ref(false);
@@ -189,10 +192,12 @@ const saveWorkflow = () => {
       task_operations: taskOperations,
     })
       .then((response) => {
+        toast.success('Flow successfully created!');
         // Clear the drawflow
         editor.value.clear();
       })
       .catch((error) => {
+        toast.error('Something went wrong during the API call');
         console.error(error);
       });
 }

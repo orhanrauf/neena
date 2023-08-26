@@ -2,10 +2,12 @@
 import router from "@/router"
 import axios from "@axios";
 import { lengthValidator, requiredValidator } from "@validators"
+import { useToast } from "vue-toastification"
 import { VForm } from "vuetify/components/VForm";
 
+const toast = useToast();
+
 const refVForm = ref<VForm>();
-const showError = ref(false);
 
 const errors = reactive({
   body: undefined,
@@ -53,12 +55,13 @@ const createFlow = () => {
     })
     .then((response) => {
       Object.assign(form, getInitialForm());
-      refVForm.value.resetValidation();
+      refVForm.value?.resetValidation();
 
+      toast.success('Flow request successfully created!');
       redirectToFlow(response.data.id);
     })
     .catch((error) => {
-      showError.value = true;
+      toast.error('Something went wrong during the API call');
       console.error(error);
     });
 };
@@ -77,10 +80,6 @@ const redirectToFlow = (flowRequestId: string) => {
 
 <template>
   <VForm ref="refVForm" @submit.prevent="onSubmit">
-    <VAlert v-model="showError" color="error" class="mb-3" closable>
-      Something went wrong with the API call. Please try again later.
-    </VAlert>
-
     <VRow class="match-height">
       <!-- Describe request -->
       <VCol cols="12" md="7">
