@@ -102,8 +102,9 @@ def check_task_arguments(task_op: schemas.TaskOperationBase,
             if arg.source not in valid_sources:
                 validation_messages.append(TaskValidationFailureMessage(f"Invalid source for argument {arg.name} in task {task_op.name}. Source should be one of @tasks(), @context(), @metadata().", task_name=task_op.name))
             if arg.source == "@metadata()":
-                if not any(d.get(arg.name) == arg.value for d in flow_request.request_metadata):
-                    validation_messages.append(TaskValidationFailureMessage(f"Argument {arg.name} for task {task_op.name} does not exist in the flow request metadata or the value does not match.", task_name=task_op.name))
+                if not any(arg.value in d.values() for d in flow_request.request_metadata):
+                    validation_messages.append(TaskValidationFailureMessage(f"Value {arg.value} for argument {arg.name} in task {task_op.name} does not exist in the flow request metadata.", task_name=task_op.name))
+
         except KeyError:
             validation_messages.append(TaskValidationFailureMessage(f"Argument {arg.name} for task {task_op.name} does not exist in task definition parameters.", task_name=task_op.name))
 
