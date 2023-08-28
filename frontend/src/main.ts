@@ -14,10 +14,27 @@ import { createPinia } from "pinia";
 import { createApp } from "vue";
 import dayjs from "dayjs";
 import "dayjs/locale/en";
+import Toast, { PluginOptions, TYPE } from "vue-toastification"
+import "vue-toastification/dist/index.css";
 
 dayjs.locale("en");
 
 loadFonts();
+
+const toastOptions: PluginOptions = {
+  toastDefaults: {
+    [TYPE.ERROR]: {
+      timeout: 4000,
+      hideProgressBar: true,
+      pauseOnHover: false,
+    },
+    [TYPE.SUCCESS]: {
+      timeout: 5000,
+      hideProgressBar: true,
+      pauseOnHover: false,
+    }
+  }
+};
 
 // Create vue app
 const app = createApp(App);
@@ -30,6 +47,7 @@ app.use(layoutsPlugin);
 app.use(ElementPlus);
 // @ts-ignore
 app.use(dayjs);
+app.use(Toast, toastOptions);
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);
 }

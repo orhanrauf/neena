@@ -1,7 +1,15 @@
 <script setup>
+import axios from "@axios"
 import Drawflow from "drawflow";
 import { onMounted, shallowRef, h, getCurrentInstance, render, ref } from "vue";
+import { useToast } from "vue-toastification"
 import Node from "./nodes/Node.vue";
+
+const props = defineProps({
+  flowRequestId: String,
+});
+
+const toast = useToast();
 
 const editor = shallowRef({});
 const dialogVisible = ref(false);
@@ -10,10 +18,6 @@ const Vue = { version: 3, h, render };
 const internalInstance = getCurrentInstance();
 internalInstance.appContext.app._context.config.globalProperties.$df = editor;
 
-function exportEditor() {
-  dialogData.value = editor.value.export();
-  dialogVisible.value = true;
-}
 const drag = (ev) => {
   if (ev.type === "touchstart") {
     mobile_item_selec = ev.target
@@ -149,6 +153,54 @@ const connectionRemoved = (connection) => {
     parameters: parameters,
   });
 };
+
+const saveWorkflow = () => {
+  // Get all the nodes from the workflow
+  const exportData = editor.value.export();
+  const nodes = exportData.drawflow.Home.data;
+  const nodeKeys = Object.keys(nodes);
+
+  const flowRequestId = props.flowRequestId;
+
+  // Create task operations object
+  const taskOperations = nodeKeys.map((key) => {
+    const node = nodes[key];
+
+    return {
+      name: node.data.task_definition.task_name,
+      task_definition: node.data.task_definition.id,
+      arguments: node.data.task_definition.parameters.map((parameter) => {
+        return {
+          name: parameter.name,
+          data_type: parameter.data_type,
+          value: parameter.value,
+          source: parameter.source,
+        }
+      }),
+      explanation: node.data.task_definition.description,
+      x: node.pos_x,
+      y: node.pos_y,
+      z: 0,
+    }
+  });
+
+  // Create the flow
+  axios
+    .post('/v1/flows', {
+      flow_request: flowRequestId,
+      name: 'No name',
+      task_operations: taskOperations,
+    })
+      .then((response) => {
+        toast.success('Flow successfully created!');
+        // Clear the drawflow
+        editor.value.clear();
+      })
+      .catch((error) => {
+        toast.error('Something went wrong during the API call');
+        console.error(error);
+      });
+}
 </script>
 
 <template>
@@ -167,7 +219,7 @@ const connectionRemoved = (connection) => {
             <VBtn
               prepend-icon="tabler:device-floppy"
               color="secondary"
-              @click="exportEditor"
+              @click="saveWorkflow"
             >
               Save Flow
             </VBtn>

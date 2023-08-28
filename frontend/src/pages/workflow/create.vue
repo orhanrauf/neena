@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import router from "@/router"
 import axios from "@axios";
-import { requiredValidator } from "@validators";
+import { lengthValidator, requiredValidator } from "@validators"
+import { useToast } from "vue-toastification"
 import { VForm } from "vuetify/components/VForm";
 
+const toast = useToast();
+
 const refVForm = ref<VForm>();
-const showError = ref(false);
 
 const errors = reactive({
   body: undefined,
@@ -40,37 +43,43 @@ const onSubmit = () => {
 };
 
 const createFlow = () => {
+  const metadata = [...form.metadata];
+  metadata.pop();
+
   // Send post request to API
   axios
     .post("/v1/flow_requests", {
-      request_metadata: form.metadata,
+      request_metadata: metadata,
       request_instructions: form.instructions,
       request_body: form.body,
     })
     .then((response) => {
       Object.assign(form, getInitialForm());
-      refVForm.value.resetValidation();
+      refVForm.value?.resetValidation();
+
+      toast.success('Flow request successfully created!');
+      redirectToFlow(response.data.id);
     })
     .catch((error) => {
-      showError.value = true;
+      toast.error('Something went wrong during the API call');
       console.error(error);
     });
 };
 
-const handleInput = (index, event) => {
+const handleInput = (index: number, event: any) => {
   if (index === form.metadata.length - 1 && event.target.value) {
     errors.metadata.push({ name: undefined, value: undefined });
     form.metadata.push({ name: "", value: "" });
   }
 };
+
+const redirectToFlow = (flowRequestId: string) => {
+  router.push(`/task/${flowRequestId}`);
+}
 </script>
 
 <template>
   <VForm ref="refVForm" @submit.prevent="onSubmit">
-    <VAlert v-model="showError" color="error" class="mb-3" closable>
-      Something went wrong with the API call. Please try again later.
-    </VAlert>
-
     <VRow class="match-height">
       <!-- Describe request -->
       <VCol cols="12" md="7">
@@ -82,7 +91,7 @@ const handleInput = (index, event) => {
               rows="10"
               required
               placeholder="I would like to make use of the discount that is given for customers under the age of 30."
-              :rules="[requiredValidator]"
+              :rules="[requiredValidator, lengthValidator(form.body, 8)]"
               :error-messages="errors.body"
             />
           </VCardText>
@@ -99,7 +108,7 @@ const handleInput = (index, event) => {
               rows="10"
               required
               placeholder="It's important that the customer is first verified with us. Check if their email is actually in the system. Do not give any details without verifying that the email is coupled to an account in our database."
-              :rules="[requiredValidator]"
+              :rules="[requiredValidator, lengthValidator(form.instructions, 8)]"
               :error-messages="errors.instructions"
             />
           </VCardText>
@@ -121,7 +130,6 @@ const handleInput = (index, event) => {
                     :name="`parameter name ${index + 1}`"
                     :label="index === 0 ? 'Parameter name' : ''"
                     :placeholder="index === 0 ? 'city' : ''"
-                    :rules="[requiredValidator]"
                     :error-messages="errors.metadata[index].name"
                     @input="handleInput(index, $event)"
                   />
@@ -133,7 +141,7 @@ const handleInput = (index, event) => {
                     :name="`parameter value ${index + 1}`"
                     :label="index === 0 ? 'Parameter value' : ''"
                     :placeholder="index === 0 ? 'New York' : ''"
-                    :rules="[requiredValidator]"
+                    :rules="[form.metadata[index].name ? requiredValidator : undefined]"
                     :error-messages="errors.metadata[index].value"
                   />
                 </VCol>
