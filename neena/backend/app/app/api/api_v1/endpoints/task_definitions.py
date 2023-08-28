@@ -62,7 +62,7 @@ def read_task_definition(
     Get task definition by id.
     """
     
-    return crud.flow_request.get(db, id)
+    return crud.task_definition.get(db, id)
 
 @router.delete("/", response_model=schemas.TaskDefinition)
 def remove_task_definition(
