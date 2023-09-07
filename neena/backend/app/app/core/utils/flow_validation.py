@@ -47,7 +47,7 @@ def validate_flow(flow: schemas.FlowBase, db: Session) -> list[ValidationMessage
     if validation_messages:
         return validation_messages
     
-    graph, node_to_task = flow_to_graph(flow)
+    graph = flow_to_graph(flow)
     if graph.is_cyclic():
         validation_messages.append(FlowValidationFailureMessage("The flow has a cycle."))
 
