@@ -11,13 +11,13 @@ const taskDefinitionId = route.params.task_definition_id as string;
 onMounted(async () => {
   axios.get(`/v1/task_definitions/?id=${taskDefinitionId}`)
     .then((response) => {
-      const data = response.data.data;
+      const data = response.data;
 
-      form.name = data.name;
+      form.name = data.task_name;
       form.parameters = data.parameters;
-      form.output = data.output;
+      form.output = data.output_type;
       form.description = data.description;
-      form.python = data.python;
+      form.python = data.python_code;
     })
     .catch(() => {});
 });
@@ -68,6 +68,7 @@ const outputName = computed(() => {
               <VTextField
                 v-model="form.name"
                 id="taskName"
+                readonly
               />
             </div>
 
@@ -77,6 +78,7 @@ const outputName = computed(() => {
                 v-model="formattedParameters"
                 id="parameters"
                 rows="2"
+                readonly
               />
             </div>
 
@@ -85,6 +87,7 @@ const outputName = computed(() => {
               <VTextField
                 v-model="form.output"
                 id="output"
+                readonly
               />
             </div>
 
@@ -94,6 +97,7 @@ const outputName = computed(() => {
                 v-model="form.description"
                 id="description"
                 rows="6"
+                readonly
               />
             </div>
           </VCardText>
