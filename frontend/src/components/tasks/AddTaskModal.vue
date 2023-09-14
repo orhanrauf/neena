@@ -23,7 +23,9 @@ const getTaskDefinitions = async () => {
 };
 
 const addTask = (taskDefinition) => {
-  emit("addTask", taskDefinition);
+  const cloneTaskDefinition = Object.assign({}, taskDefinition);
+
+  emit("addTask", cloneTaskDefinition);
   isDialogVisible.value = false;
 };
 
