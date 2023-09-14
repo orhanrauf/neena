@@ -1,9 +1,17 @@
 <script setup lang="ts">
+import { TaskDefinition, NodeTaskDefinition } from "@/types"
 import axios from "@axios"
 import Drawflow from "drawflow"
 import { onMounted, shallowRef, h, getCurrentInstance, render, ref, ComponentInternalInstance, ShallowRef } from "vue"
 import { useToast } from "vue-toastification"
 import Node from "./nodes/Node.vue";
+
+interface NodeConnection {
+  input_class: string;
+  input_id: string;
+  output_class: string;
+  output_id: string;
+}
 
 const props = defineProps<{
   flowRequestId: string,
@@ -30,22 +38,22 @@ onMounted(() => {
 
   editor.value.registerNode("Node", Node, {}, {});
 
-  editor.value.on("connectionCreated", function (connection: any) {
+  editor.value.on("connectionCreated", (connection: NodeConnection) => {
     connectionCreated(connection);
   });
 
-  editor.value.on("connectionRemoved", function (connection: any) {
+  editor.value.on("connectionRemoved", (connection: NodeConnection) => {
     connectionRemoved(connection);
   });
 });
 
-const getNewTaskName = (taskDefinition: any): string => {
+const getNewTaskName = (taskDefinition: TaskDefinition): string => {
   const exportData = editor.value.export();
   const nodes = exportData.drawflow.Home.data;
-  let existingTaskName: string | null = null;
+  let existingTaskName = '';
 
   Object.keys(nodes).forEach((key) => {
-    const node = nodes[key];
+    const node: NodeTaskDefinition = nodes[key];
 
     if (node.data.task_definition.task_name.startsWith(taskDefinition.task_name)) {
       existingTaskName = node.data.task_definition.task_name;
@@ -64,7 +72,7 @@ const getNewTaskName = (taskDefinition: any): string => {
   return taskDefinition.task_name + '_1';
 }
 
-const addTask = (taskDefinition: any) => {
+const addTask = (taskDefinition: TaskDefinition) => {
   const inputCount = taskDefinition.parameters.length;
   const newName = getNewTaskName(taskDefinition);
 
@@ -85,7 +93,7 @@ const addTask = (taskDefinition: any) => {
   );
 };
 
-const connectionCreated = (connection: any) => {
+const connectionCreated = (connection: NodeConnection) => {
   const inputNode = editor.value.getNodeFromId(connection.input_id);
   const outputNode = editor.value.getNodeFromId(connection.output_id);
 
@@ -104,7 +112,7 @@ const connectionCreated = (connection: any) => {
   });
 };
 
-const connectionRemoved = (connection: any) => {
+const connectionRemoved = (connection: NodeConnection) => {
   const inputNode = editor.value.getNodeFromId(connection.input_id);
 
   const inputClassSplit = connection.input_class.split("_");
@@ -130,7 +138,7 @@ const saveWorkflow = () => {
 
   // Create task operations object
   const taskOperations = nodeKeys.map((key) => {
-    const node = nodes[key];
+    const node: NodeTaskDefinition = nodes[key];
 
     return {
       name: node.data.task_definition.task_name,

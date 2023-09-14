@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import router from "@/router"
+import { TaskDefinition } from "@/types"
+import { ComputedRef, Ref } from "vue"
 import { VDataTable } from "vuetify/labs/VDataTable";
 import axios from "@axios";
 import dayjs from "dayjs";
@@ -27,7 +29,7 @@ const headers = [
 ];
 
 // Data
-let items = ref([]);
+let items: Ref<TaskDefinition[]> = ref([]);
 
 const taskDefinitions = computed(() => {
   return items.value.map((item) => ({

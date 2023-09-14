@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { VForm } from "vuetify/components/VForm";
-import { requiredValidator } from "@validators";
 import { computed, reactive } from "vue"
 import axios from "@axios";
 import PythonCode from "@/components/PythonCode.vue";
