@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import router from "@/router"
+import { TaskDefinition } from "@/types"
+import { ComputedRef, Ref } from "vue"
 import { VDataTable } from "vuetify/labs/VDataTable";
 import axios from "@axios";
 import dayjs from "dayjs";
@@ -26,10 +29,11 @@ const headers = [
 ];
 
 // Data
-let items = ref([]);
+let items: Ref<TaskDefinition[]> = ref([]);
 
 const taskDefinitions = computed(() => {
   return items.value.map((item) => ({
+    item_id: item.id,
     name: item.task_name,
     parameters: item.parameters
       .map(
@@ -132,7 +136,7 @@ onMounted(() => getTasks());
         <button class="mx-1" @click="undefined">
           <VIcon icon="tabler-mail" size="26" />
         </button>
-        <button class="mx-1" @click="undefined">
+        <button class="mx-1" @click="router.push(`/taskdefinitions/${item.value.item_id}`)">
           <VIcon icon="tabler-eye" size="26" />
         </button>
         <button class="mx-1" @click="undefined">

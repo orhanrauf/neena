@@ -18,12 +18,12 @@ export default [
   // },
   {
     title: "Tasks",
-    to: { name: "tasks" },
+    to: { name: "taskdefinitions" },
     icon: { icon: "tabler:file-description" },
   },
-  {
-    title: "Task names",
-    to: { name: "tasknames-create" },
-    icon: { icon: "tabler:file-description" },
-  },
+  // {
+  //   title: "Task names",
+  //   to: { name: "tasknames-create" },
+  //   icon: { icon: "tabler:file-description" },
+  // },
 ] as VerticalNavItems;

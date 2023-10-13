@@ -770,7 +770,7 @@
 
 "@types/drawflow@^0.0.5":
   version "0.0.5"
-  resolved "https://registry.npmjs.org/@types/drawflow/-/drawflow-0.0.5.tgz"
+  resolved "https://registry.yarnpkg.com/@types/drawflow/-/drawflow-0.0.5.tgz#a550251a74d431c0e7397cc4d90e033bef7b4dbf"
   integrity sha512-346oD6FCwpMsnWBi9Rv+N/Q2XEcNVOwFIdhgdyw6O9AtRzzNzBcKeb/X0pyRHlUDfh9F9vwvS5fIfDn7fjAujw==
 
 "@types/estree@^1.0.0":

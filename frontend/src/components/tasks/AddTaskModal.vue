@@ -1,14 +1,15 @@
 <script setup lang="ts">
+import { TaskDefinition } from "@/types"
 import axios from "@axios";
 import { VInfiniteScroll } from "vuetify/labs/components";
 
 const emit = defineEmits<{
-  (e: "addTask", task: object): void;
+  (e: "addTask", task: TaskDefinition): void;
 }>();
 
 const loading = ref(false);
 const filter = ref("");
-let taskDefinitions = reactive([]);
+let taskDefinitions: TaskDefinition[] = reactive([]);
 const isDialogVisible = ref(false);
 
 const getTaskDefinitions = async () => {
@@ -22,8 +23,10 @@ const getTaskDefinitions = async () => {
   });
 };
 
-const addTask = (taskDefinition) => {
-  emit("addTask", taskDefinition);
+const addTask = (taskDefinition: TaskDefinition) => {
+  const cloneTaskDefinition = Object.assign({}, taskDefinition);
+
+  emit("addTask", cloneTaskDefinition);
   isDialogVisible.value = false;
 };
 
