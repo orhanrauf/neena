@@ -14,11 +14,11 @@ const vuetifyTheme = useTheme();
         </div>
 
         <div class="mb-4">
-          <VLabel for="porometers" class="mb-1" text="Porometers" />
+          <VLabel for="parameters" class="mb-1" text="Parameters" />
           <VTextarea
-            id="porometers"
-            placeholder="Object : details \nCallable : Condition"
-            rows="4"
+            id="parameters"
+            placeholder="Object : details &#10;Callable : Condition"
+            rows="2"
           />
         </div>
 
@@ -28,28 +28,11 @@ const vuetifyTheme = useTheme();
         </div>
 
         <div class="mb-4">
-          <VLabel
-            for="descriptionShort"
-            class="mb-1"
-            text="Description ( Short )"
-          />
+          <VLabel for="description" class="mb-1" text="Description" />
           <VTextarea
-            id="descriptionShort"
-            placeholder="Verifies is a details matches the given condition."
-            rows="3"
-          />
-        </div>
-
-        <div>
-          <VLabel
-            for="descriptionLong"
-            class="mb-1"
-            text="Description ( Long )"
-          />
-          <VTextarea
-            id="descriptionLong"
-            placeholder="This function takes in tow parameters, one which presents a details of a  customers, employee or product. The other is a lamsla function that encodes the condition that needs to be met."
-            rows="2"
+            id="description"
+            placeholder="This is a long description of this task. In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available."
+            rows="6"
           />
         </div>
       </VForm>

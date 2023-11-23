@@ -1,16 +1,23 @@
 <script setup lang="ts">
-import { useTheme } from "vuetify";
+const props = defineProps<{
+  modelValue: string;
+}>();
+const emit = defineEmits(["update:modelValue"]);
 
-const vuetifyTheme = useTheme();
+const value = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(value) {
+    emit("update:modelValue", value);
+  },
+});
 </script>
 
 <template>
   <VCard title="Provide instructions">
     <VCardText>
-      <VTextarea
-        placeholder="It’s important that the customer is first verified with us. Check if their email is actually in the system. &#10;&#10;Do not give any details without verifying that the email is coupled to an account in our database."
-        rows="10"
-      />
+      <VTextarea v-model="value" name="instructions" rows="10" required />
     </VCardText>
   </VCard>
 </template>
