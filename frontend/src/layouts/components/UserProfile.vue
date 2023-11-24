@@ -3,7 +3,7 @@ import avatar1 from '@images/avatars/avatar-1.png'
 </script>
 
 <template>
-  <VBadge
+  <VBadge 
     dot
     location="bottom right"
     offset-x="3"
@@ -11,7 +11,7 @@ import avatar1 from '@images/avatars/avatar-1.png'
     bordered
     color="success"
   >
-    <VAvatar
+    <VAvatar 
       class="cursor-pointer"
       color="primary"
       variant="tonal"
@@ -23,9 +23,9 @@ import avatar1 from '@images/avatars/avatar-1.png'
         activator="parent"
         width="230"
         location="bottom end"
-        offset="14px"
+        offset="14px" 
       >
-        <VList>
+        <VList class=" border">
           <!-- 👉 User Avatar & Name -->
           <VListItem>
             <template #prepend>

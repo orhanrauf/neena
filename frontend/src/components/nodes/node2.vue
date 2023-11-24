@@ -8,7 +8,7 @@
       <el-drawer
         v-model="drawer"
         :direction="direction"
-        :before-close="handleClose"
+        :before-close="handleClose" class=" border"
       >
         <template #header="{ close, titleId, titleClass }">
           <div>

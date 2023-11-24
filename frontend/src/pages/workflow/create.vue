@@ -20,9 +20,9 @@
 
       <!-- Buttons -->
       <VCol cols="12" md="12" class="d-flex gap-4 justify-end">
-        <VBtn type="submit">Generate Flow</VBtn>
+        <VBtn type="submit" color='success' class=" border">Generate Flow</VBtn>
 
-        <VBtn type="reset" color="secondary"> Create Manually </VBtn>
+        <VBtn type="reset" color="secondary" class=" border"> Create Manually </VBtn>
       </VCol>
     </VRow>
   </VForm>

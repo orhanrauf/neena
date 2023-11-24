@@ -201,10 +201,10 @@ export default {
           <AddTaskModal />
 
           <div class="d-flex gap-4">
-            <VBtn prepend-icon="tabler:adjustments-code" color="success">
+            <VBtn prepend-icon="tabler:adjustments-code" color="secondary" class=" border">
               Run Flow
             </VBtn>
-            <VBtn
+            <VBtn class=" border"
               prepend-icon="tabler:device-floppy"
               color="secondary"
               @click="exportEditor"

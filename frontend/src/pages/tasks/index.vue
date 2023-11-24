@@ -157,7 +157,7 @@ const items = [
 </script>
 
 <template>
-  <VCard>
+  <VCard class=" border">
     <!-- Filters -->
     <VCardText>
       <VRow>
@@ -227,6 +227,7 @@ const items = [
 
             <VCol lg="10" cols="9" class="d-flex justify-end">
               <VPagination
+                
                 v-model="options.page"
                 total-visible="5"
                 :length="Math.ceil(items.length / options.itemsPerPage)"

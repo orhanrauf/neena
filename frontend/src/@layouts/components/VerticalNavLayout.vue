@@ -69,7 +69,7 @@ export default defineComponent({
         [
           h(
             'div',
-            { class: 'navbar-content-container' },
+            { class: 'navbar-content-container headerborder' },
             slots.navbar?.({
               toggleVerticalOverlayNavActive: toggleIsOverlayNavActive,
             }),
@@ -244,5 +244,9 @@ export default defineComponent({
       }
     }
   }
+}
+.headerborder {
+  border-radius: 6px;
+  border: 1.5px solid var(--light-solid-color-gray-gray-700-active, #4B465C);;
 }
 </style>

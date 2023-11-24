@@ -6,7 +6,7 @@ const isDialogVisible = ref(false);
   <VDialog v-model="isDialogVisible" width="auto">
     <!-- Activator -->
     <template #activator="{ props }">
-      <VBtn prepend-icon="tabler:circle-plus" v-bind="props"> Add task </VBtn>
+      <VBtn prepend-icon="tabler:circle-plus" color='success' class=" border" v-bind="props"> Add task </VBtn>
     </template>
 
     <!-- Dialog close btn -->
@@ -35,7 +35,7 @@ const isDialogVisible = ref(false);
                   the bulk of the card's content.
 
                   <div class="mt-4 d-flex gap-3">
-                    <VBtn prepend-icon="tabler:circle-plus"> Add task </VBtn>
+                    <VBtn prepend-icon="tabler:circle-plus" color='success'> Add task </VBtn>
                     <VBtn prepend-icon="tabler:info-circle" color="secondary">
                       Info
                     </VBtn>
@@ -52,7 +52,7 @@ const isDialogVisible = ref(false);
                   the bulk of the card's content.
 
                   <div class="mt-4 d-flex gap-3">
-                    <VBtn prepend-icon="tabler:circle-plus"> Add task </VBtn>
+                    <VBtn prepend-icon="tabler:circle-plus" color='success'> Add task </VBtn>
                     <VBtn prepend-icon="tabler:info-circle" color="secondary">
                       Info
                     </VBtn>
@@ -69,7 +69,7 @@ const isDialogVisible = ref(false);
                   the bulk of the card's content.
 
                   <div class="mt-4 d-flex gap-3">
-                    <VBtn prepend-icon="tabler:circle-plus"> Add task </VBtn>
+                    <VBtn prepend-icon="tabler:circle-plus" color='success'> Add task </VBtn>
                     <VBtn prepend-icon="tabler:info-circle" color="secondary">
                       Info
                     </VBtn>
@@ -88,7 +88,7 @@ const isDialogVisible = ref(false);
                   the bulk of the card's content.
 
                   <div class="mt-4 d-flex gap-3">
-                    <VBtn prepend-icon="tabler:circle-plus"> Add task </VBtn>
+                    <VBtn prepend-icon="tabler:circle-plus" color='success'> Add task </VBtn>
                     <VBtn prepend-icon="tabler:info-circle" color="secondary">
                       Info
                     </VBtn>
@@ -105,7 +105,7 @@ const isDialogVisible = ref(false);
                   the bulk of the card's content.
 
                   <div class="mt-4 d-flex gap-3">
-                    <VBtn prepend-icon="tabler:circle-plus"> Add task </VBtn>
+                    <VBtn prepend-icon="tabler:circle-plus" color='success'> Add task </VBtn>
                     <VBtn prepend-icon="tabler:info-circle" color="secondary">
                       Info
                     </VBtn>
@@ -122,7 +122,7 @@ const isDialogVisible = ref(false);
                   the bulk of the card's content.
 
                   <div class="mt-4 d-flex gap-3">
-                    <VBtn prepend-icon="tabler:circle-plus"> Add task </VBtn>
+                    <VBtn prepend-icon="tabler:circle-plus" color='success'> Add task </VBtn>
                     <VBtn prepend-icon="tabler:info-circle" color="secondary">
                       Info
                     </VBtn>

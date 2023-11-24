@@ -6,12 +6,12 @@ import TaskForm from "@/components/tasknames/TaskForm.vue";
   <VRow class="match-height">
     <!-- Task form -->
     <VCol cols="12" md="9">
-      <TaskForm />
+      <TaskForm class=" border" />
     </VCol>
 
     <!-- View task -->
     <VCol cols="12" md="3">
-      <ViewTask />
+      <ViewTask class=" border" />
     </VCol>
   </VRow>
 </template>

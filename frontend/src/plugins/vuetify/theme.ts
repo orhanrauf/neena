@@ -10,20 +10,20 @@ const theme: VuetifyOptions['theme'] = {
     light: {
       dark: false,
       colors: {
-        'primary': localStorage.getItem(`${themeConfig.app.title}-lightThemePrimaryColor`) || staticPrimaryColor,
-        'on-primary': '#fff',
-        'secondary': '#A8AAAE',
+        'primary': '#4b465c',
+        'on-primary': '#212121', 
+        'secondary': '#FF9F43', //ff0011
         'on-secondary': '#fff',
-        'success': '#28C76F',
+        'success': '#67B6F0',
         'on-success': '#fff',
         'info': '#00CFE8',
         'on-info': '#fff',
         'warning': '#FF9F43',
         'on-warning': '#fff',
         'error': '#EA5455',
-        'background': '#F8F7FA',
-        'on-background': '#2F2B3D',
-        'on-surface': '#2F2B3D',
+        'background': '#FAFAF7',
+        'on-background': '#4B465C',
+        'on-surface': '#4B465C',
         'grey-50': '#FAFAFA',
         'grey-100': '#F5F5F5',
         'grey-200': '#EEEEEE',
@@ -51,8 +51,8 @@ const theme: VuetifyOptions['theme'] = {
         'pressed-opacity': 0.14,
         'dragged-opacity': 0.1,
         'disabled-opacity': 0.42,
-        'border-color': '#2F2B3D',
-        'border-opacity': 0.16,
+        'border-color': '#4B465C',
+        'border-opacity': 1,
         'high-emphasis-opacity': 0.78,
         'medium-emphasis-opacity': 0.68,
         'switch-opacity': 0.2,
@@ -61,7 +61,7 @@ const theme: VuetifyOptions['theme'] = {
         'switch-checked-disabled-opacity': 0.3,
 
         // Shadows
-        'shadow-key-umbra-color': '#2F2B3D',
+        'shadow-key-umbra-color': '',
       },
     },
     dark: {
