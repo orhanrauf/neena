@@ -18,6 +18,7 @@ const value = computed({
   <VCard
     title="Metadata"
     subtitle="Specify your custom parameters for the request"
+    class="border"
   >
     <VCardText>
       <VRow>

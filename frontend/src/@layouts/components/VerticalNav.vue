@@ -61,7 +61,7 @@ const handleNavScroll = (evt: Event) => {
   <Component
     :is="props.tag"
     ref="refNav"
-    class="layout-vertical-nav"
+    class="layout-vertical-nav cardborder"
     :class="[
       {
         'overlay-nav': isLessThanOverlayNavBreakpoint(windowWidth),
@@ -206,5 +206,10 @@ const handleNavScroll = (evt: Event) => {
       }
     }
   }
+}
+
+
+.cardborder {
+border: 0.5px solid var(--light-solid-color-secondary-secondary-500-base, #4B465C);
 }
 </style>

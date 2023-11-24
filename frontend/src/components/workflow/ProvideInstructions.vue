@@ -15,7 +15,7 @@ const value = computed({
 </script>
 
 <template>
-  <VCard title="Provide instructions">
+  <VCard title="Provide instructions" class="border">
     <VCardText>
       <VTextarea v-model="value" name="instructions" rows="10" required />
     </VCardText>

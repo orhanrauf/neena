@@ -20,7 +20,7 @@ const logout = () => {
 </script>
 
 <template>
-  <VBadge
+  <VBadge 
     dot
     location="bottom right"
     offset-x="3"
