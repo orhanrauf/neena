@@ -4,3 +4,8 @@
 # Python local development
 .venv
 
+**/__pycache__
+.vscode
+
+# Terraform
+infra/.terraform
