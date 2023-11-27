@@ -10,6 +10,8 @@ jobs:
 
   terraform:
     runs-on: ubuntu-latest
+    environment: 
+      name: production
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
