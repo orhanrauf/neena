@@ -13,7 +13,25 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
+      
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: |
+          {
+            "clientId": "${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}",
+            "clientSecret": "${{ secrets.DEPLOYMENT_SP_SECRET }}",
+            "subscriptionId": "${{ secrets.DEPLOYMENT_SUBSCRIPTION_ID }}",
+            "tenantId": "${{ secrets.DEPLOYMENT_SP_TENANT_ID }}"
+          }
+          
+    - name: Get storage account key
+      id: get_storage_key
+      run: |
+        az storage account keys list --resource-group ${{secrets.TF_STATE_RG}} --account-name ${{secrets.TF_STATE_STORAGE_ACC}} --query '[0].value' --output tsv
+      env:
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.DEPLOYMENT_SUBSCRIPTION_ID }}
+          
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
@@ -27,6 +45,7 @@ jobs:
         ARM_CLIENT_SECRET: ${{ secrets.DEPLOYMENT_SP_SECRET }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.DEPLOYMENT_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.DEPLOYMENT_SP_TENANT_ID }}
+        ARM_ACCOUNT_KEY: ${{ steps.get_storage_key.outputs.value }}
         
   # build:
   #   runs-on: ubuntu-latest
