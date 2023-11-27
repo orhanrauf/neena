@@ -1,16 +1,23 @@
 <script setup lang="ts">
-import { useTheme } from "vuetify";
+const props = defineProps<{
+  modelValue: string;
+}>();
+const emit = defineEmits(["update:modelValue"]);
 
-const vuetifyTheme = useTheme();
+const value = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(value) {
+    emit("update:modelValue", value);
+  },
+});
 </script>
 
 <template>
   <VCard title="Describe Request" class="border">
     <VCardText>
-      <VTextarea
-        placeholder="I would like to make use of the discount that is given for customers under the age of 30."
-        rows="10"
-      />
+      <VTextarea v-model="value" name="body" rows="10" required />
     </VCardText>
   </VCard>
 </template>

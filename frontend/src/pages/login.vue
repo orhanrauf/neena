@@ -1,51 +1,109 @@
 <script setup lang="ts">
-import { VForm } from 'vuetify/components/VForm'
+import { VForm } from "vuetify/components/VForm";
+import { useGenerateImageVariant } from "@core/composable/useGenerateImageVariant";
+import authV2LoginIllustrationBorderedDark from "@images/pages/auth-v2-login-illustration-bordered-dark.png";
+import authV2LoginIllustrationBorderedLight from "@images/pages/auth-v2-login-illustration-bordered-light.png";
+import authV2LoginIllustrationDark from "@images/pages/auth-v2-login-illustration-dark.png";
+import authV2LoginIllustrationLight from "@images/pages/auth-v2-login-illustration-light.png";
+import authV2MaskDark from "@images/pages/misc-mask-dark.png";
+import authV2MaskLight from "@images/pages/misc-mask-light.png";
+import { VNodeRenderer } from "@layouts/components/VNodeRenderer";
+import { themeConfig } from "@themeConfig";
+import axios from "@axios";
+import { LoginResponse } from "@/types";
+import { emailValidator, requiredValidator } from "@validators";
 
-import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
-import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
-import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
-import authV2LoginIllustrationBorderedLight from '@images/pages/auth-v2-login-illustration-bordered-light.png'
-import authV2LoginIllustrationDark from '@images/pages/auth-v2-login-illustration-dark.png'
-import authV2LoginIllustrationLight from '@images/pages/auth-v2-login-illustration-light.png'
-import authV2MaskDark from '@images/pages/misc-mask-dark.png'
-import authV2MaskLight from '@images/pages/misc-mask-light.png'
-import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
-import { themeConfig } from '@themeConfig'
+const authThemeImg = useGenerateImageVariant(
+  authV2LoginIllustrationLight,
+  authV2LoginIllustrationDark,
+  authV2LoginIllustrationBorderedLight,
+  authV2LoginIllustrationBorderedDark,
+  true
+);
 
-const authThemeImg = useGenerateImageVariant(authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
+const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark);
 
-const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
+const isPasswordVisible = ref(false);
 
-const isPasswordVisible = ref(false)
+const route = useRoute();
+const router = useRouter();
 
-const refVForm = ref<VForm>()
-const email = ref('admin@demo.com')
-const password = ref('admin')
-const rememberMe = ref(false)
+const errors = ref<Record<string, string | undefined>>({
+  email: undefined,
+  password: undefined,
+});
+
+const refVForm = ref<VForm>();
+const email = ref("");
+const password = ref("");
+// const rememberMe = ref(false);
+
+const login = () => {
+  axios
+    .post<LoginResponse>(
+      "/v1/login/access-token",
+      {
+        username: email.value,
+        password: password.value,
+      },
+      {
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+      }
+    )
+    .then((response) => {
+      const { access_token } = response.data;
+
+      if (access_token) {
+        localStorage.setItem("accessToken", JSON.stringify(access_token));
+
+        getUserData();
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      // const { errors: formErrors } = e.response.data;
+
+      // errors.value = formErrors;
+      // console.error(e.response.data);
+    });
+};
+
+const getUserData = () => {
+  axios
+    .get("/v1/users")
+    .then((response) => {
+      localStorage.setItem("userData", JSON.stringify(response.data));
+
+      // Redirect to `to` query if exist or redirect to index route
+      router.replace(route.query.to ? String(route.query.to) : "/");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+const onSubmit = () => {
+  refVForm.value?.validate().then(({ valid: isValid }) => {
+    if (isValid) {
+      login();
+    }
+  });
+};
 </script>
 
 <template>
-  <VRow
-    no-gutters
-    class="auth-wrapper bg-surface"
-  >
-    <VCol
-      lg="8"
-      class="d-none d-lg-flex"
-    >
+  <VRow no-gutters class="auth-wrapper bg-surface">
+    <VCol lg="8" class="d-none d-lg-flex">
       <div class="position-relative bg-background rounded-lg w-100 ma-8 me-0">
         <div class="d-flex align-center justify-center w-100 h-100">
           <VImg
             max-width="505"
-            :src="authThemeImg"
+            :src="authThemeImg as string"
             class="auth-illustration mt-16 mb-2"
           />
         </div>
 
-        <VImg
-          :src="authThemeMask"
-          class="auth-footer-mask"
-        />
+        <VImg :src="authThemeMask as string" class="auth-footer-mask" />
       </div>
     </VCol>
 
@@ -54,20 +112,11 @@ const rememberMe = ref(false)
       lg="4"
       class="auth-card-v2 d-flex align-center justify-center"
     >
-      <VCard
-        flat
-        :max-width="500"
-        class="mt-12 mt-sm-0 pa-4"
-      >
+      <VCard flat :max-width="500" class="mt-12 mt-sm-0 pa-4">
         <VCardText>
-          <VNodeRenderer
-            :nodes="themeConfig.app.logo"
-            class="mb-6"
-          />
+          <VNodeRenderer :nodes="themeConfig.app.logo" class="mb-6" />
 
-          <h5 class="text-h5 mb-1">
-            Welcome to <span class="text-capitalize"> {{ themeConfig.app.title }} </span>! 👋🏻
-          </h5>
+          <h5 class="text-h5 mb-1">Welcome! 👋🏻</h5>
 
           <p class="mb-0">
             Please sign-in to your account and start the adventure
@@ -75,25 +124,7 @@ const rememberMe = ref(false)
         </VCardText>
 
         <VCardText>
-          <VAlert
-            color="primary"
-            variant="tonal"
-          >
-            <p class="text-caption mb-2">
-              Admin  Email: <strong>admin@demo.com</strong> / Pass: <strong>admin</strong>
-            </p>
-
-            <p class="text-caption mb-0">
-              Client Email: <strong>client@demo.com</strong> / Pass: <strong>client</strong>
-            </p>
-          </VAlert>
-        </VCardText>
-
-        <VCardText>
-          <VForm
-            ref="refVForm"
-            @submit="() => { }"
-          >
+          <VForm ref="refVForm" @submit.prevent="onSubmit">
             <VRow>
               <!-- email -->
               <VCol cols="12">
@@ -102,6 +133,8 @@ const rememberMe = ref(false)
                   label="Email"
                   type="email"
                   autofocus
+                  :rules="[requiredValidator, emailValidator]"
+                  :error-messages="errors.email"
                 />
               </VCol>
 
@@ -110,64 +143,37 @@ const rememberMe = ref(false)
                 <AppTextField
                   v-model="password"
                   label="Password"
+                  :rules="[requiredValidator]"
                   :type="isPasswordVisible ? 'text' : 'password'"
-                  :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
+                  :error-messages="errors.password"
+                  :append-inner-icon="
+                    isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'
+                  "
                   @click:append-inner="isPasswordVisible = !isPasswordVisible"
                 />
 
-                <div class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4">
-                  <VCheckbox
-                    v-model="rememberMe"
-                    label="Remember me"
-                  />
-                  <a
-                    class="text-primary ms-2 mb-1"
-                    href="#"
-                  >
-                    Forgot Password?
-                  </a>
-                </div>
+                <!--                <div-->
+                <!--                  class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4"-->
+                <!--                >-->
+                <!--                  <VCheckbox v-model="rememberMe" label="Remember me" />-->
+                <!--                  <a class="text-primary ms-2 mb-1" href="#">-->
+                <!--                    Forgot Password?-->
+                <!--                  </a>-->
+                <!--                </div>-->
 
-                <VBtn
-                  block
-                  type="submit"
-                >
-                  Login
-                </VBtn>
+                <VBtn class="mt-6" block type="submit"> Login </VBtn>
               </VCol>
 
               <!-- create account -->
-              <VCol
-                cols="12"
-                class="text-center"
-              >
+              <VCol cols="12" class="text-center">
                 <span>New on our platform?</span>
 
-                <a
+                <RouterLink
                   class="text-primary ms-2"
-                  href="#"
+                  :to="{ name: 'register' }"
                 >
                   Create an account
-                </a>
-              </VCol>
-
-              <VCol
-                cols="12"
-                class="d-flex align-center"
-              >
-                <VDivider />
-
-                <span class="mx-4">or</span>
-
-                <VDivider />
-              </VCol>
-
-              <!-- auth providers -->
-              <VCol
-                cols="12"
-                class="text-center"
-              >
-                <AuthProvider />
+                </RouterLink>
               </VCol>
             </VRow>
           </VForm>
@@ -184,4 +190,7 @@ const rememberMe = ref(false)
 <route lang="yaml">
 meta:
   layout: blank
+  action: read
+  subject: Auth
+  redirectIfLoggedIn: true
 </route>
