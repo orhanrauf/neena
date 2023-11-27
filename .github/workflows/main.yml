@@ -22,9 +22,9 @@ jobs:
         creds: |
           {
             "clientId": "${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}",
-            "clientSecret": "${{ secrets.DEPLOYMENT_SP_SECRET }}",
-            "subscriptionId": "${{ secrets.DEPLOYMENT_SUBSCRIPTION_ID }}",
-            "tenantId": "${{ secrets.DEPLOYMENT_SP_TENANT_ID }}"
+            "clientSecret": "${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}",
+            "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}",
+            "tenantId": "${{ secrets.TENANT_ID }}"
           }
           
     - name: Get storage account key
@@ -32,7 +32,7 @@ jobs:
       run: |
         az storage account keys list --resource-group ${{secrets.TF_STATE_RG}} --account-name ${{secrets.TF_STATE_STORAGE_ACC}} --query '[0].value' --output tsv
       env:
-        AZURE_SUBSCRIPTION_ID: ${{ secrets.DEPLOYMENT_SUBSCRIPTION_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
           
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
@@ -44,9 +44,9 @@ jobs:
       run: terraform apply -auto-approve
       env:
         ARM_CLIENT_ID: ${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.DEPLOYMENT_SP_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.DEPLOYMENT_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.DEPLOYMENT_SP_TENANT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
         ARM_ACCOUNT_KEY: ${{ steps.get_storage_key.outputs.value }}
         
   # build:
