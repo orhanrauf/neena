@@ -38,11 +38,11 @@ jobs:
       uses: hashicorp/setup-terraform@v1
 
     - name: Terraform Init
-      run: terraform init -var-file ="infra/${{ github.job.environment }}.terraform.tfvars"
+      run: terraform init
       working-directory: infra
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve -var-file ="infra/${{ github.job.environment }}.terraform.tfvars"
+      run: terraform apply -auto-approve -var-file="infra/dev.terraform.tfvars"
       env:
         ARM_CLIENT_ID: ${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}
