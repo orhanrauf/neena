@@ -84,6 +84,8 @@ module "postgresql" {
   ssl_enforcement_enabled = var.postgresql_ssl_enforcement_enabled
   service_app_principal_id = module.service_app.service_app_principal_id
   function_app_principal_id = module.function_app.principal_id
+  psql_admin_username     = var.psql_admin_username
+  psql_admin_password     = var.psql_admin_password
 }
 
 module "static_website" {

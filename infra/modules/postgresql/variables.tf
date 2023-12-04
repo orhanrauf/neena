@@ -43,3 +43,13 @@ variable "function_app_principal_id" {
   description = "The principal ID of the function app"
   type        = string
 }
+
+variable "psql_admin_username" {
+  description = "PostgreSQL Admin Username"
+  type        = string
+}
+
+variable "psql_admin_password" {
+  description = "PostgreSQL Admin Password"
+  type        = string
+}

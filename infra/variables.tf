@@ -66,3 +66,13 @@ variable "postgresql_ssl_enforcement_enabled" {
   type        = bool
   
 }
+
+variable "psql_admin_username" {
+  description = "PostgreSQL Admin Username"
+  type        = string
+}
+
+variable "psql_admin_password" {
+  description = "PostgreSQL Admin Password"
+  type        = string
+}
