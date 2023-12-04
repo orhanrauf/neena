@@ -11,9 +11,6 @@ terraform {
   }
 }
 
-provider "azurerm" {
-  features {}
-}
 
 locals {
   resource_prefix = "${var.organization}-${var.project_name}-${var.environment}"
