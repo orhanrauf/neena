@@ -8,6 +8,7 @@ on:
 
 jobs:
 
+
   terraform:
     runs-on: ubuntu-latest
     environment: 
@@ -15,7 +16,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      
+    - name: Print non-sensitive Terraform variables
+      run: |
+        echo "PostgreSQL Admin Username: $TF_VAR_psql_admin_username"
+      working-directory: infra
+      env:
+        TF_VAR_psql_admin_username: ${{ secrets.PSQL_ADMIN_USERNAME }}
+        
     - name: Login to Azure
       uses: azure/login@v1
       with:
