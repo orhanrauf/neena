@@ -6,6 +6,9 @@ resource "azurerm_postgresql_server" "psql_server" {
   sku_name = var.sku_name
   version  = var.postgres_version
   ssl_enforcement_enabled = var.ssl_enforcement_enabled
+
+  administrator_login          = var.psql_admin_username
+  administrator_login_password = var.psql_admin_password
 }
 
 resource "azurerm_postgresql_database" "psql_db" {
