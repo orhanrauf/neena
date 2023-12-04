@@ -45,6 +45,24 @@ variable "function_app_plan_size" {
 variable "kv_sku_name" {
   description = "The Name of the SKU used for this Key Vault"
   default     = "standard"
+  type        = string 
+}
+
+variable "postgresql_version" {
+  description = "The version of PostgreSQL to use"
+  default     = "11"
   type        = string
+}
+
+variable "postgresql_sku_name" {
+  description = "The Name of the SKU used for this PostgreSQL server"
+  default     = "B_Gen4_1"
+  type        = string
+}
+
+variable "postgresql_ssl_enforcement_enabled" {
+  description = "Enable SSL enforcement"
+  default     = true
+  type        = bool
   
 }

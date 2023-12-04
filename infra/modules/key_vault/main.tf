@@ -10,19 +10,32 @@ resource "azurerm_key_vault" "kv" {
   purge_protection_enabled   = var.purge_protection_enabled
 
   network_acls {
-    default_action             = "Deny"
+    default_action             = "Allow" # For now while dynamic whitelisting of GitHub workers is out of scope.
     bypass                     = "AzureServices"
   }
 }
 
-resource "azurerm_role_assignment" "function_app_reader" {
-  scope                = azurerm_key_vault.kv.id
-  role_definition_name = "Reader"
-  principal_id         = var.function_app_principal_id
+resource "azurerm_key_vault_access_policy" "svc_policy" {
+  key_vault_id = azurerm_key_vault.kv.id
+
+  tenant_id = var.tenant_id
+  object_id = var.service_app_principal_id
+
+  secret_permissions = [
+    "Get",
+    "Set",
+    "List",
+    "Delete"
+  ]
 }
 
-resource "azurerm_role_assignment" "service_app_reader" {
-  scope                = azurerm_key_vault.kv.id
-  role_definition_name = "Reader"
-  principal_id         = var.service_app_principal_id
+resource "azurerm_key_vault_access_policy" "func_policy" {
+  key_vault_id = azurerm_key_vault.kv.id
+
+  tenant_id = var.tenant_id
+  object_id = var.function_app_principal_id
+
+  secret_permissions = [
+    "Get"
+  ]
 }

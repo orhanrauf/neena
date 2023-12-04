@@ -31,7 +31,6 @@ resource "azurerm_function_app" "funcapp" {
   identity {
     type = "SystemAssigned"
   }
-
 }
 
 resource "azurerm_role_assignment" "func_sami_role" {
@@ -57,22 +56,13 @@ resource "azurerm_monitor_diagnostic_setting" "law" {
   target_resource_id         = azurerm_function_app.funcapp.id
   log_analytics_workspace_id = var.log_analytics_workspace_id
 
-  log {
+  enabled_log {
     category = "FunctionAppLogs"
-    enabled  = true
-
-    retention_policy {
-      enabled = false
-    }
   }
 
   metric {
     category = "AllMetrics"
     enabled  = true
-
-    retention_policy {
-      enabled = false
-    }
   }
 }
 

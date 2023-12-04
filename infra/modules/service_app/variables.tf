@@ -25,11 +25,6 @@ variable "app_service_plan_name" {
   type        = string
 }
 
-variable "storage_account_name" {
-  description = "The name of the storage account"
-  type        = string
-}
-
 variable "log_analytics_workspace_id" {
   description = "The ID of the Log Analytics Workspace"
   type        = string

@@ -48,23 +48,12 @@ resource "azurerm_monitor_diagnostic_setting" "app_service_diagnostic" {
   target_resource_id         = azurerm_app_service.app_service.id
   log_analytics_workspace_id = var.log_analytics_workspace_id
 
-  log {
+  enabled_log {
     category = "AppServiceHTTPLogs"
-    enabled  = true
-
-    retention_policy {
-      days    = 0
-      enabled = false
-    }
   }
 
   metric {
     category = "AllMetrics"
     enabled  = true
-
-    retention_policy {
-      days    = 0
-      enabled = false
-    }
   }
 }
