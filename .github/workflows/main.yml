@@ -33,12 +33,12 @@ jobs:
       id: terraform_apply
       run: |
         terraform apply -auto-approve -var-file="dev.tfvars"
-        echo "::set-output name=service_app_name::$(terraform output -raw service_app_name)"
-        echo "::set-output name=function_app_name::$(terraform output -raw function_app_name)"
-        echo "::set-output name=postgresql_server_name::$(terraform output -raw postgresql_server_name)"
-        echo "::set-output name=postgresql_database_name::$(terraform output -raw postgresql_database_name)"
-        echo "::set-output name=resource_group_name::$(terraform output -raw resource_group_name)"
-        echo "::set-output name=static_website_endpoint::$(terraform output -raw static_website_endpoint)"
+        echo "service_app_name=$(terraform output -raw service_app_name)" >> $GITHUB_ENV
+        echo "function_app_name=$(terraform output -raw function_app_name)" >> $GITHUB_ENV
+        echo "postgresql_server_name=$(terraform output -raw postgresql_server_name)" >> $GITHUB_ENV
+        echo "postgresql_database_name=$(terraform output -raw postgresql_database_name)" >> $GITHUB_ENV
+        echo "resource_group_name=$(terraform output -raw resource_group_name)" >> $GITHUB_ENV
+        echo "static_website_endpoint=$(terraform output -raw static_website_endpoint)" >> $GITHUB_ENV
       env:
         ARM_CLIENT_ID: ${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}
@@ -65,8 +65,8 @@ jobs:
     - name: Update PostgreSQL Firewall Rule
       run: |
         az postgres server firewall-rule create \
-          --resource-group ${{ steps.terraform_apply.outputs.resource_group_name }} \
-          --server ${{ steps.terraform_apply.outputs.postgresql_server_name }} \
+          --resource-group ${{ env.resource_group_name }} \
+          --server ${{ env.postgresql_server_name }} \
           --name AllowGitHubActions \
           --start-ip-address $RUNNER_IP \
           --end-ip-address $RUNNER_IP
