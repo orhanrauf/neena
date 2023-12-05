@@ -8,3 +8,7 @@ output "postgresql_server_name" {
 output "database_name" {
   value = azurerm_postgresql_database.psql_db.name
 }
+
+output "postgresql_server_fqdn" {
+  value = azurerm_postgresql_server.example.fqdn
+}

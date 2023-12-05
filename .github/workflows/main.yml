@@ -39,6 +39,7 @@ jobs:
         echo "postgresql_database_name=$(terraform-bin output -raw postgresql_database_name)" >> $GITHUB_ENV
         echo "resource_group_name=$(terraform-bin output -raw resource_group_name)" >> $GITHUB_ENV
         echo "static_website_endpoint=$(terraform-bin output -raw static_website_endpoint)" >> $GITHUB_ENV
+        echo "postgresql_server_fqdn=$(terraform-bin output -raw postgresql_server_fqdn)" >> $GITHUB_ENV
       env:
         ARM_CLIENT_ID: ${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}
@@ -89,7 +90,7 @@ jobs:
       env:
         POSTGRES_USER: ${{ secrets.PSQL_ADMIN_USERNAME }}
         POSTGRES_PASSWORD: ${{ secrets.PSQL_ADMIN_PASSWORD }}
-        POSTGRES_SERVER: ${{ env.postgresql_server_name }}
+        POSTGRES_SERVER: ${{ env.postgresql_server_fqdn }}
         POSTGRES_DB: ${{ env.postgresql_database_name }}
       run: |
         poetry run alembic upgrade head

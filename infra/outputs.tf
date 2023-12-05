@@ -33,3 +33,7 @@ output "resource_group_name" {
 output "static_website_endpoint" {
   value = module.static_website.endpoint
 }
+
+output "postgresql_server_fqdn" {
+  value = module.postgresql.postgresql_server_fqdn
+}
