@@ -15,16 +15,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Login to Azure
-      uses: azure/login@v1
-      with:
-        creds: |
-          {
-            "clientId": "${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}",
-            "clientSecret": "${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}",
-            "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}",
-            "tenantId": "${{ secrets.TENANT_ID }}"
-          }
+    # - name: Login to Azure
+    #   uses: azure/login@v1
+    #   with:
+    #     creds: |
+    #       {
+    #         "clientId": "${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}",
+    #         "clientSecret": "${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}",
+    #         "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}",
+    #         "tenantId": "${{ secrets.TENANT_ID }}"
+    #       }
           
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
