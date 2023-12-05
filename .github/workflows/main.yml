@@ -26,13 +26,6 @@ jobs:
             "tenantId": "${{ secrets.TENANT_ID }}"
           }
           
-    - name: Get storage account key
-      id: get_storage_key
-      run: |
-        az storage account keys list --resource-group ${{secrets.TF_STATE_RG}} --account-name ${{secrets.TF_STATE_STORAGE_ACC}} --query '[0].value' --output tsv
-      env:
-        AZURE_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
-          
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
@@ -55,7 +48,6 @@ jobs:
         ARM_CLIENT_SECRET: ${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
-        ARM_ACCOUNT_KEY: ${{ steps.get_storage_key.outputs.value }}
         TF_VAR_psql_admin_username: ${{ secrets.PSQL_ADMIN_USERNAME }}
         TF_VAR_psql_admin_password: ${{ secrets.PSQL_ADMIN_PASSWORD }}
       working-directory: infra
@@ -73,33 +65,26 @@ jobs:
           --end-ip-address $RUNNER_IP
       env:
         RUNNER_IP: ${{ env.RUNNER_IP }}
-    
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8' # Set this to your Python version
-
-    - name: Install Dependencies
-      run: |
-        pip install alembic psycopg2-binary # or other relevant dependencies
 
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.8' # Set this to your Python version
+        python-version: '3.9' # Set this to your Python version
 
     - name: Install Dependencies
       run: |
-        pip install alembic psycopg2-binary
+        pip install poetry
+        poetry install
+      
 
     - name: Run Alembic Migrations
       env:
-        DB_USERNAME: ${{ secrets.DB_USERNAME }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_NAME: ${{ secrets.DB_NAME }}
+        POSTGRES_USER: ${{ secrets.PSQL_ADMIN_USERNAME }}
+        POSTGRES_PASSWORD: ${{ secrets.PSQL_ADMIN_PASSWORD }}
+        POSTGRES_SERVER: ${{ steps.terraform_apply.outputs.postgresql_server_name }}
+        POSTGRES_DB: ${{ steps.terraform_apply.outputs.postgresql_database_name }}
       run: |
-        alembic upgrade head
+        poetry run alembic upgrade head
 
     
   # build:
