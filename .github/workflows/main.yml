@@ -65,7 +65,7 @@ jobs:
     - name: Update PostgreSQL Firewall Rule
       run: |
         az postgres server firewall-rule create \
-          --resource-group ${{ steps.terraform_apply.outputs.postgresql_resource_group_name }} \
+          --resource-group ${{ steps.terraform_apply.outputs.resource_group_name }} \
           --server ${{ steps.terraform_apply.outputs.postgresql_server_name }} \
           --name AllowGitHubActions \
           --start-ip-address $RUNNER_IP \
