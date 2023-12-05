@@ -3,7 +3,6 @@ provider "azurerm" {
 }
 
 terraform {
-
   backend "azurerm" {
     resource_group_name   = "neena-core-tf-state-rg"
     storage_account_name  = "neenacoretfstatest"

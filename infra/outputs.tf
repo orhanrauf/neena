@@ -7,11 +7,11 @@ output "service_app_principal_id" {
 }
 
 output "service_app_name" {
-  value = module.service_app.app_service_name
+  value = module.service_app.name
 }
 
 output "function_app_name" {
-  value = module.function_app.function_app_name
+  value = module.function_app.name
 }
 
 output "postgresql_server_name" {
