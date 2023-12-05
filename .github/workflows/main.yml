@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  build_and_deploy:
     runs-on: ubuntu-latest
     environment: 
       name: dev
@@ -74,7 +74,34 @@ jobs:
       env:
         RUNNER_IP: ${{ env.RUNNER_IP }}
     
-        
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8' # Set this to your Python version
+
+    - name: Install Dependencies
+      run: |
+        pip install alembic psycopg2-binary # or other relevant dependencies
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8' # Set this to your Python version
+
+    - name: Install Dependencies
+      run: |
+        pip install alembic psycopg2-binary
+
+    - name: Run Alembic Migrations
+      env:
+        DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+      run: |
+        alembic upgrade head
+
+    
   # build:
   #   runs-on: ubuntu-latest
 
