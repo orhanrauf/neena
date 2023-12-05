@@ -83,7 +83,7 @@ jobs:
       run: |
         pip install poetry
         poetry install
-      working-directory: neena/backend/app
+      working-directory: backend
       
 
     - name: Run Alembic Migrations
@@ -94,7 +94,20 @@ jobs:
         POSTGRES_DB: ${{ env.postgresql_database_name }}
       run: |
         poetry run alembic upgrade head
-      working-directory: neena/backend/app
+      working-directory: backend
+    
+    - name: Fetch Publish Profile
+      run: |
+        publishProfile=$(az webapp deployment list-publishing-profiles --name ${{ env.service_app_name }} --resource-group ${{ env.resource_group_name }} --xml)
+        echo "PUBLISH_PROFILE<<EOF" >> $GITHUB_ENV
+        echo "$publishProfile" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+
+    - name: Test Publish profile
+      run: |
+        echo ${{ env.PUBLISH_PROFILE }}
+        echo ${{ env.PUBLISH_PROFILE }} | grep -q "publishMethod=\"MSDeploy\""
+    
 
 
   # deploy:
