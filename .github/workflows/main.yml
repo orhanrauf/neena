@@ -41,7 +41,15 @@ jobs:
       working-directory: infra
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve -var-file="dev.tfvars"
+      id: terraform_apply
+      run: |
+        terraform apply -auto-approve -var-file="dev.tfvars"
+        echo "::set-output name=service_app_name::$(terraform output -raw service_app_name)"
+        echo "::set-output name=function_app_name::$(terraform output -raw function_app_name)"
+        echo "::set-output name=postgresql_server_name::$(terraform output -raw postgresql_server_name)"
+        echo "::set-output name=postgresql_database_name::$(terraform output -raw postgresql_database_name)"
+        echo "::set-output name=resource_group_name::$(terraform output -raw resource_group_name)"
+        echo "::set-output name=static_website_endpoint::$(terraform output -raw static_website_endpoint)"
       env:
         ARM_CLIENT_ID: ${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}
@@ -50,8 +58,22 @@ jobs:
         ARM_ACCOUNT_KEY: ${{ steps.get_storage_key.outputs.value }}
         TF_VAR_psql_admin_username: ${{ secrets.PSQL_ADMIN_USERNAME }}
         TF_VAR_psql_admin_password: ${{ secrets.PSQL_ADMIN_PASSWORD }}
-
       working-directory: infra
+      
+    - name: Get Public IP
+      run: echo "RUNNER_IP=$(curl -s ifconfig.me)" >> $GITHUB_ENV
+
+    - name: Update PostgreSQL Firewall Rule
+      run: |
+        az postgres server firewall-rule create \
+          --resource-group ${{ steps.terraform_apply.outputs.postgresql_resource_group_name }} \
+          --server ${{ steps.terraform_apply.outputs.postgresql_server_name }} \
+          --name AllowGitHubActions \
+          --start-ip-address $RUNNER_IP \
+          --end-ip-address $RUNNER_IP
+      env:
+        RUNNER_IP: ${{ env.RUNNER_IP }}
+    
         
   # build:
   #   runs-on: ubuntu-latest
