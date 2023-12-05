@@ -10,3 +10,8 @@ app_service_plan_size     = "S1"
 function_app_plan_tier    = "Standard"
 function_app_plan_size    = "S1"
 kv_sku_name               = "standard"
+
+backend_resource_group_name = "neena-core-tf-state-rg"
+backend_storage_account_name = "neenacoretfstatest"
+backend_container_name = "tfstate"
+backend_key = "core-prd.terraform.tfstate"

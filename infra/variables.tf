@@ -76,3 +76,23 @@ variable "psql_admin_password" {
   description = "PostgreSQL Admin Password"
   type        = string
 }
+
+variable "backend_storage_account_name" {
+  description = "The name of the storage account used for the backend"
+  type        = string
+}
+
+variable "backend_container_name" {
+  description = "The name of the container used for the backend"
+  type        = string
+}
+
+variable "backend_key" {
+  description = "The name of the key used for the backend"
+  type        = string
+}
+
+variable "backend_resource_group_name" {
+  description = "The name of the resource group used for the backend"
+  type        = string
+}

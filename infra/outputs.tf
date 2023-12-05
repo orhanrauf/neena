@@ -6,6 +6,13 @@ output "service_app_principal_id" {
   value = module.service_app.service_app_principal_id
 }
 
+output "service_app_name" {
+  value = module.service_app.app_service_name
+}
+
+output "function_app_name" {
+  value = module.function_app.function_app_name
+}
 
 output "postgresql_server_name" {
   value = module.postgresql.postgresql_server_name
@@ -21,4 +28,8 @@ output "postgresql_server_id" {
 
 output "resource_group_name" {
   value = azurerm_resource_group.rg.name
+}
+
+output "static_website_endpoint" {
+  value = module.static_website.endpoint
 }
