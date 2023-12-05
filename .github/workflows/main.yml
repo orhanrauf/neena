@@ -15,16 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    # - name: Login to Azure
-    #   uses: azure/login@v1
-    #   with:
-    #     creds: |
-    #       {
-    #         "clientId": "${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}",
-    #         "clientSecret": "${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}",
-    #         "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}",
-    #         "tenantId": "${{ secrets.TENANT_ID }}"
-    #       }
+
           
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
@@ -32,6 +23,11 @@ jobs:
     - name: Terraform Init
       run: terraform init
       working-directory: infra
+      env:
+        ARM_CLIENT_ID: ${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
 
     - name: Terraform Apply
       id: terraform_apply
@@ -52,6 +48,17 @@ jobs:
         TF_VAR_psql_admin_password: ${{ secrets.PSQL_ADMIN_PASSWORD }}
       working-directory: infra
       
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: |
+          {
+            "clientId": "${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}",
+            "clientSecret": "${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}",
+            "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}",
+            "tenantId": "${{ secrets.TENANT_ID }}"
+          }
+
     - name: Get Public IP
       run: echo "RUNNER_IP=$(curl -s ifconfig.me)" >> $GITHUB_ENV
 
