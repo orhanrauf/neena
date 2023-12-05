@@ -56,7 +56,7 @@ variable "postgresql_version" {
 
 variable "postgresql_sku_name" {
   description = "The Name of the SKU used for this PostgreSQL server"
-  default     = "B_Gen4_1"
+  default     = "B_Gen5_1"
   type        = string
 }
 
