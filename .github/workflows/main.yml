@@ -33,7 +33,7 @@ jobs:
       id: terraform_apply
       run: |
         terraform apply -auto-approve -var-file="dev.tfvars"
-        echo "service_app_name=$(terraform output -raw service_app_name)" >> $GITHUB_ENV
+        # echo "service_app_name=$(terraform output -raw service_app_name)" >> $GITHUB_ENV
         # echo "function_app_name=$(terraform output -raw function_app_name)" >> $GITHUB_ENV
         # echo "postgresql_server_name=$(terraform output -raw postgresql_server_name)" >> $GITHUB_ENV
         # echo "postgresql_database_name=$(terraform output -raw postgresql_database_name)" >> $GITHUB_ENV
