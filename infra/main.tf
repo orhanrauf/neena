@@ -18,7 +18,6 @@ terraform {
   }
 }
 
-
 locals {
   resource_prefix = "${var.organization}-${var.project_name}-${var.environment}"
   resource_prefiex_no_hyphens = "${replace(local.resource_prefix, "-", "")}"
@@ -35,11 +34,11 @@ module "function_app" {
   location                    = var.location
   function_app_name           = "${local.resource_prefix}-func"
   storage_account_name        = "${local.resource_prefiex_no_hyphens}funcst"
-  app_service_plan_name       = "${local.resource_prefix}-func-asp"
   log_analytics_workspace_id  = module.log_analytics_workspace.log_analytics_workspace_id
   function_app_plan_tier      = var.function_app_plan_tier
   function_app_plan_size      = var.function_app_plan_size 
   service_app_principal_id    = module.service_app.service_app_principal_id
+  azurerm_application_insights_instrumentation_key = module.application_insights.app_insights_instrumentation_key
 }
 
 module "service_app" {
@@ -48,10 +47,10 @@ module "service_app" {
   location                    = var.location
   function_app_principal_id   = module.function_app.principal_id
   app_service_name            = "${local.resource_prefix}-svc"
-  app_service_plan_name       = "${local.resource_prefix}-svc-asp"
   log_analytics_workspace_id  = module.log_analytics_workspace.log_analytics_workspace_id
   app_service_plan_tier       = var.app_service_plan_tier
   app_service_plan_size       = var.app_service_plan_size 
+  azurerm_application_insights_instrumentation_key = module.application_insights.app_insights_instrumentation_key
 }
 
 module "log_analytics_workspace" {

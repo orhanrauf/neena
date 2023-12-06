@@ -2,7 +2,9 @@ resource "azurerm_app_service_plan" "funcapp_plan" {
   name                = var.function_app_name
   location            = var.location
   resource_group_name = var.resource_group_name
-  kind                = "FunctionApp"
+
+  kind                = "Linux"
+  reserved            = true
 
   sku {
     tier = var.function_app_plan_tier
@@ -27,6 +29,11 @@ resource "azurerm_function_app" "funcapp" {
   storage_account_access_key = azurerm_storage_account.funcapp_storage.primary_access_key
   os_type                   = "linux"
   version                   = "~3"
+
+  app_settings = {
+    "APPINSIGHTS_INSTRUMENTATIONKEY" = var.azurerm_application_insights_instrumentation_key
+    "FUNCTIONS_WORKER_RUNTIME" = "python" # This tells the function app to use Python
+  }
 
   identity {
     type = "SystemAssigned"

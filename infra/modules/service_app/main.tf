@@ -1,8 +1,11 @@
 # Create an App Service Plan
 resource "azurerm_app_service_plan" "app_service_plan" {
-  name                = var.app_service_plan_name
+  name                = var.app_service_name
   location            = var.location
   resource_group_name = var.resource_group_name
+
+  kind                = "Linux"
+  reserved            = true
 
   sku {
     tier = var.app_service_plan_tier
@@ -22,7 +25,8 @@ resource "azurerm_app_service" "app_service" {
   }
 
   app_settings = {
-    "SOME_KEY" = "some-value"
+    "APPINSIGHTS_INSTRUMENTATIONKEY" = var.azurerm_application_insights_instrumentation_key
+    # Other settings...
   }
 
   identity {

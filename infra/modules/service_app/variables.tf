@@ -20,10 +20,12 @@ variable "app_service_name" {
   
 }
 
-variable "app_service_plan_name" {
-  description = "The name of the app service plan"
+variable "azurerm_application_insights_instrumentation_key" {
+  description = "The instrumentation key for the application insights instance"
   type        = string
+  
 }
+
 
 variable "log_analytics_workspace_id" {
   description = "The ID of the Log Analytics Workspace"

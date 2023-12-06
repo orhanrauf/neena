@@ -19,11 +19,6 @@ variable "service_app_principal_id" {
   
 }
 
-variable "app_service_plan_name" {
-  description = "The name of the app service plan"
-  type        = string
-}
-
 variable "storage_account_name" {
   description = "The name of the storage account"
   type        = string
@@ -32,6 +27,12 @@ variable "storage_account_name" {
 variable "log_analytics_workspace_id" {
   description = "The ID of the Log Analytics Workspace"
   type        = string
+}
+
+variable "azurerm_application_insights_instrumentation_key" {
+  description = "The instrumentation key for the application insights instance"
+  type        = string
+  
 }
 
 variable "function_app_plan_tier" {
