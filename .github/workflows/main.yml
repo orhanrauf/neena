@@ -84,7 +84,6 @@ jobs:
         pip install poetry
         poetry install
       working-directory: backend
-      
 
     - name: Run Alembic Migrations
       env:
@@ -92,6 +91,7 @@ jobs:
         POSTGRES_PASSWORD: ${{ secrets.PSQL_ADMIN_PASSWORD }}
         POSTGRES_SERVER: ${{ env.postgresql_server_fqdn }}
         POSTGRES_DB: ${{ env.postgresql_database_name }}
+        PYTHONPATH: "./backend"
       run: |
         poetry run alembic upgrade head
       working-directory: backend
