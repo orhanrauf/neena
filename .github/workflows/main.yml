@@ -95,19 +95,20 @@ jobs:
       run: |
         poetry run alembic upgrade head
       working-directory: backend
-    
-    - name: Fetch Publish Profile
-      run: |
-        publishProfile=$(az webapp deployment list-publishing-profiles --name ${{ env.service_app_name }} --resource-group ${{ env.resource_group_name }} --xml)
-        echo "PUBLISH_PROFILE<<EOF" >> $GITHUB_ENV
-        echo "$publishProfile" >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
 
-    - name: Test Publish profile
+    - name: Install dependencies
       run: |
-        echo ${{ env.PUBLISH_PROFILE }}
-        echo ${{ env.PUBLISH_PROFILE }} | grep -q "publishMethod=\"MSDeploy\""
+        pip install poetry
+        cd backend
+        poetry install
     
+    - name: Deploy App Service
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.service_app_name }}
+        slot-name: 'production'  # Remove if not using deployment slots
+        publish-profile: ${{ secrets.SVC_PUBLISH_PROFILE }}
+        package: backend
 
 
   # deploy:

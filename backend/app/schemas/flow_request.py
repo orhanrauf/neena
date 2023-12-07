@@ -1,9 +1,7 @@
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 from uuid import UUID
 from datetime import datetime
-
-from pydantic import BaseModel, EmailStr, constr, datetime_parse
-from pydantic.datetime_parse import date
+from pydantic import BaseModel, EmailStr, constr
 
 
 # Shared properties

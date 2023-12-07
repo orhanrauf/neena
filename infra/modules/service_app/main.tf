@@ -13,20 +13,24 @@ resource "azurerm_app_service_plan" "app_service_plan" {
   }
 }
 
-resource "azurerm_app_service" "app_service" {
+resource "azurerm_linux_web_app" "app_service" {
   name                = var.app_service_name
   location            = var.location
   resource_group_name = var.resource_group_name
-  app_service_plan_id = azurerm_app_service_plan.app_service_plan.id
+  service_plan_id = azurerm_app_service_plan.app_service_plan.id
 
   site_config {
-    dotnet_framework_version = "v4.0"
-    scm_type                 = "LocalGit"
+    app_command_line = "gunicorn -w 4 -k uvicorn.workers.UvicornWorker myapp:app"
+    linux_fx_version = "PYTHON|3.9" 
   }
 
   app_settings = {
     "APPINSIGHTS_INSTRUMENTATIONKEY" = var.azurerm_application_insights_instrumentation_key
-    # Other settings...
+    "DTAP_ENVIRONMENT" = var.environment
+    "POSTGRES_SERVER" = var.postgresql_server_url
+    "POSTGRES_DATABASE" = var.postgresql_database_name
+    "POSTGRES_USER" = var.postgresql_admin_username
+    "POSTGRES_PASSWORD" = var.postgresql_admin_password
   }
 
   identity {

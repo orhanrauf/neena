@@ -17,3 +17,7 @@ docker-stack.yml
 # .env
 *.code-workspace
 .s3cfg
+
+**/.venv
+
+**/.env

@@ -45,3 +45,8 @@ variable "function_app_plan_size" {
   type        = string
   
 }
+
+variable "environment" {
+  description = "The environment for the function app"
+  type        = string
+}

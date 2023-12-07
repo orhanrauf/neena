@@ -41,3 +41,29 @@ variable "app_service_plan_size" {
   description = "The instance size for the app service plan"
   type        = string
 }
+
+variable "environment" {
+  description = "The environment for the app service"
+  type        = string
+}
+
+variable "postgresql_server_url" {
+  description = "The url of the postgresql server"
+  type        = string  
+}
+
+variable "postgresql_database_name" {
+  description = "The name of the postgresql database"
+  type        = string  
+}
+
+variable "postgresql_admin_username" {
+  description = "The admin username for the postgresql server"
+  type        = string  
+}
+
+variable "postgresql_admin_password" {
+  description = "The admin password for the postgresql server"
+  type        = string  
+  
+}
