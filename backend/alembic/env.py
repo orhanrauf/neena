@@ -1,6 +1,8 @@
 from __future__ import with_statement
 
 import os
+from pathlib import Path
+import sys
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
@@ -15,11 +17,12 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-# target_metadata = None
+# Get the absolute path of the current directory
+current_dir = Path(__file__).parent.parent.absolute()
+
+# Add the current directory to sys.path
+if str(current_dir) not in sys.path:
+    sys.path.append(str(current_dir))
 
 from app.db.base import Base  # noqa
 
