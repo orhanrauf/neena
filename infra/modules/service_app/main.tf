@@ -19,9 +19,12 @@ resource "azurerm_linux_web_app" "app_service" {
   resource_group_name = var.resource_group_name
   service_plan_id = azurerm_app_service_plan.app_service_plan.id
 
+
   site_config {
-    app_command_line = "gunicorn -w 4 -k uvicorn.workers.UvicornWorker myapp:app"
-    linux_fx_version = "PYTHON|3.9" 
+    app_command_line = "gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app"
+    application_stack {
+      python_version = "3.9"
+    }
   }
 
   app_settings = {
