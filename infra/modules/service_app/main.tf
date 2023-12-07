@@ -39,13 +39,13 @@ resource "azurerm_linux_web_app" "app_service" {
 }
 
 resource "azurerm_role_assignment" "service_app_sami_role" {
-  scope                = azurerm_app_service.app_service.id
+  scope                = azurerm_linux_web_app.app_service.id
   role_definition_name = "Contributor"
-  principal_id         = azurerm_app_service.app_service.identity[0].principal_id
+  principal_id         = azurerm_linux_web_app.app_service.identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "function_to_app_service" {
-  scope                = azurerm_app_service.app_service.id
+  scope                = azurerm_linux_web_app.app_service.id
   role_definition_name = "Contributor" # Or a more restrictive role as needed
   principal_id         = var.function_app_principal_id
 }
@@ -53,7 +53,7 @@ resource "azurerm_role_assignment" "function_to_app_service" {
 # Configure App Service diagnostics to send to Log Analytics Workspace
 resource "azurerm_monitor_diagnostic_setting" "app_service_diagnostic" {
   name                       = "${var.app_service_name}-diagnostics"
-  target_resource_id         = azurerm_app_service.app_service.id
+  target_resource_id         = azurerm_linux_web_app.app_service.id
   log_analytics_workspace_id = var.log_analytics_workspace_id
 
   enabled_log {

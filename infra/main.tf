@@ -55,8 +55,8 @@ module "service_app" {
   environment = var.environment
   postgresql_server_url     = module.postgresql.postgresql_server_fqdn
   postgresql_database_name    = module.postgresql.database_name
-  postgresql_admin_username   = module.postgresql.psql_admin_username
-  postgresql_admin_password   = module.postgresql.psql_admin_password
+  postgresql_admin_username   = var.psql_admin_username
+  postgresql_admin_password   = var.psql_admin_password
 }
 
 module "log_analytics_workspace" {
