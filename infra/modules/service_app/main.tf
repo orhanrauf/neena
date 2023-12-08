@@ -36,6 +36,7 @@ resource "azurerm_linux_web_app" "app_service" {
     "POSTGRES_PASSWORD" = var.postgresql_admin_password
     "FIRST_SUPERUSER" = var.first_superuser
     "FIRST_SUPERUSER_PASSWORD" = var.first_superuser_password
+    "PROJECT_NAME" = "Neena"
   }
 
   identity {
