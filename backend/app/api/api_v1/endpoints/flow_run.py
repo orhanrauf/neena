@@ -25,7 +25,6 @@ def read_all_flows_runs(
     Retrieve all flow runs.
     """
     response = crud.flow.get_multi(db=db, skip=skip, limit=limit)
-    print(response)
     return response
 
 @router.get("/", response_model=List[schemas.FlowRun])

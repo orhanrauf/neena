@@ -21,7 +21,7 @@ resource "azurerm_linux_web_app" "app_service" {
 
 
   site_config {
-    app_command_line = "gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app"
+    app_command_line = "./startup.sh"
     application_stack {
       python_version = "3.9"
     }
@@ -31,7 +31,7 @@ resource "azurerm_linux_web_app" "app_service" {
     "APPINSIGHTS_INSTRUMENTATIONKEY" = var.azurerm_application_insights_instrumentation_key
     "DTAP_ENVIRONMENT" = var.environment
     "POSTGRES_SERVER" = var.postgresql_server_url
-    "POSTGRES_DATABASE" = var.postgresql_database_name
+    "POSTGRES_DB" = var.postgresql_database_name
     "POSTGRES_USER" = var.postgresql_admin_username
     "POSTGRES_PASSWORD" = var.postgresql_admin_password
     "FIRST_SUPERUSER" = var.first_superuser

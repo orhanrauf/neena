@@ -7,8 +7,8 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.api.api_v1.api import api_router
 from app.core.config import settings
-from backend.app.db import init_db
-from backend.app.db.session import SessionLocal
+from app.db.init_db import init_db
+from app.db.session import SessionLocal
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json")
 
@@ -43,6 +43,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 @app.on_event("startup")
 async def startup_event():
     db = SessionLocal()
+    print
     try:
         init_db(db)
     finally:
