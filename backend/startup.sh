@@ -1,3 +1,7 @@
+python -m venv venv
+
+source venv/bin/activate
+
 pip install poetry 
 pip install uvicorn 
 pip install gunicorn
