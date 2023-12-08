@@ -1,4 +1,9 @@
-pip install poetry uvicorn gunicorn
+pip install poetry 
+pip install uvicorn 
+pip install gunicorn
+
+
+uvicorn --version
 
 poetry install
 
