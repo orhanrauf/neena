@@ -21,3 +21,4 @@ docker-stack.yml
 **/.venv
 
 **/.env
+backend/venv/
