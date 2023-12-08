@@ -76,3 +76,13 @@ variable "psql_admin_password" {
   description = "PostgreSQL Admin Password"
   type        = string
 }
+
+variable "first_superuser" {
+  description = "First Superuser"
+  type        = string
+}
+
+variable "first_superuser_password" {
+  description = "First Superuser Password"
+  type        = string
+}

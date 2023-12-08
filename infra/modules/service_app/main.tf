@@ -34,6 +34,8 @@ resource "azurerm_linux_web_app" "app_service" {
     "POSTGRES_DATABASE" = var.postgresql_database_name
     "POSTGRES_USER" = var.postgresql_admin_username
     "POSTGRES_PASSWORD" = var.postgresql_admin_password
+    "FIRST_SUPERUSER" = var.first_superuser
+    "FIRST_SUPERUSER_PASSWORD" = var.first_superuser_password
   }
 
   identity {

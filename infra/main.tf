@@ -57,6 +57,9 @@ module "service_app" {
   postgresql_database_name    = module.postgresql.database_name
   postgresql_admin_username   = var.psql_admin_username
   postgresql_admin_password   = var.psql_admin_password
+  first_superuser = var.first_superuser
+  first_superuser_password = var.first_superuser_password
+
 }
 
 module "log_analytics_workspace" {

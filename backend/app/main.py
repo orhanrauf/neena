@@ -4,10 +4,11 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from starlette.middleware.cors import CORSMiddleware
-from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.api_v1.api import api_router
 from app.core.config import settings
+from backend.app.db import init_db
+from backend.app.db.session import SessionLocal
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json")
 
@@ -38,3 +39,11 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+@app.on_event("startup")
+async def startup_event():
+    db = SessionLocal()
+    try:
+        init_db(db)
+    finally:
+        db.close()

@@ -17,7 +17,6 @@ variable "function_app_principal_id" {
 variable "app_service_name" {
   description = "The name of the app service"
   type        = string
-  
 }
 
 variable "azurerm_application_insights_instrumentation_key" {
@@ -25,7 +24,6 @@ variable "azurerm_application_insights_instrumentation_key" {
   type        = string
   
 }
-
 
 variable "log_analytics_workspace_id" {
   description = "The ID of the Log Analytics Workspace"
@@ -65,5 +63,14 @@ variable "postgresql_admin_username" {
 variable "postgresql_admin_password" {
   description = "The admin password for the postgresql server"
   type        = string  
-  
+}
+
+variable "first_superuser" {
+  description = "The first superuser."
+  type        = string  
+}
+
+variable "first_superuser_password" {
+  description = "The first superuser password."
+  type        = string  
 }
