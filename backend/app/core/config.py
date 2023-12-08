@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn, validator
 
 # Check if DTAP_ENV is set in the environment, indicating a cloud environment
-if "DTAP_ENV" not in os.environ:
+if "DTAP_ENVIRONMENT" not in os.environ:
     from dotenv import load_dotenv
     load_dotenv('.env')  # Load environment variables from .env file
     

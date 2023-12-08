@@ -39,7 +39,7 @@ module "function_app" {
   function_app_plan_size      = var.function_app_plan_size 
   service_app_principal_id    = module.service_app.service_app_principal_id
   azurerm_application_insights_instrumentation_key = module.application_insights.app_insights_instrumentation_key
-  environment = var.environment
+  environment                 = var.environment
 }
 
 module "service_app" {
@@ -52,8 +52,8 @@ module "service_app" {
   app_service_plan_tier       = var.app_service_plan_tier
   app_service_plan_size       = var.app_service_plan_size 
   azurerm_application_insights_instrumentation_key = module.application_insights.app_insights_instrumentation_key
-  environment = var.environment
-  postgresql_server_url     = module.postgresql.postgresql_server_fqdn
+  environment                 = var.environment
+  postgresql_server_url       = module.postgresql.postgresql_server_fqdn
   postgresql_database_name    = module.postgresql.database_name
   postgresql_admin_username   = var.psql_admin_username
   postgresql_admin_password   = var.psql_admin_password

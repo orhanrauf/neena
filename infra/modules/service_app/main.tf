@@ -32,7 +32,7 @@ resource "azurerm_linux_web_app" "app_service" {
     "DTAP_ENVIRONMENT" = var.environment
     "POSTGRES_SERVER" = var.postgresql_server_url
     "POSTGRES_DB" = var.postgresql_database_name
-    "POSTGRES_USER" = var.postgresql_admin_username
+    "POSTGRES_USER" = "${var.postgresql_admin_username}@${var.postgresql_database_name}"
     "POSTGRES_PASSWORD" = var.postgresql_admin_password
     "FIRST_SUPERUSER" = var.first_superuser
     "FIRST_SUPERUSER_PASSWORD" = var.first_superuser_password
