@@ -32,10 +32,10 @@ resource "azurerm_role_assignment" "service_app_db_access" {
 }
 
 resource "azurerm_postgresql_firewall_rule" "service_app_outbound_ip_addresses" {
-  for_each            = toset(var.service_app_outbound_ip_addresses)
+  for_each            = { for ip in var.service_app_outbound_ip_addresses : replace(ip, ".", "-") => ip }
   name                = "AppServiceOutboundIP-${each.key}"
-  resource_group_name = "example-resourcegroup"
-  server_name         = azurerm_postgresql_server.psql_server.name
+  resource_group_name = azurerm_resource_group.example.name
+  server_name         = azurerm_postgresql_server.example.name
   start_ip_address    = each.value
   end_ip_address      = each.value
 }
