@@ -53,3 +53,8 @@ variable "psql_admin_password" {
   description = "PostgreSQL Admin Password"
   type        = string
 }
+
+variable "service_app_outbound_ip_addresses" {
+  description = "Outbound IP addresses of the service app"
+  type        = list(string)
+}

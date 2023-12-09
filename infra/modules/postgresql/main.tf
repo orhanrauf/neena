@@ -30,3 +30,12 @@ resource "azurerm_role_assignment" "service_app_db_access" {
   role_definition_name = "Contributor"  # Use appropriate role
   principal_id         = var.service_app_principal_id
 }
+
+resource "azurerm_postgresql_firewall_rule" "service_app_outbound_ip_addresses" {
+  for_each            = toset(var.service_app_outbound_ip_addresses)
+  name                = "AppServiceOutboundIP-${each.key}"
+  resource_group_name = "example-resourcegroup"
+  server_name         = azurerm_postgresql_server.psql_server.name
+  start_ip_address    = each.value
+  end_ip_address      = each.value
+}

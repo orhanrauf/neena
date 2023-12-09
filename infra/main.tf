@@ -101,6 +101,7 @@ module "postgresql" {
   function_app_principal_id = module.function_app.principal_id
   psql_admin_username     = var.psql_admin_username
   psql_admin_password     = var.psql_admin_password
+  service_app_outbound_ip_addresses = module.service_app.outbound_ip_addresses
 }
 
 module "static_website" {
