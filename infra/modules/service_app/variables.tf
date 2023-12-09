@@ -50,6 +50,11 @@ variable "postgresql_server_url" {
   type        = string  
 }
 
+variable "postgresql_server_name" {
+  description = "The name of the postgresql server"
+  type        = string
+}
+
 variable "postgresql_database_name" {
   description = "The name of the postgresql database"
   type        = string  
