@@ -11,5 +11,5 @@ output "name" {
 }
 
 output "outbound_ip_addresses" {
-  value = azurerm_linux_web_app.app_service.outbound_ip_addresses
+  value = azurerm_linux_web_app.app_service.possible_outbound_ip_address_list
 }
