@@ -132,16 +132,22 @@
 
       > .router-link-exact-active {
         @extend %nav-link-active;
-        background: var(--light-opacity-color-extra-menu-hover, rgba(75, 70, 92, 0.04)) !important;
+        background: rgba(118, 109, 109, 0.04) !important;
         box-shadow: none !important;
+        border: 1.3px solid !important;
+        border-color: #a3a3a3 !important;
       }
+      
 
       > a {
         // Adds before psudo element to style hover state
         @include mixins.before-pseudo;
 
         // Adds vuetify states
-        @include vuetifyStates.states($active: false);
+
+        &:not(.router-link-active, .router-link-exact-active){
+          @include vuetifyStates.states($active: false);
+        }
       }
     }
 
@@ -182,8 +188,10 @@
       // Nav group label
       > :first-child {
         // Adds before psudo element to style hover state
-        @include mixins.before-pseudo;
+        @include mixins.before-pseudo;     
+      }
 
+      &:not(.active,.open) > :first-child {
         // Adds vuetify states
         @include vuetifyStates.states($active: false);
       }

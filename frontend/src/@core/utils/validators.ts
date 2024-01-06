@@ -1,4 +1,4 @@
-import { isEmpty, isEmptyArray, isNullOrUndefined } from './index'
+import { isEmpty, isEmptyArray, isNullOrUndefined } from './helpers'
 
 // 👉 Required Validator
 export const requiredValidator = (value: unknown) => {
@@ -27,11 +27,7 @@ export const passwordValidator = (password: string) => {
 
   const validPassword = regExp.test(password)
 
-  return (
-    // eslint-disable-next-line operator-linebreak
-    validPassword ||
-    'Field must contain at least one uppercase, lowercase, special character and digit with min 8 chars'
-  )
+  return validPassword || 'Field must contain at least one uppercase, lowercase, special character and digit with min 8 chars'
 }
 
 // 👉 Confirm Password Validator
@@ -95,7 +91,7 @@ export const lengthValidator = (value: unknown, length: number) => {
   if (isEmpty(value))
     return true
 
-  return String(value).length >= length || `The Min Character field must be at least ${length} characters`
+  return String(value).length === length || `The Min Character field must be at least ${length} characters`
 }
 
 // 👉 Alpha-dash Validator

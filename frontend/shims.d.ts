@@ -12,6 +12,4 @@ declare module 'vue-prism-component' {
   export default component
 }
 declare module 'vue-shepherd';
-declare module 'drawflow';
-declare module 'element-plus';
-declare module '@element-plus/icons';
+declare module '@videojs-player/vue';

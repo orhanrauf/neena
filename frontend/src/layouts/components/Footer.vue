@@ -3,20 +3,12 @@
     <!-- 👉 Footer: left content -->
     <span class="d-flex align-center">
       &copy;
-      {{ new Date().getFullYear() }}
-      Made With
-      <VIcon
-        icon="tabler-heart"
-        color="error"
-        size="1.25rem"
-        class="mx-1"
-      />
-      By <a
+      {{ new Date().getFullYear() }} <a
         href="https://pixinvent.com"
         target="_blank"
         rel="noopener noreferrer"
         class="text-primary ms-1"
-      >Pixinvent</a>
+      >Neena</a>
     </span>
     <!-- 👉 Footer: right content -->
     <span class="d-md-flex gap-x-4 text-primary d-none">
@@ -24,10 +16,6 @@
         href="https://themeforest.net/licenses/standard"
         target="noopener noreferrer"
       >License</a>
-      <a
-        href="https://1.envato.market/pixinvent_portfolio"
-        target="noopener noreferrer"
-      >More Themes</a>
       <a
         href="https://demos.pixinvent.com/vuexy-vuejs-admin-template/documentation/"
         target="noopener noreferrer"

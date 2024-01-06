@@ -1,0 +1,19 @@
+// Write your overrides
+.full-screen-drawer  .el-drawer__title {
+    font-weight: 500;
+    font-size: 25px !important;
+    color: #5d5a58;
+    justify-content: right;
+
+  }
+  .full-screen-drawer  .el-drawer__header {
+    font-weight: 500;
+    font-size: 25px !important;
+    color: #5d5a58;
+    margin-bottom: 0px !important;
+  }
+
+  .full-screen-drawer  .el-drawer__close {
+    color: #5d5a58;
+    font-size: 25px !important;
+  }

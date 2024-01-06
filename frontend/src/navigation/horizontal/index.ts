@@ -1,14 +1,11 @@
+import apps from './apps'
+import charts from './charts'
+import dashboard from './dashboard'
+import forms from './forms'
+import misc from './misc'
+import pages from './pages'
+import tables from './tables'
+import uiElements from './ui-elements'
 import type { HorizontalNavItems } from '@layouts/types'
 
-export default [
-  {
-    title: 'Home',
-    to: { name: 'index' },
-    icon: { icon: 'tabler-smart-home' },
-  },
-  {
-    title: 'Second page',
-    to: { name: 'second-page' },
-    icon: { icon: 'tabler-file' },
-  },
-] as HorizontalNavItems
+export default [...dashboard, ...apps, ...pages, ...uiElements, ...forms, ...tables, ...charts, ...misc] as HorizontalNavItems

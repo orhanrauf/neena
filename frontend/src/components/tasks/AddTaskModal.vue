@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { TaskDefinition } from "@/types"
-import axios from "@axios";
+import axios from 'axios';
 import { VInfiniteScroll } from "vuetify/labs/components";
 
 const emit = defineEmits<{
-  (e: "addTask", task: TaskDefinition): void;
+  (e: "add-task", task: TaskDefinition): void;
 }>();
 
 const loading = ref(false);
@@ -26,7 +26,7 @@ const getTaskDefinitions = async () => {
 const addTask = (taskDefinition: TaskDefinition) => {
   const cloneTaskDefinition = Object.assign({}, taskDefinition);
 
-  emit("addTask", cloneTaskDefinition);
+  emit("add-task", cloneTaskDefinition);
   isDialogVisible.value = false;
 };
 
@@ -53,7 +53,7 @@ const load = async ({ done }) => {
   <VDialog v-model="isDialogVisible" width="auto">
     <!-- Activator -->
     <template #activator="{ props }">
-      <VBtn prepend-icon="tabler:circle-plus" color='success' class=" border" v-bind="props"> Add task </VBtn>
+      <VBtn prepend-icon="tabler:circle-plus" v-bind="props"> Add task </VBtn>
     </template>
 
     <!-- Dialog close btn -->
@@ -97,105 +97,24 @@ const load = async ({ done }) => {
                       {{ taskDefinition.description }}
                     </div>
 
-                  <div class="mt-4 d-flex gap-3">
-                    <VBtn prepend-icon="tabler:circle-plus" color='success'> Add task </VBtn>
-                    <VBtn prepend-icon="tabler:info-circle" color="secondary">
-                      Info
-                    </VBtn>
-                  </div>
-                </VCardText>
-              </VCard>
-            </VCol>
-
-            <!-- Example card -->
-            <VCol cols="12" sm="6" md="4">
-              <VCard title="Look up details" subtitle="look_up_details">
-                <VCardText>
-                  Some quick example text to build on the card title and make up
-                  the bulk of the card's content.
-
-                  <div class="mt-4 d-flex gap-3">
-                    <VBtn prepend-icon="tabler:circle-plus" color='success'> Add task </VBtn>
-                    <VBtn prepend-icon="tabler:info-circle" color="secondary">
-                      Info
-                    </VBtn>
-                  </div>
-                </VCardText>
-              </VCard>
-            </VCol>
-
-            <!-- Example card -->
-            <VCol cols="12" sm="6" md="4">
-              <VCard title="Look up details" subtitle="look_up_details">
-                <VCardText>
-                  Some quick example text to build on the card title and make up
-                  the bulk of the card's content.
-
-                  <div class="mt-4 d-flex gap-3">
-                    <VBtn prepend-icon="tabler:circle-plus" color='success'> Add task </VBtn>
-                    <VBtn prepend-icon="tabler:info-circle" color="secondary">
-                      Info
-                    </VBtn>
-                  </div>
-                </VCardText>
-              </VCard>
-            </VCol>
-          </VRow>
-
-          <VRow>
-            <!-- Example card -->
-            <VCol cols="12" sm="6" md="4">
-              <VCard title="Look up details" subtitle="look_up_details">
-                <VCardText>
-                  Some quick example text to build on the card title and make up
-                  the bulk of the card's content.
-
-                  <div class="mt-4 d-flex gap-3">
-                    <VBtn prepend-icon="tabler:circle-plus" color='success'> Add task </VBtn>
-                    <VBtn prepend-icon="tabler:info-circle" color="secondary">
-                      Info
-                    </VBtn>
-                  </div>
-                </VCardText>
-              </VCard>
-            </VCol>
-
-            <!-- Example card -->
-            <VCol cols="12" sm="6" md="4">
-              <VCard title="Look up details" subtitle="look_up_details">
-                <VCardText>
-                  Some quick example text to build on the card title and make up
-                  the bulk of the card's content.
-
-                  <div class="mt-4 d-flex gap-3">
-                    <VBtn prepend-icon="tabler:circle-plus" color='success'> Add task </VBtn>
-                    <VBtn prepend-icon="tabler:info-circle" color="secondary">
-                      Info
-                    </VBtn>
-                  </div>
-                </VCardText>
-              </VCard>
-            </VCol>
-
-            <!-- Example card -->
-            <VCol cols="12" sm="6" md="4">
-              <VCard title="Look up details" subtitle="look_up_details">
-                <VCardText>
-                  Some quick example text to build on the card title and make up
-                  the bulk of the card's content.
-
-                  <div class="mt-4 d-flex gap-3">
-                    <VBtn prepend-icon="tabler:circle-plus" color='success'> Add task </VBtn>
-                    <VBtn prepend-icon="tabler:info-circle" color="secondary">
-                      Info
-                    </VBtn>
-                  </div>
-                </VCardText>
-              </VCard>
-            </VCol>
-          </VRow>
-        </VCol>
-      </VRow>
+                    <div class="mt-4 d-flex gap-3">
+                      <VBtn
+                        prepend-icon="tabler:circle-plus"
+                        @click="addTask(taskDefinition)"
+                      >
+                        Add task
+                      </VBtn>
+                      <VBtn prepend-icon="tabler:info-circle" color="secondary">
+                        Info
+                      </VBtn>
+                    </div>
+                  </VCardText>
+                </VCard>
+              </VCol>
+            </VRow>
+          </VInfiniteScroll>
+        </div>
+      </div>
     </VCard>
   </VDialog>
 </template>

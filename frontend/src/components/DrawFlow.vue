@@ -1,233 +1,296 @@
 <script setup lang="ts">
-import { TaskDefinition, NodeTaskDefinition } from "@/types"
-import axios from "@axios"
-import Drawflow from "drawflow"
-import { onMounted, shallowRef, h, getCurrentInstance, render, ref, ComponentInternalInstance, ShallowRef } from "vue"
-import { useToast } from "vue-toastification"
+import { TaskDefinition, TaskOperation, Dependency } from "@/types";
+import DependencyDrawer from "./nodes/DependencyDrawer.vue";
+import axios from 'axios';
+import RequestDialog from "./dialogs/RequestDialog.vue";
+import SaveFlowDialog from "./dialogs/SaveFlowDialog.vue";
+import Drawflow from "../plugins/drawflow/drawflow.js";
+import { defineEmits, onMounted, shallowRef, h, getCurrentInstance, render, ref, ComponentInternalInstance, ShallowRef } from "vue";
 import Node from "./nodes/Node.vue";
+import { useStore } from 'vuex';
 
-interface NodeConnection {
-  input_class: string;
-  input_id: string;
-  output_class: string;
-  output_id: string;
-}
-
-const props = defineProps<{
-  flowRequestId: string,
-}>();
-
-const toast = useToast();
-
+const store = useStore();
+const isRequestPopupVisible = ref(false);
+const isSaveWorkflowPopupVisible = ref(false);
+const showDrawer = ref(false);
+const selectedSourceNodeId = ref(0);
+const selectedTargetNodeId = ref(0);
 const editor: ShallowRef = shallowRef({});
-const dialogVisible = ref(false);
-const dialogData = ref({});
+const cardVisible = ref(false);
 const Vue = { version: 3, h, render };
-
 const internalInstance = getCurrentInstance() as ComponentInternalInstance;
 internalInstance.appContext.app._context.config.globalProperties.$df = editor;
+const emit = defineEmits(['close-card']);
+
+
+// Method to toggle the visibility of the pop-up
+const requestTogglePopup = () => {
+  isRequestPopupVisible.value = !isRequestPopupVisible.value;
+};
+
+const saveWorkflowTogglePopup = () => {
+  isSaveWorkflowPopupVisible.value = !isSaveWorkflowPopupVisible.value;
+};
+
+// Function to handle the ESC key press
+const closeOnEsc = (event) => {
+  if (event.key === 'Escape') {
+    isRequestPopupVisible.value = false;
+    isSaveWorkflowPopupVisible.value = false;
+  }
+};
+
+window.addEventListener('keydown', closeOnEsc);
 
 onMounted(() => {
   const id = document.getElementById("drawflow");
+
   editor.value = new Drawflow(
     id,
     Vue,
     internalInstance.appContext.app._context
   );
+
+  store.commit('setDrawflowEditor', editor.value);
+
+  editor.value.curvature = 1;
+  editor.value.line_path = 20;
+  editor.value.reroute = true;
+
   editor.value.start();
 
   editor.value.registerNode("Node", Node, {}, {});
 
-  editor.value.on("connectionCreated", (connection: NodeConnection) => {
-    connectionCreated(connection);
+  editor.value.on("nodeRemoved", (nodeId) => {
+    store.commit('deleteTaskOperation', nodeId);
   });
 
-  editor.value.on("connectionRemoved", (connection: NodeConnection) => {
+  editor.value.on("connectionRemoved", (connection) => {
     connectionRemoved(connection);
   });
+
+  editor.value.on("connectionCreated", (connection) => {
+    // {output_id: '2', input_id: '1', output_class: 'output_1', input_class: 'input_1'}
+    const source_node_id = parseInt(connection.output_id);
+    const target_node_id = parseInt(connection.input_id);
+
+    var dependency: Dependency = {
+      source_node_id: source_node_id,
+      target_node_id: target_node_id,
+      instructions: ''
+    }
+    store.commit('addDependency', dependency);
+  });
+
+  editor.value.on('connectionDoubleClicked', (connection) => {
+    console.log('botot')
+    showDrawer.value = true;
+    selectedSourceNodeId.value = connection.input_id;
+    selectedTargetNodeId.value = connection.output_id;
+  });
+})
+
+const connectionRemoved = (connection) => {
+  store.commit('deleteDependencyByTargetNodeId', connection.input_id);
+};
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', closeOnEsc);
 });
 
-const getNewTaskName = (taskDefinition: TaskDefinition): string => {
+const toggleTaskListCard = () => {
+  cardVisible.value = !cardVisible.value;
+};
+
+const getNewTaskOpName = (taskDefinition: TaskDefinition): string => {
   const exportData = editor.value.export();
   const nodes = exportData.drawflow.Home.data;
-  let existingTaskName = '';
+  let maxNumber = 0;
+  let baseNameExists = false;
 
   Object.keys(nodes).forEach((key) => {
-    const node: NodeTaskDefinition = nodes[key];
-
-    if (node.data.task_definition.task_name.startsWith(taskDefinition.task_name)) {
-      existingTaskName = node.data.task_definition.task_name;
+    const node = nodes[key];
+    if (node.name === taskDefinition.name) {
+      baseNameExists = true;
+    }
+    if (node.name.startsWith(taskDefinition.name)) {
+      const matches = node.name.match(/_(\d+)$/);
+      if (matches && matches.length > 1) {
+        const number = parseInt(matches[1]);
+        if (number > maxNumber) {
+          maxNumber = number;
+        }
+      }
     }
   });
 
-  if (existingTaskName) {
-    const matches = existingTaskName.match(/_(\d+)$/);
-    if (matches && matches.length > 0) {
-      const number = parseInt(matches[1]) + 1;
+  if (baseNameExists) {
+    return maxNumber > 0 ? `${taskDefinition.name}_${maxNumber + 1}` : `${taskDefinition.name}_2`;
+  } else {
+    return taskDefinition.name;
+  }
+};
 
-      return taskDefinition.task_name + '_' + number;
-    }
+const addBlankTaskOp = (taskDefinition: TaskDefinition) => {
+  const taskOpName = getNewTaskOpName(taskDefinition);
+  var nextNodeId = editor.value.nodeId;
+  var taskOp: TaskOperation = {
+    drawflow_node_id: nextNodeId,
+    name: taskOpName,
+    task_definition: taskDefinition.id,
+    instructions: '',
+    x: 400,
+    y: 150
   }
 
-  return taskDefinition.task_name + '_1';
-}
-
-const addTask = (taskDefinition: TaskDefinition) => {
-  const inputCount = taskDefinition.parameters.length;
-  const newName = getNewTaskName(taskDefinition);
-
-  taskDefinition.task_name = newName;
+  store.commit('addTaskOperation', taskOp);
 
   editor.value.addNode(
-    newName /* name */,
-    inputCount /* inputs */,
+    taskOpName /* name */,
+    1 /* inputs */,
     1 /* outputs */,
-    100 /* pos_x */,
-    100 /* pos_y */,
+    taskOp.x /* pos_x */,
+    taskOp.y /* pos_y */,
     "node" /* class */,
-    {
-      task_definition: taskDefinition,
-    } /* data */,
+    {} /* data, retrieved from vuex state */,
     "Node" /* html */,
     "vue" /* typenode */
   );
 };
 
-const connectionCreated = (connection: NodeConnection) => {
-  const inputNode = editor.value.getNodeFromId(connection.input_id);
-  const outputNode = editor.value.getNodeFromId(connection.output_id);
-
-  const inputClassSplit = connection.input_class.split("_");
-  const inputIndex = parseInt(inputClassSplit[1]) - 1;
-
-  const parameters = inputNode.data.task_definition.parameters;
-  parameters[inputIndex].source = "@tasks()";
-  parameters[
-    inputIndex
-  ].value = `${outputNode.data.task_definition.task_name}.output`;
-
-  editor.value.updateNodeDataFromId(connection.input_id, {
-    ...inputNode.data,
-    parameters: parameters,
-  });
-};
-
-const connectionRemoved = (connection: NodeConnection) => {
-  const inputNode = editor.value.getNodeFromId(connection.input_id);
-
-  const inputClassSplit = connection.input_class.split("_");
-  const inputIndex = parseInt(inputClassSplit[1]) - 1;
-
-  const parameters = inputNode.data.task_definition.parameters;
-  parameters[inputIndex].source = null;
-  parameters[inputIndex].value = "";
-
-  editor.value.updateNodeDataFromId(connection.input_id, {
-    ...inputNode.data,
-    parameters: parameters,
-  });
-};
-
-const saveWorkflow = () => {
-  // Get all the nodes from the workflow
-  const exportData = editor.value.export();
-  const nodes = exportData.drawflow.Home.data;
-  const nodeKeys = Object.keys(nodes);
-
-  const flowRequestId = props.flowRequestId;
-
-  // Create task operations object
-  const taskOperations = nodeKeys.map((key) => {
-    const node: NodeTaskDefinition = nodes[key];
-
-    return {
-      name: node.data.task_definition.task_name,
-      task_definition: node.data.task_definition.id,
-      arguments: node.data.task_definition.parameters.map((parameter: any) => {
-        return {
-          name: parameter.name,
-          data_type: parameter.data_type,
-          value: parameter.value,
-          source: parameter.source,
-        }
-      }),
-      explanation: node.data.task_definition.description,
-      x: node.pos_x,
-      y: node.pos_y,
-      z: 0,
-    }
-  });
-
-  // Create the flow through the API
-  axios
-    .post('/v1/flows', {
-      flow_request: flowRequestId,
-      name: 'No name',
-      task_operations: taskOperations,
-    })
-      .then((response) => {
-        toast.success('Flow successfully created!');
-        // Clear the drawflow
-        editor.value.clear();
-      })
-      .catch((error) => {
-        toast.error('Something went wrong during the API call');
-        console.error(error);
-      });
-}
 </script>
 
 <template>
   <div>
     <el-container>
       <el-header class="header">
-        <VRow class="d-flex gap-4 justify-space-between">
-          <!-- Add task button -->
-          <AddTaskModal @addTask="addTask" />
+        <VRow class="d-flex justify-space-between align-center full-width">
 
-          <!-- Action buttons -->
-          <div class="d-flex gap-4">
-            <VBtn prepend-icon="tabler:adjustments-code" color="secondary" class=" border">
+          <!-- Left Group -->
+          <div class="d-flex align-center gap">
+            <!-- Add task button -->
+            <VBtn class="add-task-btn" @click="cardVisible = !cardVisible" prepend-icon="tabler-plus">
+              Add Task
+            </VBtn>
+
+            <!-- Request icon -->
+            <el-button @click="requestTogglePopup" class="icon-container request-icon-container">
+              <v-icon color="#494949">tabler-message</v-icon>
+            </el-button>
+          </div>
+
+          <!-- Right Group -->
+          <div class="d-flex align-center gap">
+            <!-- Save icon -->
+            <el-button @click="saveWorkflowTogglePopup" class="icon-container save-icon-container">
+              <v-icon color="#494949">tabler-device-floppy</v-icon>
+            </el-button>
+
+            <!-- Run Flow button -->
+            <VBtn class="run-flow-btn" prepend-icon="tabler-bolt">
               Run Flow
             </VBtn>
-            <VBtn class=" border"
-              prepend-icon="tabler:device-floppy"
-              color="secondary"
-              @click="saveWorkflow"
-            >
-              Save Flow
-            </VBtn>
           </div>
+
+          <!-- Request pop-up component -->
+          <div v-if="isRequestPopupVisible" class="request-popup-overlay" @click.self="requestTogglePopup">
+            <RequestDialog class="request-popup-container" @close="requestTogglePopup"></RequestDialog>
+          </div>
+
+          <!-- Save workflow pop-up component -->
+          <div v-if="isSaveWorkflowPopupVisible" class="request-popup-overlay" @click.self="saveWorkflowTogglePopup">
+            <SaveFlowDialog class="request-popup-container" @close="saveWorkflowTogglePopup"></SaveFlowDialog>
+          </div>
+
         </VRow>
       </el-header>
-
       <!-- Actual Drawflow container -->
-      <el-container class="container">
+      <el-container class="drawflow-container">
         <el-main>
-          <div
-            id="drawflow"
-          ></div>
+
+          <TaskListCard v-if="cardVisible" class="task-list-card" @close-card="toggleTaskListCard"
+            @add-task="addBlankTaskOp" />
+
+          <div id="drawflow"></div>
         </el-main>
       </el-container>
     </el-container>
-
-    <!-- Export dialog -->
-    <el-dialog v-model="dialogVisible" title="Export" width="50%">
-      <span>Data:</span>
-      <pre><code>{{ dialogData }}</code></pre>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="dialogVisible = false">
-            Confirm
-          </el-button>
-        </span>
-      </template>
-    </el-dialog>
+    <DependencyDrawer v-if="showDrawer" v-model="showDrawer" :source-node-id="selectedSourceNodeId" :target-node-id="selectedTargetNodeId"/>
   </div>
 </template>
 
 <style scoped>
+.request-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.15);
+  /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(2px);
+  z-index: 100;
+  /* Make sure it's above all other content */
+}
+
+.request-popup-container {
+  z-index: 101;
+  /* Above the overlay */
+}
+
+/* When the pop-up is visible, blur the background content */
+body.blurred {
+  overflow: hidden;
+  filter: blur(5px);
+}
+
+.gap {
+  gap: 10px;
+  /* Adjust the gap size as needed */
+}
+
+.add-task-btn {
+  color: #fff !important;
+}
+
+.icon-container {
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--Light-Solid-Color-Gray-Gray---900, #494949);
+  display: flex;
+  align-items: center;
+  background-color: #eefaff;
+  display: flex;
+  flex-direction: column;
+  width: 38px;
+  height: 38px;
+  padding: 0 8px;
+}
+
+.request-icon-container {
+  background-color: #f0f9fc;
+}
+
+.request-icon-container:hover {
+  background-color: #b3cad9;
+}
+
+.save-icon-container {
+  background-color: #ffbf84;
+}
+
+.save-icon-container:hover {
+  background-color: #df985e;
+}
+
+.run-flow-btn {
+  background-color: #FF9F43 !important;
+  color: #494949 !important;
+  border: 1px solid #494949 !important;
+  /* Removes the border */
+
+}
+
 .header {
   display: flex;
   align-items: center;
@@ -235,8 +298,18 @@ const saveWorkflow = () => {
   border-block-end: 1px solid #494949;
 }
 
-.container {
-  min-block-size: calc(100vh - 250px);
+.task-list-card {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  z-index: 10;
+  /* Ensure it's above the Drawflow container */
+}
+
+.drawflow-container {
+  min-block-size: calc(100vh - 220px);
+  position: relative;
+  padding-top: 0.6rem;
 }
 </style>
 
@@ -272,7 +345,7 @@ const saveWorkflow = () => {
 
 #drawflow {
   background: #494949;
-  background-image: radial-gradient(transparent 1px, #f8f7fa 1px);
+  background-image: radial-gradient(transparent 1px, #FAFAF7 1px);
   background-size: 20px 20px;
   block-size: 100%;
   inline-size: 100%;
@@ -280,12 +353,15 @@ const saveWorkflow = () => {
 }
 
 .drawflow .connection .main-path {
-  stroke-width: 2px !important;
-  stroke: #4b465c !important;
+  stroke-width: 3px !important;
+  stroke: #6e6b78 !important;
 }
 
 .drawflow .connection .main-path.selected {
-  stroke: #5b4d80 !important;
+  stroke: #e38c3b !important;
+  stroke-width: 3.5px !important;
+
 }
 </style>
-<style src="drawflow/dist/drawflow.min.css"></style>
+<style src="../plugins/drawflow/drawflow.css"></style>
+x
