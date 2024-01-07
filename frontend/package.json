@@ -13,6 +13,7 @@
     "postinstall": "npm run build:icons && npm run msw:init"
   },
   "dependencies": {
+    "@auth0/auth0-vue": "^2.3.3",
     "@casl/ability": "^6.5.0",
     "@casl/vue": "^2.2.1",
     "@faker-js/faker": "^8.3.1",
@@ -27,7 +28,8 @@
     "@tiptap/pm": "^2.1.12",
     "@tiptap/starter-kit": "^2.1.12",
     "@tiptap/vue-3": "^2.1.12",
-    "@vueuse/core": "^10.5.0",
+    "@vueuse/core": "^10.7.1",
+    "@vueuse/integrations": "^10.7.1",
     "@vueuse/math": "^10.5.0",
     "apexcharts-clevision": "^3.28.5",
     "axios": "^1.6.2",
@@ -47,6 +49,7 @@
     "shepherd.js": "^11.2.0",
     "swiper": "^10.3.1",
     "ufo": "^1.3.1",
+    "universal-cookie": "^7.0.1",
     "unplugin-vue-define-options": "^1.3.18",
     "vue": "^3.3.4",
     "vue-chartjs": "^5.2.0",
@@ -58,6 +61,7 @@
     "vue3-perfect-scrollbar": "^1.6.1",
     "vuetify": "3.3.22",
     "vuex": "^4.1.0",
+    "vuex-persist": "^3.1.3",
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {

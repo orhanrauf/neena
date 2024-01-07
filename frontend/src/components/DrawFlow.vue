@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { TaskDefinition, TaskOperation, Dependency } from "@/types";
-import DependencyDrawer from "./nodes/DependencyDrawer.vue";
+// import DependencyDrawer from "./nodes/DependencyDrawer.vue";
 import axios from 'axios';
 import RequestDialog from "./dialogs/RequestDialog.vue";
 import SaveFlowDialog from "./dialogs/SaveFlowDialog.vue";
@@ -215,9 +215,11 @@ const addBlankTaskOp = (taskDefinition: TaskDefinition) => {
         </el-main>
       </el-container>
     </el-container>
-    <DependencyDrawer v-if="showDrawer" v-model="showDrawer" :source-node-id="selectedSourceNodeId" :target-node-id="selectedTargetNodeId"/>
+    
   </div>
 </template>
+
+<!-- <DependencyDrawer v-if="showDrawer" v-model="showDrawer" :source-node-id="selectedSourceNodeId" :target-node-id="selectedTargetNodeId"/> -->
 
 <style scoped>
 .request-popup-overlay {

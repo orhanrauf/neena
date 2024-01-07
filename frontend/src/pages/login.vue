@@ -1,7 +1,6 @@
 <!-- ❗Errors in the form are set on line 60 -->
 <script setup lang="ts">
 import { VForm } from 'vuetify/components/VForm'
-import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
 import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
 import authV2LoginIllustrationBorderedLight from '@images/pages/auth-v2-login-illustration-bordered-light.png'
@@ -11,6 +10,9 @@ import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+import { useAuth0 } from '@auth0/auth0-vue'
+import { useStore } from 'vuex'
+
 
 const authThemeImg = useGenerateImageVariant(authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
 
@@ -22,67 +24,24 @@ definePage({
     unauthenticatedOnly: true,
   },
 })
+const { loginWithRedirect, isAuthenticated, getAccessTokenSilently, user } = useAuth0();
+const store = useStore();
 
-const isPasswordVisible = ref(false)
+const onLogin = async () => {
+  await loginWithRedirect()
+  const token = getAccessTokenSilently();
+  await store.commit('saveToken', token);
 
-const route = useRoute()
-const router = useRouter()
+  console.log(store.state.auth.token);
+  console.log(store);
 
-const ability = useAbility()
 
-const errors = ref<Record<string, string | undefined>>({
-  email: undefined,
-  password: undefined,
-})
-
-const refVForm = ref<VForm>()
-
-const credentials = ref({
-  email: 'admin@demo.com',
-  password: 'admin',
-})
-
-const rememberMe = ref(false)
-
-const login = async () => {
-  try {
-    const res = await $api('/auth/login', {
-      method: 'POST',
-      body: {
-        email: credentials.value.email,
-        password: credentials.value.password,
-      },
-      onResponseError({ response }) {
-        errors.value = response._data.errors
-      },
-    })
-
-    const { accessToken, userData, userAbilityRules } = res
-
-    useCookie('userAbilityRules').value = userAbilityRules
-    ability.update(userAbilityRules)
-
-    useCookie('userData').value = userData
-    useCookie('accessToken').value = accessToken
-
-    // Redirect to `to` query if exist or redirect to index route
-    // ❗ nextTick is required to wait for DOM updates and later redirect
-    await nextTick(() => {
-      router.replace(route.query.to ? String(route.query.to) : '/')
-    })
-  }
-  catch (err) {
-    console.error(err)
-  }
 }
 
-const onSubmit = () => {
-  refVForm.value?.validate()
-    .then(({ valid: isValid }) => {
-      if (isValid)
-        login()
-    })
+const onSignUp = async () => {
+  await loginWithRedirect()
 }
+
 </script>
 
 <template>
@@ -115,126 +74,110 @@ const onSubmit = () => {
       lg="4"
       class="auth-card-v2 d-flex align-center justify-center"
     >
-      <VCard
-        flat
-        :max-width="500"
-        class="mt-12 mt-sm-0 pa-4"
-      >
-        <VCardText>
+    
+    <div class="login-view">
+      <div class="login-container">
+        <h1 class="title">Get started</h1>
+        <div class="buttons">
+          <button class="login-button" @click="onLogin">Log in</button>
+          <button class="signup-button" @click="onSignUp">Sign up</button>
+        </div>
+      </div>
+      <footer class="login-footer">
+        <div class="app-logo-and-title">
           <VNodeRenderer
+          class="logo"
             :nodes="themeConfig.app.logo"
-            class="mb-6"
           />
+          <h4 class="text-h3 mb-1 app-title">{{ themeConfig.app.title }}</h4>
+        </div>
 
-          <h4 class="text-h4 mb-1">
-            Welcome to <span class="text-capitalize"> {{ themeConfig.app.title }} </span>! 👋🏻
-          </h4>
-          <p class="mb-0">
-            Please sign-in to your account and start the adventure
-          </p>
-        </VCardText>
-        <VCardText>
-          <VAlert
-            color="primary"
-            variant="tonal"
-          >
-            <p class="text-sm mb-2">
-              Admin Email: <strong>admin@demo.com</strong> / Pass: <strong>admin</strong>
-            </p>
-            <p class="text-sm mb-0">
-              Client Email: <strong>client@demo.com</strong> / Pass: <strong>client</strong>
-            </p>
-          </VAlert>
-        </VCardText>
-        <VCardText>
-          <VForm
-            ref="refVForm"
-            @submit.prevent="onSubmit"
-          >
-            <VRow>
-              <!-- email -->
-              <VCol cols="12">
-                <AppTextField
-                  v-model="credentials.email"
-                  label="Email"
-                  placeholder="johndoe@email.com"
-                  type="email"
-                  autofocus
-                  :rules="[requiredValidator, emailValidator]"
-                  :error-messages="errors.email"
-                />
-              </VCol>
+        <a href="https://openai.com/terms/" target="_blank">Terms of use</a>
+        <a href="https://openai.com/privacy/" target="_blank">Privacy policy</a>
+      </footer>
+    </div>
 
-              <!-- password -->
-              <VCol cols="12">
-                <AppTextField
-                  v-model="credentials.password"
-                  label="Password"
-                  placeholder="············"
-                  :rules="[requiredValidator]"
-                  :type="isPasswordVisible ? 'text' : 'password'"
-                  :error-messages="errors.password"
-                  :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
-                  @click:append-inner="isPasswordVisible = !isPasswordVisible"
-                />
-
-                <div class="d-flex align-center flex-wrap justify-space-between mt-1 mb-4">
-                  <VCheckbox
-                    v-model="rememberMe"
-                    label="Remember me"
-                  />
-                  <RouterLink
-                    class="text-primary ms-2 mb-1"
-                    :to="{ name: 'forgot-password' }"
-                  >
-                    Forgot Password?
-                  </RouterLink>
-                </div>
-
-                <VBtn
-                  block
-                  type="submit"
-                >
-                  Login
-                </VBtn>
-              </VCol>
-
-              <!-- create account -->
-              <VCol
-                cols="12"
-                class="text-center"
-              >
-                <span>New on our platform?</span>
-                <RouterLink
-                  class="text-primary ms-2"
-                  :to="{ name: 'register' }"
-                >
-                  Create an account
-                </RouterLink>
-              </VCol>
-              <VCol
-                cols="12"
-                class="d-flex align-center"
-              >
-                <VDivider />
-                <span class="mx-4">or</span>
-                <VDivider />
-              </VCol>
-
-              <!-- auth providers -->
-              <VCol
-                cols="12"
-                class="text-center"
-              >
-                <AuthProvider />
-              </VCol>
-            </VRow>
-          </VForm>
-        </VCardText>
-      </VCard>
     </VCol>
   </VRow>
 </template>
+
+<style scoped>
+.login-view {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  color: #fff;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-container {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.title {
+  margin-bottom: 20px;
+}
+
+.buttons {
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px 60px;
+  margin: 0 10px;
+  border: none;
+  color: #fff;
+  background-color: #5865f2;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #43458b;
+}
+
+.login-footer {
+  position: absolute;
+  bottom: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.login-footer a {
+  color: #696969;
+  text-decoration: none;
+  margin: 0 10px;
+  font-size: 14px;
+}
+
+.app-logo-and-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  /* Adjust the size of the logo as needed */
+  height: 20px; /* Example size */
+  width: auto;
+  margin-right: 7px; /* Spacing between logo and title */
+}
+
+.app-title {
+  margin: 0;
+  font-size: 2em; /* Adjust as needed */
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}
+</style>
+
 
 <style lang="scss">
 @use "@core/scss/template/pages/page-auth.scss";

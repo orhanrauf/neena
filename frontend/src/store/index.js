@@ -1,10 +1,25 @@
 // store/index.js
 import { createStore } from 'vuex';
+import VuexPersist from 'vuex-persist';
+
+const vuexPersist = new VuexPersist({
+  key: 'neena', // The key to store the state on in the storage provider.
+  storage: window.localStorage, // or window.sessionStorage or localForage
+  // You can also specify the parts of the state you want to persist.
+  reducer: state => ({
+    auth: state.auth, // only persist the auth module
+    // add other modules that you want to persist here
+  })
+});
 
 // Create a new store instance.
 const store = createStore({
   state() {
     return {
+      auth: {
+        token: null,
+        user: null,
+      },
       flowCreation: {
         request: null, // flow request
         drawflowEditor: null, // entire DrawFlow object
@@ -13,10 +28,12 @@ const store = createStore({
           dependencies: []
         }
       },
-      taskDefinitions: []
+      taskDefinitions: [],
     };
   },
   getters: {
+    token: state => state.auth.token,
+    user: state => state.auth.user,
     taskDefinitions: state => state.taskDefinitions,
     // Getter to find a task operation by drawflow_node_id
     getTaskOperationByNodeId: (state) => (nodeId) => {
@@ -80,6 +97,12 @@ const store = createStore({
     }
   },
   mutations: {
+    saveToken(state, token) {
+      state.auth.token = token;
+    },
+    setUser(state, user) {
+      state.user = user;
+    },
     setRequest(state, request) {
       state.flowCreation.request = request;
     },
@@ -126,6 +149,7 @@ const store = createStore({
       );
       state.flowCreation.flow.dependencies.splice(index, 1);
     },
+
   },
   actions: {
     fetchTaskDefinitions: async ({ commit, state }) => {
@@ -151,7 +175,8 @@ const store = createStore({
         }, 100);
       }
     }
-  }
+  },
+  plugins: [vuexPersist.plugin]
 });
 
 export default store;

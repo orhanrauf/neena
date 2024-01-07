@@ -53,6 +53,7 @@ const show = computed({
 });
 
 const loadDependencies = () => {
+{
   // For incoming dependencies
   const incomingDependencies = store.getters.getDependenciesByTargetNodeId(taskOp.value.drawflow_node_id);
   incomingDependencyTuples.value = incomingDependencies.map(dep => {
@@ -131,7 +132,7 @@ const save = () => {
     <el-drawer v-model="show" direction="rtl" class="full-screen-drawer" title="Task">
       <input class="task-operation-name-input" v-model="taskOp.name" />
       <div class="task-definition">
-        <img src='src/assets/images/icons/integrations/salesforce.svg' class="task-definition-img" />
+        <img src='@/assets/images/icons/integrations/salesforce.svg' class="task-definition-img" />
         <div class="task-definition-text">Get customer by email</div>
       </div>
       <div class="divider"></div>
