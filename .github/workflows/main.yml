@@ -38,7 +38,7 @@ jobs:
         echo "resource_group_name=$(terraform-bin output -raw resource_group_name)" >> $GITHUB_ENV
         echo "static_website_endpoint=$(terraform-bin output -raw static_website_endpoint)" >> $GITHUB_ENV
         echo "postgresql_server_fqdn=$(terraform-bin output -raw postgresql_server_fqdn)" >> $GITHUB_ENV
-        echo "static_website_blob_store_account_name=$(terraform-bin output -raw static_website_blob_store_account_name)" >> $GITHUB_ENV
+        echo "static_website_blob_connection_string=$(terraform-bin output -raw static_website_blob_connection_string)" >> $GITHUB_ENV
         echo "service_app_base_url=$(terraform-bin output -raw service_app_base_url)" >> $GITHUB_ENV
       env:
         ARM_CLIENT_ID: ${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}
@@ -87,7 +87,7 @@ jobs:
         az storage blob upload-batch \
           -s ./frontend/dist \
           -d $web \ 
-          --account-name ${{ env.static_website_blob_store_account_name }}
+          --account-name ${{ env.static_website_blob_connection_string }}
 
     - name: Get Public IP
       run: echo "RUNNER_IP=$(curl -s ifconfig.me)" >> $GITHUB_ENV

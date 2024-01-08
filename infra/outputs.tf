@@ -38,8 +38,8 @@ output "static_website_endpoint" {
   value = module.static_website.endpoint
 }
 
-output static_website_blob_store_account_name {
-  value = module.static_website.blob_store_account_name
+output static_website_blob_connection_string {
+  value = module.static_website.blob_connection_string
 }
 
 output "postgresql_server_fqdn" {
