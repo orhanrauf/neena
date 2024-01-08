@@ -85,10 +85,7 @@ jobs:
     - name: Deploy to Vue distribution Azure Blob Storage
       run: |
         cd ./frontend
-        az storage blob upload-batch \
-          -s dist \
-          -d "$web" \ 
-          --connection-string "${{ env.static_website_blob_connection_string }}"
+        az storage blob upload-batch -s dist -d "$web" --connection-string "${{ env.static_website_blob_connection_string }}"
 
     - name: Get Public IP
       run: echo "RUNNER_IP=$(curl -s ifconfig.me)" >> $GITHUB_ENV
