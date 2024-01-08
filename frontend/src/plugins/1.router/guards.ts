@@ -1,5 +1,4 @@
 import type { Router } from 'vue-router'
-import { canNavigate } from '@layouts/plugins/casl'
 import store from '@/store'
 
 
@@ -8,32 +7,34 @@ export const setupGuards = (router: Router) => {
   // Docs: https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards
   router.beforeEach(to => {
 
-    const isLoggedIn = store.state.auth.token !== null;
-
+    const isLoggedIn = store.state.auth.token !== null && Object.keys(store.state.auth.token).length !== 0;
 
     /*
       * If it's a public route continue navigation.
       * This kind of pages are allowed to be visited by login & non-login users without any restrictions.
       * Examples of public routes are 404, under maintenance, etc.
     */
-    if (to.meta.public)
+    if (to.meta.public) {
       return
-    /**
-     * Check if user is logged in by checking if token & user data exists in local storage
-     * Feel free to update this logic to suit your needs
-    */
+    }
 
-      /*
-        If user is logged in and is trying to access login like page, redirect to home
-        else allow visiting the page
-        (WARN: Don't allow executing further by return statement because next code will check for permissions)
-       */
-      if (to.meta.unauthenticatedOnly) {
-        if (isLoggedIn)
-          return '/' // send to default page (that gets picked up by router)
-        else
-          return undefined
+    /*
+      If user is logged in and is trying to access login like page, redirect to home
+      else allow visiting the page
+      (WARN: Don't allow executing further by return statement because next code will check for permissions)
+      */
+    if (to.meta.unauthenticatedOnly) {
+      if (isLoggedIn) {
+        return '/' // send to default page (that gets picked up by router)
       }
-    return
+      else {
+        return undefined
+      }
+    }
+    
+    if (!isLoggedIn) {
+      return '/login' // send to login
+    }
   })
+
 }

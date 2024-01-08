@@ -2,6 +2,9 @@
 import { createStore } from 'vuex';
 import VuexPersist from 'vuex-persist';
 
+// await store.commit('setUser', user.value);
+// await store.commit('setAuthDateTimestamp', Date.now());
+
 const vuexPersist = new VuexPersist({
   key: 'neena', // The key to store the state on in the storage provider.
   storage: window.localStorage, // or window.sessionStorage or localForage
@@ -19,6 +22,7 @@ const store = createStore({
       auth: {
         token: null,
         user: null,
+        authDateTimestamp: null
       },
       flowCreation: {
         request: null, // flow request
@@ -101,7 +105,15 @@ const store = createStore({
       state.auth.token = token;
     },
     setUser(state, user) {
-      state.user = user;
+      state.auth.user = user;
+    },
+    setAuthDateTimestamp(state, timestamp) {
+      state.auth.authDateTimestamp = timestamp;
+    },
+    logOut(state, user) {
+      state.auth.token = null;
+      state.auth.user = null;
+      state.auth.authDateTimestamp = null;
     },
     setRequest(state, request) {
       state.flowCreation.request = request;

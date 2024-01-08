@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
+import { useStore } from 'vuex'
+
 
 const router = useRouter()
 const ability = useAbility()
+const store = useStore()
 
-// TODO: Get type from backend
-const userData = useCookie<any>('userData')
+const userData = {
+  fullName: store.state.auth.user.name,
+  username: store.state.auth.user.email,
+  avatar: store.state.auth.user.picture,
+  role: 'admin',
+}
 
 const logout = async () => {
-  // Remove "accessToken" from cookie
-  useCookie('accessToken').value = null
-
-  // Remove "userData" from cookie
-  userData.value = null
+  store.commit('logOut')
 
   // Redirect to login page
   await router.push('/login')

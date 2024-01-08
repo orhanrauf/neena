@@ -4,6 +4,7 @@ import ScrollToTop from '@core/components/ScrollToTop.vue'
 import initCore from '@core/initCore'
 import { initConfigStore, useConfigStore } from '@core/stores/config'
 import { hexToRgb } from '@layouts/utils'
+import { useStore } from 'vuex'
 
 const { global } = useTheme()
 
@@ -12,6 +13,7 @@ initCore()
 initConfigStore()
 
 const configStore = useConfigStore()
+const store = useStore()
 </script>
 
 <template>

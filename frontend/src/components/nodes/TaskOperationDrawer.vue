@@ -53,78 +53,77 @@ const show = computed({
 });
 
 const loadDependencies = () => {
-{
-  // For incoming dependencies
-  const incomingDependencies = store.getters.getDependenciesByTargetNodeId(taskOp.value.drawflow_node_id);
-  incomingDependencyTuples.value = incomingDependencies.map(dep => {
-    const sourceTaskOp = store.getters.getTaskOperationByNodeId(dep.source_node_id);
-    return { dependency: dep, taskOperation: sourceTaskOp };
-  });
+    // For incoming dependencies
+    const incomingDependencies = store.getters.getDependenciesByTargetNodeId(taskOp.value.drawflow_node_id);
+    incomingDependencyTuples.value = incomingDependencies.map(dep => {
+      const sourceTaskOp = store.getters.getTaskOperationByNodeId(dep.source_node_id);
+      return { dependency: dep, taskOperation: sourceTaskOp };
+    });
 
-  // For outgoing dependencies
-  const outgoingDependencies = store.getters.getDependenciesBySourceNodeId(taskOp.value.drawflow_node_id);
-  outgoingDependencyTuples.value = outgoingDependencies.map(dep => {
-    const targetTaskOp = store.getters.getTaskOperationByNodeId(dep.target_node_id);
-    return { dependency: dep, taskOperation: targetTaskOp };
-  });
-}
-
-const disableScroll = () => {
-  const scrollY = window.scrollY; // Remember the scroll position
-  document.documentElement.style.position = 'fixed'; // Keep the document in place
-  document.documentElement.style.top = `-${scrollY}px`; // Adjust the top position based on scroll position
-  document.documentElement.style.width = '100%'; // Ensure the width doesn't change
-};
-
-const enableScroll = () => {
-  const scrollY = document.documentElement.style.top;
-  document.documentElement.style.position = '';
-  document.documentElement.style.top = '';
-  document.documentElement.style.width = '';
-  window.scrollTo(0, parseInt(scrollY || '0') * -1); // Scroll to the original position
-};
-
-const onDependencyClick = (dependency) => {
-  // Handle dependency click event
-  console.log('Dependency clicked:', dependency);
-};
-
-const onTaskOperationClick = (taskOperation) => {
-  // Handle task operation click event
-  console.log('Task Operation clicked:', taskOperation);
-};
-
-const getIconUrl = (source: string) => {
-  return `src/assets/images/icons/integrations/${source}.svg`;
-}
-
-watch(show, (newValue) => {
-  if (newValue) {
-    disableScroll();
-    loadDependencies();
-  } else {
-    enableScroll();
+    // For outgoing dependencies
+    const outgoingDependencies = store.getters.getDependenciesBySourceNodeId(taskOp.value.drawflow_node_id);
+    outgoingDependencyTuples.value = outgoingDependencies.map(dep => {
+      const targetTaskOp = store.getters.getTaskOperationByNodeId(dep.target_node_id);
+      return { dependency: dep, taskOperation: targetTaskOp };
+    });
   }
-});
 
-watch(route, (to, from) => {
-  // Check if the drawer is open, and if so, close it
-  if (show.value) {
+  const disableScroll = () => {
+    const scrollY = window.scrollY; // Remember the scroll position
+    document.documentElement.style.position = 'fixed'; // Keep the document in place
+    document.documentElement.style.top = `-${scrollY}px`; // Adjust the top position based on scroll position
+    document.documentElement.style.width = '100%'; // Ensure the width doesn't change
+  };
+
+  const enableScroll = () => {
+    const scrollY = document.documentElement.style.top;
+    document.documentElement.style.position = '';
+    document.documentElement.style.top = '';
+    document.documentElement.style.width = '';
+    window.scrollTo(0, parseInt(scrollY || '0') * -1); // Scroll to the original position
+  };
+
+  const onDependencyClick = (dependency) => {
+    // Handle dependency click event
+    console.log('Dependency clicked:', dependency);
+  };
+
+  const onTaskOperationClick = (taskOperation) => {
+    // Handle task operation click event
+    console.log('Task Operation clicked:', taskOperation);
+  };
+
+  const getIconUrl = (source: string) => {
+    return `src/assets/images/icons/integrations/${source}.svg`;
+  }
+
+  watch(show, (newValue) => {
+    if (newValue) {
+      disableScroll();
+      loadDependencies();
+    } else {
+      enableScroll();
+    }
+  });
+
+  watch(route, (to, from) => {
+    // Check if the drawer is open, and if so, close it
+    if (show.value) {
+      show.value = false;
+    }
+  });
+
+  onMounted(() => {
+    taskOp.value = store.getters.getTaskOperationByNodeId(parseInt(props.nodeId));
+    taskDefinition.value = store.getters.getTaskDefinitionById(taskOp.value.task_definition);
+  });
+
+
+  const save = () => {
+    // Your existing save logic
+    emit('update');
     show.value = false;
-  }
-});
-
-onMounted(() => {
-  taskOp.value = store.getters.getTaskOperationByNodeId(parseInt(props.nodeId));
-  taskDefinition.value = store.getters.getTaskDefinitionById(taskOp.value.task_definition);
-});
-
-
-const save = () => {
-  // Your existing save logic
-  emit('update');
-  show.value = false;
-};
+  };
 </script>
 
 <template>
@@ -146,24 +145,23 @@ const save = () => {
       <div class="dependencies-header-text">Dependencies</div>
 
       <div class="dependencies-sub-text">incoming</div>
-        <div v-if="incomingDependencyTuples.length">
-          <div v-for="(tuple, index) in incomingDependencyTuples" :key="'incoming-' + index" class="incoming-dependency">
-            <div class="incoming-dependency-logo-and-task" @click="onTaskOperationClick(tuple.taskOperation)">
-              <!-- Replace with dynamic content -->
-              <img :src="getIconUrl(store.getters.getTaskDefinitionById(tuple.taskOperation.task_definition).source)"
-                class="dependency-logo" />
-              <div class="dependency-task-name">{{ tuple.taskOperation.name }}</div>
-            </div>
-            <div :id="'arrow-' + tuple.dependency.id" class="dependency-arrow"
-              @click="onDependencyClick(tuple.dependency)">
-              <svg class="arrow-svg" width="144" height="31" viewBox="0 0 131 31" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <path d="M131 15.5L121 9.7265V21.2735L131 15.5ZM0 16.5H122V14.5H0V16.5Z" fill="#4B465C" />
-              </svg>
-            </div>
+      <div v-if="incomingDependencyTuples.length">
+        <div v-for="(tuple, index) in incomingDependencyTuples" :key="'incoming-' + index" class="incoming-dependency">
+          <div class="incoming-dependency-logo-and-task" @click="onTaskOperationClick(tuple.taskOperation)">
+            <!-- Replace with dynamic content -->
+            <img :src="getIconUrl(store.getters.getTaskDefinitionById(tuple.taskOperation.task_definition).source)"
+              class="dependency-logo" />
+            <div class="dependency-task-name">{{ tuple.taskOperation.name }}</div>
+          </div>
+          <div :id="'arrow-' + tuple.dependency.id" class="dependency-arrow" @click="onDependencyClick(tuple.dependency)">
+            <svg class="arrow-svg" width="144" height="31" viewBox="0 0 131 31" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path d="M131 15.5L121 9.7265V21.2735L131 15.5ZM0 16.5H122V14.5H0V16.5Z" fill="#4B465C" />
+            </svg>
           </div>
         </div>
-        <div v-else class="no-dependencies">None</div>
+      </div>
+      <div v-else class="no-dependencies">None</div>
       <div class="dependencies-box">
         <div class="dependencies-sub-text">outgoing</div>
         <div v-if="outgoingDependencyTuples.length">
@@ -462,4 +460,5 @@ const save = () => {
   margin-top: 8px;
   border: 1px solid #aaaaaa;
   border-radius: 4px;
-}</style>
+}
+</style>

@@ -1,6 +1,5 @@
 <!-- ❗Errors in the form are set on line 60 -->
 <script setup lang="ts">
-import { VForm } from 'vuetify/components/VForm'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
 import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
 import authV2LoginIllustrationBorderedLight from '@images/pages/auth-v2-login-illustration-bordered-light.png'
@@ -12,6 +11,9 @@ import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { useStore } from 'vuex'
+import { onBeforeMount } from 'vue'
+import { useRouter } from 'vue-router'
+import {watch} from 'vue';
 
 
 const authThemeImg = useGenerateImageVariant(authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
@@ -26,16 +28,30 @@ definePage({
 })
 const { loginWithRedirect, isAuthenticated, getAccessTokenSilently, user } = useAuth0();
 const store = useStore();
+const router = useRouter();
+
+watch(() => isAuthenticated.value, async (newValue) => {
+  if (newValue) {
+    try {
+      const token = await getAccessTokenSilently();
+      console.log('token', token);
+
+      console.log('user', user.value); 
+      
+      await store.commit('saveToken', token);
+      await store.commit('setUser', user.value);
+      await store.commit('setAuthDateTimestamp', Date.now());
+      
+      router.push('/');
+    } catch (error) {
+      console.error('Error getting token or redirecting:', error);
+    }
+  }
+});
+
 
 const onLogin = async () => {
   await loginWithRedirect()
-  const token = getAccessTokenSilently();
-  await store.commit('saveToken', token);
-
-  console.log(store.state.auth.token);
-  console.log(store);
-
-
 }
 
 const onSignUp = async () => {

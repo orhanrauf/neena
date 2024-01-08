@@ -10,7 +10,6 @@ export const redirects: RouteRecordRaw[] = [
     path: '/',
     name: 'index',
     redirect: to => {
-      // TODO: Get type from backend
       const userData = useCookie<Record<string, unknown> | null | undefined>('userData')
       // const userRole = userData.value?.role
       const userRole = 'admin';
