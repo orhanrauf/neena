@@ -48,7 +48,7 @@ jobs:
         TF_VAR_first_superuser: ${{ secrets.FIRST_SUPERUSER }}
         TF_VAR_first_superuser_password: ${{ secrets.FIRST_SUPERUSER_PASSWORD }}
       working-directory: infra
-      
+
     - name: Login to Azure
       uses: azure/login@v1
       with:
@@ -73,7 +73,24 @@ jobs:
           --end-ip-address $RUNNER_IP
       env:
         RUNNER_IP: ${{ env.RUNNER_IP }}
+        
+    - name: Install pnpm
+      run: npm install -g pnpm
 
+    - name: Build Vue Project
+      run: |
+        cd frontend
+        pnpm install
+        pnpm run build
+      working-directory: ./frontend
+
+    - name: Deploy to Vue distribution Azure Blob Storage
+      run: |
+        az storage blob upload-batch \
+          -s ./frontend/dist \ # Adjust this path to your build artifacts directory
+          -d \$web \ # Destination in Azure Blob Storage
+          --account-name ${{ env.static_website_endpoint }}
+          
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
