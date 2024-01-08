@@ -56,7 +56,8 @@
     "skipLibCheck": true,
     "types": [
       "vite/client",
-      "vite-plugin-vue-layouts/client"
+      "vite-plugin-vue-layouts/client",
+      "node"
     ]
   },
   "include": [

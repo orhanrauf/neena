@@ -229,7 +229,7 @@ devDependencies:
     specifier: ^2.7.16
     version: 2.7.19
   '@types/node':
-    specifier: ^20.8.6
+    specifier: ^20.10.6
     version: 20.10.6
   '@types/webfontloader':
     specifier: ^1.6.35
