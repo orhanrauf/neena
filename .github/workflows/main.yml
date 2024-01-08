@@ -38,6 +38,8 @@ jobs:
         echo "resource_group_name=$(terraform-bin output -raw resource_group_name)" >> $GITHUB_ENV
         echo "static_website_endpoint=$(terraform-bin output -raw static_website_endpoint)" >> $GITHUB_ENV
         echo "postgresql_server_fqdn=$(terraform-bin output -raw postgresql_server_fqdn)" >> $GITHUB_ENV
+        echo "static_website_blob_store_account_name=$(terraform-bin output -raw static_website_blob_store_account_name)" >> $GITHUB_ENV
+        echo "service_app_base_url=$(terraform-bin output -raw service_app_base_url)" >> $GITHUB_ENV
       env:
         ARM_CLIENT_ID: ${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}
@@ -75,13 +77,17 @@ jobs:
         pnpm install
         pnpm run build
       working-directory: ./frontend
+      env: 
+        VITE_APP_AUTH0_DOMAIN: ${{ secrets.VITE_APP_AUTH0_DOMAIN }}
+        VITE_APP_AUTH0_CLIENT_ID: ${{ secrets.VITE_APP_AUTH0_CLIENT_ID }}
+        VITE_APP_SERVER_URL: ${{ env.service_app_base_url }}
 
     - name: Deploy to Vue distribution Azure Blob Storage
       run: |
         az storage blob upload-batch \
           -s ./frontend/dist \
           -d $web \ 
-          --account-name ${{ env.static_website_endpoint }}
+          --account-name ${{ env.static_website_blob_store_account_name }}
 
     - name: Get Public IP
       run: echo "RUNNER_IP=$(curl -s ifconfig.me)" >> $GITHUB_ENV

@@ -10,6 +10,10 @@ output "service_app_name" {
   value = module.service_app.name
 }
 
+output "service_app_base_url" {
+  value = module.service_app.service_app_base_url
+}
+
 output "function_app_name" {
   value = module.function_app.name
 }
@@ -32,6 +36,10 @@ output "resource_group_name" {
 
 output "static_website_endpoint" {
   value = module.static_website.endpoint
+}
+
+output static_website_blob_store_account_name {
+  value = module.static_website.blob_store_account_name
 }
 
 output "postgresql_server_fqdn" {
