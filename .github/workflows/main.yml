@@ -80,7 +80,7 @@ jobs:
       run: |
         az storage blob upload-batch \
           -s ./frontend/dist \ # Adjust this path to your build artifacts directory
-          -d \$web \ # Destination in Azure Blob Storage
+          -d $web \ # Destination in Azure Blob Storage
           --account-name ${{ env.static_website_endpoint }}
 
     - name: Get Public IP
