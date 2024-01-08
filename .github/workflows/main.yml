@@ -79,7 +79,6 @@ jobs:
 
     - name: Build Vue Project
       run: |
-        cd frontend
         pnpm install
         pnpm run build
       working-directory: ./frontend
