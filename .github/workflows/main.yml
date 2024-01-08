@@ -69,7 +69,9 @@ jobs:
 
     - name: Build Vue Project
       run: |
+        npm install -g tsx
         pnpm install ts-node
+        pnpm install tsx
         pnpm install
         pnpm run build
       working-directory: ./frontend
