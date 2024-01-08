@@ -59,6 +59,23 @@ jobs:
             "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}",
             "tenantId": "${{ secrets.TENANT_ID }}"
           }
+        
+    - name: Install pnpm
+      run: npm install -g pnpm
+
+    - name: Build Vue Project
+      run: |
+        pnpm install ts-node
+        pnpm install
+        pnpm run build
+      working-directory: ./frontend
+
+    - name: Deploy to Vue distribution Azure Blob Storage
+      run: |
+        az storage blob upload-batch \
+          -s ./frontend/dist \ # Adjust this path to your build artifacts directory
+          -d \$web \ # Destination in Azure Blob Storage
+          --account-name ${{ env.static_website_endpoint }}
 
     - name: Get Public IP
       run: echo "RUNNER_IP=$(curl -s ifconfig.me)" >> $GITHUB_ENV
@@ -73,22 +90,6 @@ jobs:
           --end-ip-address $RUNNER_IP
       env:
         RUNNER_IP: ${{ env.RUNNER_IP }}
-        
-    - name: Install pnpm
-      run: npm install -g pnpm
-
-    - name: Build Vue Project
-      run: |
-        pnpm install
-        pnpm run build
-      working-directory: ./frontend
-
-    - name: Deploy to Vue distribution Azure Blob Storage
-      run: |
-        az storage blob upload-batch \
-          -s ./frontend/dist \ # Adjust this path to your build artifacts directory
-          -d \$web \ # Destination in Azure Blob Storage
-          --account-name ${{ env.static_website_endpoint }}
           
     - name: Set up Python
       uses: actions/setup-python@v2
