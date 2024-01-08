@@ -87,7 +87,7 @@ jobs:
         az storage blob upload-batch \
           -s ./frontend/dist \
           -d $web \ 
-          --account-name ${{ env.static_website_blob_connection_string }}
+          --connection-string ${{ env.static_website_blob_connection_string }}
 
     - name: Get Public IP
       run: echo "RUNNER_IP=$(curl -s ifconfig.me)" >> $GITHUB_ENV
