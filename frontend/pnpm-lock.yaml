@@ -91,6 +91,9 @@ dependencies:
   element-plus:
     specifier: ^2.4.4
     version: 2.4.4(react@18.2.0)(vue@3.4.5)
+  flatpickr:
+    specifier: ^4.6.13
+    version: 4.6.13
   highlight.js:
     specifier: ^11.9.0
     version: 11.9.0
