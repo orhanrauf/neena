@@ -59,6 +59,10 @@ jobs:
             "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}",
             "tenantId": "${{ secrets.TENANT_ID }}"
           }
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20' # Set this to your Node.js version
         
     - name: Install pnpm
       run: npm install -g pnpm
