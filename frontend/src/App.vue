@@ -13,7 +13,8 @@ initCore()
 initConfigStore()
 
 const configStore = useConfigStore()
-const store = useStore()
+const store = useStore() 
+const state = store.state // For easy access in developer tools
 </script>
 
 <template>

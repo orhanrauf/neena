@@ -37,6 +37,7 @@ resource "azurerm_linux_web_app" "app_service" {
     "FIRST_SUPERUSER" = var.first_superuser
     "FIRST_SUPERUSER_PASSWORD" = var.first_superuser_password
     "PROJECT_NAME" = "Neena"
+    "LOG_APPINSIGHTS": "true"
   }
 
   identity {

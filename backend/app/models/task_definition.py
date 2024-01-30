@@ -43,9 +43,10 @@ class TaskDefinition(Base):
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
     task_name: Mapped[str] = mapped_column(String)
     parameters: Mapped[list[TaskParameter]] = mapped_column(TaskParameterType)
-    output_type: Mapped[str] = mapped_column(String)
-    description: Mapped[str] = mapped_column(String)
+    python_method_name: Mapped[str] = mapped_column(String)
     python_code: Mapped[str] = mapped_column(String)
+    output_type: Mapped[str] = mapped_column(String) # Should make pydantic type that has JSON and YML as serializable types
+    description: Mapped[str] = mapped_column(String)
     created_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=True)
     modified_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=True)
     created_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)

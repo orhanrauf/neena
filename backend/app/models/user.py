@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 from uuid import uuid4
 
-from sqlalchemy import DateTime
+from sqlalchemy import ARRAY, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -12,7 +12,7 @@ from sqlalchemy.sql import func
 from app.db.base_class import Base
 
 if TYPE_CHECKING:
-    from . import Token  # noqa: F401
+    from . import IntegrationCredential  # noqa: F401
     from . import FlowRequest # noqa: F401
     from . import TaskDefinition
     from . import Flow
@@ -20,16 +20,13 @@ if TYPE_CHECKING:
 
 class User(Base):
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
-    created_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    modified_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), server_onupdate=func.now(), nullable=False
-    )
+    auth0_id: Mapped[str] = mapped_column(unique=True, index=True, nullable=False)
+    organization: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("organization.id"), nullable=True)
+
+    permissions: Mapped[Optional[List[str]]] = mapped_column(ARRAY(String))
     full_name: Mapped[str] = mapped_column(index=True)
     email: Mapped[str] = mapped_column(unique=True, index=True, nullable=False)
-    hashed_password: Mapped[Optional[str]] = mapped_column(nullable=True)
-    is_active: Mapped[bool] = mapped_column(default=True)
-    is_superuser: Mapped[bool] = mapped_column(default=False)
-    refresh_tokens: Mapped[list["Token"]] = relationship(back_populates="authenticates", lazy="dynamic")
+    created_date: Mapped[datetime] = mapped_column(DateTime( timezone=True), server_default=func.now(), nullable=False)
     
     created_flow_requests: Mapped[list["FlowRequest"]] = relationship(back_populates="created_by", lazy="dynamic", foreign_keys='FlowRequest.created_by_email')
     modified_flow_requests: Mapped[list["FlowRequest"]] = relationship(back_populates="modified_by", lazy="dynamic", foreign_keys='FlowRequest.modified_by_email')
@@ -40,3 +37,5 @@ class User(Base):
     created_task_operations: Mapped[list["TaskOperation"]] = relationship(back_populates="created_by", lazy="dynamic", foreign_keys='TaskOperation.created_by_email')
     modified_task_operations: Mapped[list["TaskOperation"]] = relationship(back_populates="modified_by", lazy="dynamic", foreign_keys='TaskOperation.modified_by_email')
     
+    created_credentials: Mapped[list["IntegrationCredential"]] = relationship("IntegrationCredential", back_populates="creator", foreign_keys='IntegrationCredential.created_by_email')
+    modified_credentials: Mapped[list["IntegrationCredential"]] = relationship("IntegrationCredential", back_populates="modifier", foreign_keys='IntegrationCredential.modified_by_email')

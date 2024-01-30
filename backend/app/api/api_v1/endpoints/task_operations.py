@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
-from app.core.config import settings
+from app.core.auth import Auth0User, auth
 
 router = APIRouter()
 
@@ -19,7 +19,7 @@ def create_task_operation(
     arguments: list[schemas.Argument] = Body(...),
     flow: str = Body(...),
     explanation: str = Body(...),
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Create task operation.
@@ -42,7 +42,7 @@ def read_all_task_operations(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Retrieve all task operations.
@@ -56,7 +56,7 @@ def read_task_operation(
     *,
     db: Session = Depends(deps.get_db),
     id: str,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Get task operation by id.
@@ -69,7 +69,7 @@ def remove_task_operation(
     *,
     db: Session = Depends(deps.get_db),
     id: str,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Delete task operation by id.

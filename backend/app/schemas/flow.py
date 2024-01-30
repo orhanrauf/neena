@@ -32,6 +32,7 @@ class FlowInDBBase(FlowBase):
     modified_date: datetime
     created_by_email: EmailStr
     modified_by_email: EmailStr
+    organization: Optional[UUID] = None
     
     class Config:
         orm_mode = True

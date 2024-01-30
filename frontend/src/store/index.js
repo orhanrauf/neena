@@ -114,6 +114,11 @@ const store = createStore({
       state.auth.token = null;
       state.auth.user = null;
       state.auth.authDateTimestamp = null;
+      
+      // Clear only the auth data under 'neena.auth' in local storage
+      const neenaData = JSON.parse(localStorage.getItem('neena') || '{}');
+      delete neenaData.auth;
+      localStorage.setItem('neena', JSON.stringify(neenaData));
     },
     setRequest(state, request) {
       state.flowCreation.request = request;

@@ -1,6 +1,12 @@
-from fastapi import FastAPI
+from app.core.logging import logger
+import time
+from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from opencensus.ext.azure.log_exporter import AzureLogHandler
+import traceback
+import os
+
 from pydantic import ValidationError
 
 from starlette.middleware.cors import CORSMiddleware
@@ -38,13 +44,43 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     )
 
+if settings.LOG_APPINSIGHTS:        
+    ai_handler = AzureLogHandler(connection_string=f'InstrumentationKey={settings.APPINSIGHTS_INSTRUMENTATIONKEY}')
+    logger.addHandler(ai_handler)
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+    logger.info(f"Handled request {request.method} {request.url} in {duration:.2f} seconds. Response code: {response.status_code}")
+
+    return response
+    
+# Add exception handling to also log it
+@app.middleware("http")
+async def exception_logging_middleware(request: Request, call_next):
+    try:
+        # Try processing the request
+        response = await call_next(request)
+        return response
+    except Exception as exc:
+        # Log the exception with traceback
+        logger.error(f"Unhandled exception: {exc}\n{traceback.format_exc()}")
+
+        # Return a generic error response
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal Server Error"}
+        )
+
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.on_event("startup")
 async def startup_event():
     db = SessionLocal()
-    print
     try:
         init_db(db)
     finally:
         db.close()
+        

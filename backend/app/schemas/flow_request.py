@@ -9,6 +9,8 @@ class FlowRequestBase(BaseModel):
     request_metadata: Optional[List[Dict]] = None
     request_instructions : constr(max_length=512) = None
     request_body: constr(min_length=8, max_length=512)
+    flow: Optional[UUID] = None
+    organization: Optional[UUID] = None
 
 # Properties to receive via API on creation
 class FlowRequestCreate(FlowRequestBase):

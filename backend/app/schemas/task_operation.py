@@ -11,11 +11,9 @@ from pydantic.datetime_parse import date
 class TaskOperationBase(BaseModel):
     name: str
     task_definition: UUID
-    arguments: list[Argument]
-    explanation: Optional[str] = None
+    instruction: str
     x: float
     y: float
-    z: int
 
     class Config:
         orm_mode = True

@@ -9,15 +9,15 @@ from pydantic import BaseModel, EmailStr, constr
 class TaskDefinitionBase(BaseModel):
     task_name: constr(min_length=6, max_length=64)
     parameters: list[TaskParameter]
-    output_type: str
-    description: str
     python_code: str
+    description: str
+    python_method_name: str
+    output_type: str
     
 
 # Properties to receive via API on creation
 class TaskDefinitionCreate(TaskDefinitionBase):
     pass
-
 
 # Properties to receive via API on update
 class TaskDefinitionUpdate(TaskDefinitionBase):

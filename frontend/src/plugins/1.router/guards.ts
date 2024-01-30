@@ -1,7 +1,7 @@
 import type { Router } from 'vue-router'
 import store from '@/store'
 
-
+// TODO: Add vuex store check if token refresh is required
 export const setupGuards = (router: Router) => {
   // 👉 router.beforeEach
   // Docs: https://router.vuejs.org/guide/advanced/navigation-guards.html#global-before-guards

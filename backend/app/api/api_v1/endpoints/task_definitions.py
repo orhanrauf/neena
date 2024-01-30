@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import deps
 from app.core.config import settings
+from app.core.auth import Auth0User, auth
 
 router = APIRouter()
 
@@ -19,7 +20,7 @@ def create_task_definition(
     output_type: str = Body(...),
     description: str = Body(...),
     python_code: str = Body(...),
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Create task definition.
@@ -42,7 +43,7 @@ def read_all_task_definitions(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Retrieve all task definitions.
@@ -56,7 +57,7 @@ def read_task_definition(
     *,
     db: Session = Depends(deps.get_db),
     id: str,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Get task definition by id.
@@ -69,7 +70,7 @@ def remove_task_definition(
     *,
     db: Session = Depends(deps.get_db),
     id: str,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Delete task definition by id.

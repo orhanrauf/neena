@@ -5,9 +5,9 @@ from typing import Any, Dict, List, Optional, Union
 from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn, validator
 
 # Check if DTAP_ENV is set in the environment, indicating a cloud environment
-if "DTAP_ENVIRONMENT" not in os.environ:
-    from dotenv import load_dotenv
-    load_dotenv('.env')  # Load environment variables from .env file
+# if "DTAP_ENVIRONMENT" not in os.environ:
+#     from dotenv import load_dotenv
+#     load_dotenv('.env')  # Load environment variables from .env file
     
 
 class Settings(BaseSettings):
@@ -31,13 +31,21 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     
     FIRST_SUPERUSER: str
-    FIRST_SUPERUSER_PASSWORD: str
+    FIRST_SUPERUSER_AUTH_ID: str
 
     POSTGRES_SERVER: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
+    
+    AUTH0_DOMAIN: str
+    AUTH0_CLIENT_ID: str
+    AUTH0_API_IDENTIFIER: str
+    AUTH0_RULE_NAMESPACE: str
+    
+    LOG_APPINSIGHTS: bool = False
+    APPINSIGHTS_INSTRUMENTATIONKEY: str
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:

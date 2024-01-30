@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from app.core.auth import Auth0User, auth
 
 router = APIRouter()
 
@@ -19,7 +20,7 @@ def create_flow(
     flow_request: UUID = Body(...),
     name: str = Body(...),
     task_operations: list[schemas.TaskOperationBase] = Body(...),
-    current_user: models.User = Depends(deps.get_current_user),
+    current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Create flow.
@@ -45,7 +46,7 @@ def read_all_flows(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Retrieve all flows.
@@ -61,7 +62,7 @@ def read_flow(
     *,
     db: Session = Depends(deps.get_db),
     id: str,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Get flow by id.
@@ -74,7 +75,7 @@ def remove_flow(
     *,
     db: Session = Depends(deps.get_db),
     id: str,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Delete flow by id.

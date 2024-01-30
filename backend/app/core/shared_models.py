@@ -20,6 +20,8 @@ class TaskParameter(BaseModel):
     name: str
     data_type: str
     position: int
+    doc_string: str
+    optional: bool
 
     def to_dict(self) -> Dict[str, Any]:
         return self.dict()

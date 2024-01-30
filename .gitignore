@@ -5,7 +5,6 @@
 .venv
 
 **/__pycache__
-.vscode
 
 # Terraform
 infra/.terraform
@@ -23,3 +22,5 @@ docker-stack.yml
 backend/venv/
 
 frontend/node_modules/
+
+backend/startupLocal.sh

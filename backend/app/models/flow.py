@@ -20,9 +20,8 @@ if TYPE_CHECKING:
 class Flow(Base):
     
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
-    flow_request: Mapped[UUID] = mapped_column(UUID, ForeignKey("flow_request.id"), nullable=False)
     name: Mapped[str] = mapped_column(String, index=True, default=uuid4, nullable=True)
-    
+    organization: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("organization.id"), nullable=True)
     created_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     modified_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), server_onupdate=func.now(), nullable=False
@@ -35,7 +34,7 @@ class Flow(Base):
     modified_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=False)
     
     task_operations: Mapped[list["TaskOperation"]] = relationship(back_populates="belongs_to_flow", foreign_keys='TaskOperation.flow', cascade="all, delete-orphan")
-    created_for: Mapped["FlowRequest"] = relationship(back_populates="flow", uselist=False, foreign_keys='Flow.flow_request')
     created_by: Mapped["User"]  = relationship(back_populates="created_flows", foreign_keys='Flow.created_by_email')
     modified_by: Mapped["User"]  = relationship(back_populates="modified_flows", foreign_keys='Flow.modified_by_email')
-    flow_runs: Mapped[list["FlowRun"]] = relationship("FlowRun", back_populates="flow")
+    flow_runs: Mapped[list["FlowRun"]] = relationship("FlowRun", back_populates="belongs_to_flow")
+    flow_requests: Mapped[list["FlowRequest"]] = relationship("FlowRequest", back_populates="belongs_to_flow")

@@ -41,7 +41,7 @@ onMounted(async () => {
 
 
 const getIconUrl = (source) => {
-  return `src/assets/images/icons/integrations/${source}.svg`;
+  return `@images/icons/integrations/${source}.svg`;
 }
 </script>
 

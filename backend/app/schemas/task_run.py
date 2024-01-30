@@ -10,6 +10,7 @@ class TaskRunBase(BaseModel):
 
     status: TaskStatus
     start_time: datetime
+    result: dict
     end_time: Optional[datetime] = None
 
     class Config:

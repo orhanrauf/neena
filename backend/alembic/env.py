@@ -6,6 +6,9 @@ import sys
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
+from dotenv import load_dotenv
+
+
 
 from alembic import context
 
@@ -35,10 +38,12 @@ target_metadata = Base.metadata
 
 
 def get_url():
-    user = os.getenv("POSTGRES_USER", "postgres")
-    password = os.getenv("POSTGRES_PASSWORD", "")
-    server = os.getenv("POSTGRES_SERVER", "db")
-    db = os.getenv("POSTGRES_DB", "app")
+    load_dotenv('.env')
+    print(os.environ)
+    user = os.getenv("POSTGRES_USER")
+    password = os.getenv("POSTGRES_PASSWORD")
+    server = os.getenv("POSTGRES_SERVER")
+    db = os.getenv("POSTGRES_DB")
     return f"postgresql://{user}:{password}@{server}/{db}"
 
 
@@ -55,6 +60,8 @@ def run_migrations_offline():
 
     """
     url = get_url()
+    
+    print(url)
     context.configure(url=url, target_metadata=target_metadata, literal_binds=True, compare_type=True)
 
     with context.begin_transaction():

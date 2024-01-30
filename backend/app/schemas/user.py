@@ -6,21 +6,19 @@ from pydantic import BaseModel, EmailStr, Field, constr, validator
 # Shared properties
 class UserBase(BaseModel):
     email: EmailStr
-    is_active: Optional[bool] = True
-    is_superuser: Optional[bool] = False
     full_name: Optional[str] = "Undefined"
 
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):
     email: EmailStr
-    password: constr(min_length=8, max_length=64)
+    auth0_id: str
+    permissions: Optional[list[str]] = None
 
 
 # Properties to receive via API on update
 class UserUpdate(UserBase):
-    original: constr(min_length=8, max_length=64) = None
-    password: constr(min_length=8, max_length=64) = None
+    permissions: Optional[list[str]]
 
 
 class UserInDBBase(UserBase):
