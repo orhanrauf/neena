@@ -262,3 +262,4 @@ class Auth0:
             
             
 auth = Auth0(domain=settings.AUTH0_DOMAIN, api_audience=settings.AUTH0_API_IDENTIFIER)
+

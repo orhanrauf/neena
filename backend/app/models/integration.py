@@ -18,4 +18,5 @@ class Integration(Base):
     created_date = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     modified_date = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now(), nullable=False)
     
+    task_definitions = relationship('TaskDefinition', back_populates='belongs_to_integration')
     

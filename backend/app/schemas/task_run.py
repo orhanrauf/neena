@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class TaskRunBase(BaseModel):
     task_operation_id: UUID
-
+    flow_run_id: UUID
     status: TaskStatus
     start_time: datetime
     result: dict
@@ -15,8 +15,6 @@ class TaskRunBase(BaseModel):
 
     class Config:
         orm_mode = True
-
-
 
 class TaskRunCreate(TaskRunBase):
     pass
@@ -28,7 +26,7 @@ class TaskRunUpdate(TaskRunBase):
 
 class TaskRunInDBBase(TaskRunBase):
     id: UUID
-    flow_run_id: UUID
+    
     
     class Config:
         orm_mode = True

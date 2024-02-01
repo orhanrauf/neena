@@ -40,9 +40,10 @@ onMounted(async () => {
 });
 
 
-const getIconUrl = (source) => {
-  return `@images/icons/integrations/${source}.svg`;
-}
+const getIconUrl = (integration) => {
+  return `${import.meta.env.VITE_APP_BASE_URL}images/icons/integrations/${integration}.svg`;
+};
+
 </script>
 
 <template>

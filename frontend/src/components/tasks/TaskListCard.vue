@@ -38,9 +38,9 @@ function emitCloseCard() {
     emit('close-card');
 }
 
-function getIconUrl(source: string): string {
-  return `src/assets/images/icons/integrations/${source}.svg`;
-} 
+function getIconUrl(integration: string): string {
+  return `${import.meta.env.VITE_APP_BASE_URL}images/icons/integrations/${integration}.svg`;
+}
 
 </script>
 

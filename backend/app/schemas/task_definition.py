@@ -8,6 +8,7 @@ from pydantic import BaseModel, EmailStr, constr
 # Shared properties
 class TaskDefinitionBase(BaseModel):
     task_name: constr(min_length=6, max_length=64)
+    integration: UUID
     parameters: list[TaskParameter]
     python_code: str
     description: str

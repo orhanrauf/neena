@@ -4,12 +4,13 @@ from datetime import datetime
 from pydantic import BaseModel
 
 # Assuming FlowStatus is an enum or a valid Pydantic type, and TaskRunBase is defined elsewhere
-from app.schemas.task_run import TaskRunBase  # Replace with your actual import
+from app.schemas.task_run import TaskRunBase 
+from app.core.shared_models import FlowStatus  
 
 # Shared properties
 class FlowRunBase(BaseModel):
     flow: UUID
-    status: str #TODO make this enum
+    status: FlowStatus
     triggered_time: Optional[datetime] = None
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None

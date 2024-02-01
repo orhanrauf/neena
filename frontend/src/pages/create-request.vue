@@ -1,25 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-import chat from '@images/icons/integrations/chat-gpt.svg';
-import gmail from '@images/icons/integrations/gmail.svg';
-import trello from '@images/icons/integrations/trello.svg';
-import slack from '@images/icons/integrations/slack.svg';
-import hubspot from '@images/icons/integrations/hubspot.svg';
-import mailchimp from '@images/icons/integrations/mailchimp.svg';
-import salesforce from '@images/icons/integrations/salesforce.svg';
-import googledrive from '@images/icons/integrations/google-drive.svg';
-import facebook from '@images/icons/integrations/facebook.svg';
-
-const chatUrl = ref(chat);
-const gmailUrl = ref(gmail);
-const trelloUrl = ref(trello);
-const slackUrl = ref(slack);
-const hubspotUrl = ref(hubspot);
-const mailchimpUrl = ref(mailchimp);
-const salesforceUrl = ref(salesforce);
-const googledriveUrl = ref(googledrive);
-const facebookUrl = ref(facebook);
+const basePath = '/images/icons/integrations/';
+const chatUrl = ref(`${basePath}chat-gpt.svg`);
+const gmailUrl = ref(`${basePath}gmail.svg`);
+const trelloUrl = ref(`${basePath}trello.svg`);
+const slackUrl = ref(`${basePath}slack.svg`);
+const hubspotUrl = ref(`${basePath}hubspot.svg`);
+const mailchimpUrl = ref(`${basePath}mailchimp.svg`);
+const salesforceUrl = ref(`${basePath}salesforce.svg`);
+const googledriveUrl = ref(`${basePath}google-drive.svg`);
+const facebookUrl = ref(`${basePath}facebook.svg`);
 
 </script>
 

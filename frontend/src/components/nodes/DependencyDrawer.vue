@@ -103,7 +103,7 @@ const save = () => {
     <el-drawer v-model="show" direction="rtl" class="full-screen-drawer" title="Task">
       <input class="task-operation-name-input" placeholder="botot"/>
       <div class="task-definition">
-        <img src='@/assets/images/icons/integrations/salesforce.svg' class="task-definition-img" />
+        <img src='/images/icons/integrations/salesforce.svg' class="task-definition-img" />
         <div class="task-definition-text">Get customer by email</div>
       </div>
       <div class="divider"></div>
@@ -128,7 +128,7 @@ const save = () => {
 
           </div>
           <div class="outgoing-dependency-logo-and-task">
-            <img loading="lazy" src='src/assets/images/icons/integrations/google-drive.svg' class="dependency-logo" />
+            <img loading="lazy" src='/images/icons/integrations/google-drive.svg' class="dependency-logo" />
             <div class="dependency-task-name">Get file from Google Drive</div>
           </div>
         </div>
@@ -141,7 +141,7 @@ const save = () => {
 
           </div>
           <div class="outgoing-dependency-logo-and-task">
-            <img loading="lazy" src='src/assets/images/icons/integrations/chat-gpt.svg' class="dependency-logo" />
+            <img loading="lazy" src='images/icons/integrations/chat-gpt.svg' class="dependency-logo" />
             <div class="dependency-task-name">Process File</div>
           </div>
         </div>
@@ -149,7 +149,7 @@ const save = () => {
         <div class="incoming-dependency">
 
           <div class="incoming-dependency-logo-and-task">
-            <img loading="lazy" src='src/assets/images/icons/integrations/chat-gpt.svg' class="dependency-logo" />
+            <img loading="lazy" src='images/icons/integrations/chat-gpt.svg' class="dependency-logo" />
             <div class="dependency-task-name">Generate image</div>
           </div>
           <div id="arrow-2" class="dependency-arrow">
@@ -163,7 +163,7 @@ const save = () => {
         <div class="incoming-dependency">
 
           <div class="incoming-dependency-logo-and-task">
-            <img loading="lazy" src='src/assets/images/icons/integrations/salesforce.svg' class="dependency-logo" />
+            <img loading="lazy" src='images/icons/integrations/salesforce.svg' class="dependency-logo" />
             <div class="dependency-task-name">Get customer by email</div>
           </div>
           <div id="arrow-2" class="dependency-arrow">

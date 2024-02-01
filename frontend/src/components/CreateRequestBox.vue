@@ -57,6 +57,9 @@ const submitRequest = () => {
   }
   const request = { content: textareaInput.value }; // Use textareaInput's value here
   store.commit('setRequest', request);
+
+  
+
   router.push('/create-flow');
 };
 

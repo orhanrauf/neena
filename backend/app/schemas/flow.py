@@ -10,7 +10,6 @@ from .task_operation import TaskOperationBase
 
 # Shared properties
 class FlowBase(BaseModel):
-    flow_request: UUID
     name: Optional[str]
     task_operations: list[TaskOperationBase]
     

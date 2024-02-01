@@ -94,7 +94,7 @@ const loadDependencies = () => {
   };
 
   const getIconUrl = (source: string) => {
-    return `src/assets/images/icons/integrations/${source}.svg`;
+    return `/images/icons/integrations/${source}.svg`;
   }
 
   watch(show, (newValue) => {
@@ -131,8 +131,8 @@ const loadDependencies = () => {
     <el-drawer v-model="show" direction="rtl" class="full-screen-drawer" title="Task">
       <input class="task-operation-name-input" v-model="taskOp.name" />
       <div class="task-definition">
-        <img src='@/assets/images/icons/integrations/salesforce.svg' class="task-definition-img" />
-        <div class="task-definition-text">Get customer by email</div>
+        <img :src="getIconUrl(store.getters.getTaskDefinitionById(taskOp.task_definition).source)" class="task-definition-img" />
+        <div class="task-definition-text">{{ store.getters.getTaskDefinitionById(taskOp.task_definition).name }}</div>
       </div>
       <div class="divider"></div>
       <div class="instruction-box-header">

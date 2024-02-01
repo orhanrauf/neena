@@ -2,7 +2,7 @@ import { createFetch } from '@vueuse/core'
 import { destr } from 'destr'
 
 export const useApi = createFetch({
-  baseUrl: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseUrl: import.meta.env.VITE_API_BASE_URL || '/api/v1/',
   fetchOptions: {
     headers: {
       Accept: 'application/json',
@@ -20,7 +20,6 @@ export const useApi = createFetch({
 
         }
       }
-
       return { options }
     },
     afterFetch(ctx) {

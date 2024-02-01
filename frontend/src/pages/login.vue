@@ -11,9 +11,9 @@ import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { useStore } from 'vuex'
-import { onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 import {watch} from 'vue';
+import { User } from '@/types';
 
 
 const authThemeImg = useGenerateImageVariant(authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
@@ -35,21 +35,28 @@ watch(() => isAuthenticated.value, async (newValue) => {
   if (newValue) {
     try {
       const token = await getAccessTokenSilently();
-      console.log('token', token);
-
       console.log('user', user.value); 
       
       await store.commit('saveToken', token);
       await store.commit('setUser', user.value);
       await store.commit('setAuthDateTimestamp', Date.now());
-      
+
+      const userNeenaModel: User = {
+        email: user.value.email,
+        auth0_id: user.value.sub,
+        full_name: user.value.name,
+      };
+
+      const response = await http.post('users/create_if_not_exists', userNeenaModel)
+      console.log('response', response);
+
+    
       router.push('/');
     } catch (error) {
       console.error('Error getting token or redirecting:', error);
     }
   }
 });
-
 
 const onLogin = async () => {
   await loginWithRedirect()

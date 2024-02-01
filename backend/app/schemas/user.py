@@ -7,23 +7,19 @@ from pydantic import BaseModel, EmailStr, Field, constr, validator
 class UserBase(BaseModel):
     email: EmailStr
     full_name: Optional[str] = "Undefined"
-
+    auth0_id: str
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):
-    email: EmailStr
-    auth0_id: str
-    permissions: Optional[list[str]] = None
-
+    pass
 
 # Properties to receive via API on update
 class UserUpdate(UserBase):
-    permissions: Optional[list[str]]
-
+    permissions: Optional[list[str]] = None
 
 class UserInDBBase(UserBase):
     id: UUID
-
+    permissions: Optional[list[str]] = None
     class Config:
         orm_mode = True
 
