@@ -170,9 +170,9 @@ export interface LoginResponse {
 }
 
 export interface User {
-email: string;
-auth0_id: string;
-full_name: string;
-id?: string;
-permissions?: string[];
+  email: string;
+  auth0_id: string;
+  full_name: string;
+  id?: string;
+  permissions?: string[];
 }

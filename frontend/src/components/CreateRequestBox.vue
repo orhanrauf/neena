@@ -28,6 +28,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
+
 const dynamicPlaceholder = ref("Type here what request you would like to train your agent for");
 const textareaInput = ref(""); // Reactive variable for the textarea input
 const dotCount = ref(0);
@@ -43,25 +44,36 @@ const startDotAnimation = () => {
     } else if (dotCount.value === 0) {
       isIncreasing.value = true;
     }
-
+    
     dotCount.value += isIncreasing.value ? 1 : -1;
     dynamicPlaceholder.value = `Type here what request you would like to train your agent for${'.'.repeat(dotCount.value)}`;
   }, 700);
 };
 
-const submitRequest = () => {
+const submitRequest = async () => {
   if (!textareaInput.value.trim()) {
     // You can also add an alert or some visual feedback to inform the user
     alert("Please enter a request before proceeding.");
     return; // Exit the function if textarea is empty
   }
-  const request = { content: textareaInput.value }; // Use textareaInput's value here
-  store.commit('setRequest', request);
 
+  // Note: No semicolon after the property assignment within the object
+  var flowRequest = {
+    request_instructions: textareaInput.value
+  };
+
+  console.log(flowRequest)
   
+  const response = await http.post('flow_requests', flowRequest);
+
+  // Corrected 'response' spelling
+  flowRequest = response.data;
+
+  store.commit('setRequest', flowRequest);
 
   router.push('/create-flow');
 };
+
 
 onMounted(startDotAnimation);
 </script>

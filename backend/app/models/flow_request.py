@@ -24,8 +24,7 @@ class FlowRequest(Base):
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
     
     request_name: Mapped[str] = mapped_column(String, nullable=True)
-    request_body: Mapped[str] = mapped_column(String, nullable=False)
-    request_instructions: Mapped[str] = mapped_column(String, nullable=True)  
+    request_instructions: Mapped[str] = mapped_column(String, nullable=False)  
     request_metadata: Mapped[Optional[list[dict]]] = mapped_column(TextPickleType, nullable=True)
     flow: Mapped[UUID] = mapped_column(UUID, ForeignKey("flow.id"), nullable=True)
     

@@ -50,7 +50,6 @@ watch(() => isAuthenticated.value, async (newValue) => {
       const response = await http.post('users/create_if_not_exists', userNeenaModel)
       console.log('response', response);
 
-    
       router.push('/');
     } catch (error) {
       console.error('Error getting token or redirecting:', error);

@@ -18,7 +18,6 @@
     </div>
 </template>
   
-
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { useStore } from 'vuex';
