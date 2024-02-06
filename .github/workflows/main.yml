@@ -48,7 +48,11 @@ jobs:
         TF_VAR_psql_admin_username: ${{ secrets.PSQL_ADMIN_USERNAME }}
         TF_VAR_psql_admin_password: ${{ secrets.PSQL_ADMIN_PASSWORD }}
         TF_VAR_first_superuser: ${{ secrets.FIRST_SUPERUSER }}
-        TF_VAR_first_superuser_password: ${{ secrets.FIRST_SUPERUSER_PASSWORD }}
+        TF_VAR_first_superuser_auth_id: ${{ secrets.FIRST_SUPERUSER_AUTH_ID }}
+        TF_VAR_auth0_domain: ${{ secrets.VITE_APP_AUTH0_DOMAIN }}
+        TF_VAR_auth0_client_id: ${{ secrets.VITE_APP_AUTH0_CLIENT_ID }}
+        TF_VAR_auth0_audience: ${{ secrets.VITE_APP_AUTH0_AUDIENCE }}
+
       working-directory: infra
 
     - name: Login to Azure
@@ -80,7 +84,9 @@ jobs:
       env: 
         VITE_APP_AUTH0_DOMAIN: ${{ secrets.VITE_APP_AUTH0_DOMAIN }}
         VITE_APP_AUTH0_CLIENT_ID: ${{ secrets.VITE_APP_AUTH0_CLIENT_ID }}
-        VITE_APP_SERVER_URL: ${{ env.service_app_base_url }}
+        VITE_APP_AUTH0_AUDIENCE: ${{ secrets.VITE_APP_AUTH0_AUDIENCE }}
+        VITE_APP_BASE_URL: /
+        VITE_APP_API_URL: ${{ env.service_app_base_url }}
 
     - name: Deploy to Vue distribution Azure Blob Storage
       run: |
