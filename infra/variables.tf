@@ -102,11 +102,6 @@ variable "auth0_client_id" {
   type        = string
 }
 
-variable "auth0_api_identifier" {
-  description = "The identifier of the Auth0 API"
-  type        = string
-}
-
 variable "auth0_rule_namespace" {
   description = "The namespace for Auth0 rules"
   type        = string
