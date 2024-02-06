@@ -57,9 +57,13 @@ module "service_app" {
   postgresql_database_name    = module.postgresql.database_name
   postgresql_admin_username   = var.psql_admin_username
   postgresql_admin_password   = var.psql_admin_password
-  first_superuser = var.first_superuser
-  first_superuser_password = var.first_superuser_password
-  postgresql_server_name = module.postgresql.postgresql_server_name
+  first_superuser            = var.first_superuser
+  first_superuser_auth_id    = var.first_superuser_auth_id
+  postgresql_server_name      = module.postgresql.postgresql_server_name
+  auth0_domain                = var.auth0_domain
+  auth0_client_id             = var.auth0_client_id
+  auth0_api_identifier        = var.auth0_api_identifier
+  auth0_rule_namespace        = var.auth0_rule_namespace
 }
 
 module "log_analytics_workspace" {

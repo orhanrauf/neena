@@ -75,7 +75,27 @@ variable "first_superuser" {
   type        = string  
 }
 
-variable "first_superuser_password" {
-  description = "The first superuser password."
-  type        = string  
+variable "first_superuser_auth_id" {
+  description = "The ID of the first superuser authentication"
+  type        = string
+}
+
+variable "auth0_domain" {
+  description = "The domain of the Auth0 service"
+  type        = string
+}
+
+variable "auth0_client_id" {
+  description = "The client ID of the Auth0 service"
+  type        = string
+}
+
+variable "auth0_api_identifier" {
+  description = "The identifier of the Auth0 API"
+  type        = string
+}
+
+variable "auth0_rule_namespace" {
+  description = "The namespace for Auth0 rules"
+  type        = string
 }

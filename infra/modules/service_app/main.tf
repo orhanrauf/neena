@@ -35,7 +35,12 @@ resource "azurerm_linux_web_app" "app_service" {
     "POSTGRES_USER" = "${var.postgresql_admin_username}@${var.postgresql_server_name}"
     "POSTGRES_PASSWORD" = var.postgresql_admin_password
     "FIRST_SUPERUSER" = var.first_superuser
-    "FIRST_SUPERUSER_PASSWORD" = var.first_superuser_password
+    "FIRST_SUPERUSER_AUTH_ID" = var.first_superuser_auth_id
+    "AUTH0_DOMAIN" = var.auth0_domain
+    "AUTH0_CLIENT_ID" = var.auth0_client_id
+    "AUTH0_API_IDENTIFIER" = var.auth0_api_identifier
+    "AUTH0_RULE_NAMESPACE" = var.auth0_rule_namespace
+    "ALGORITHM" = "RS256"
     "PROJECT_NAME" = "Neena"
     "LOG_APPINSIGHTS": "true"
   }
