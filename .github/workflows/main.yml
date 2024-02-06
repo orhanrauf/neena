@@ -48,10 +48,10 @@ jobs:
         TF_VAR_psql_admin_username: ${{ secrets.PSQL_ADMIN_USERNAME }}
         TF_VAR_psql_admin_password: ${{ secrets.PSQL_ADMIN_PASSWORD }}
         TF_VAR_first_superuser: ${{ secrets.FIRST_SUPERUSER }}
-        TF_VAR_first_superuser_auth_id: ${{ secrets.FIRST_SUPERUSER_AUTH_ID }}
+        TF_VAR_first_superuser_auth_id: ${{ secrets.VITE_APP_AUTH0_AUDIENCE }}
+        TF_VAR_auth0_api_identifier: ${{ secrets.AUTH0_API_IDENTIFIER }}
         TF_VAR_auth0_domain: ${{ secrets.VITE_APP_AUTH0_DOMAIN }}
         TF_VAR_auth0_client_id: ${{ secrets.VITE_APP_AUTH0_CLIENT_ID }}
-        TF_VAR_auth0_audience: ${{ secrets.VITE_APP_AUTH0_AUDIENCE }}
 
       working-directory: infra
 

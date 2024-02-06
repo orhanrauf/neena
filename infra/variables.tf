@@ -92,6 +92,11 @@ variable "auth0_domain" {
   type        = string
 }
 
+variable "auth0_api_identifier" {
+  description = "The identifier of the Auth0 API"
+  type        = string  
+}
+
 variable "auth0_client_id" {
   description = "The client ID of the Auth0 service"
   type        = string
