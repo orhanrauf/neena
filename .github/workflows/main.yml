@@ -134,7 +134,8 @@ jobs:
       run: |
         pip install poetry
         cd backend
-        poetry install
+        poetry export --without-hashes -o requirements.txt
+
     
     - name: Deploy App Service
       uses: azure/webapps-deploy@v2
