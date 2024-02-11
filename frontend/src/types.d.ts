@@ -16,7 +16,6 @@ export interface Dependency {
   created_by_email?: string;
   modified_by_email?: string;
 }
-
   
 export interface FlowRequest {
   id?: string;
@@ -28,6 +27,7 @@ export interface FlowRequest {
   created_by_email?: string; // Optional
   modified_by_email?: string; // Optional
 }
+
 enum FlowStatus {
   Pending = "Pending",
   Running = "Running", 
