@@ -68,7 +68,7 @@ def read_user(
 #     return crud.user.get_multi(db=db, skip=skip, limit=limit)
 
 @router.post("/create_if_not_exists", response_model=schemas.User)
-def create_user_if_not_exists(
+def create_if_not_exists(
     *,
     db: Session = Depends(deps.get_db),
     user_in: schemas.UserCreate,

@@ -37,7 +37,7 @@ watch(() => isAuthenticated.value, async (newValue) => {
       const token = await getAccessTokenSilently();
       console.log('user', user.value); 
       
-      await store.commit('saveToken', token);
+      store.commit('saveToken', token);
       await store.commit('setUser', user.value);
       await store.commit('setAuthDateTimestamp', Date.now());
 
