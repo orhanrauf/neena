@@ -51,7 +51,7 @@ module "service_app" {
   log_analytics_workspace_id  = module.log_analytics_workspace.log_analytics_workspace_id
   app_service_plan_tier       = var.app_service_plan_tier
   app_service_plan_size       = var.app_service_plan_size 
-  azurerm_application_insights_connection_string = module.application_insights.app_connection_string
+  azurerm_application_insights_connection_string = module.application_insights.app_insights_connection_string
   environment                 = var.environment
   postgresql_server_url       = module.postgresql.postgresql_server_fqdn
   postgresql_database_name    = module.postgresql.database_name
