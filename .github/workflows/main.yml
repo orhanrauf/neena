@@ -88,6 +88,11 @@ jobs:
         VITE_APP_AUTH0_AUDIENCE: ${{ secrets.VITE_APP_AUTH0_AUDIENCE }}
         VITE_APP_BASE_URL: /
         VITE_API_BASE_URL: https://${{ env.service_app_base_url }}
+        
+    # New step to copy staticwebapp.config.json to the dist folder
+    - name: Copy staticwebapp.config.json to dist
+      run: |
+        cp ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
 
     - name: Deploy to Vue distribution Azure Blob Storage
       run: |
