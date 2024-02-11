@@ -19,8 +19,8 @@ variable "app_service_name" {
   type        = string
 }
 
-variable "azurerm_application_insights_instrumentation_key" {
-  description = "The instrumentation key for the application insights instance"
+variable "azurerm_application_insights_connection_string" {
+  description = "The connection string for the application insights instance"
   type        = string
   
 }

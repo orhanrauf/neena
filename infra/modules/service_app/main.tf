@@ -28,7 +28,7 @@ resource "azurerm_linux_web_app" "app_service" {
   }
 
   app_settings = {
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = var.azurerm_application_insights_instrumentation_key
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = var.azurerm_application_insights_connection_string
     "DTAP_ENVIRONMENT" = var.environment
     "POSTGRES_SERVER" = var.postgresql_server_url
     "POSTGRES_DB" = var.postgresql_database_name

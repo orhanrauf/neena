@@ -31,7 +31,7 @@ resource "azurerm_function_app" "funcapp" {
   version                   = "~3"
 
   app_settings = {
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = var.azurerm_application_insights_instrumentation_key
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = var.azurerm_application_insights_connection_string
     "FUNCTIONS_WORKER_RUNTIME" = "python" # This tells the function app to use Python
   }
 
