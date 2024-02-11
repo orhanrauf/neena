@@ -35,13 +35,16 @@ async def validation_exception_handler(request, exc):
     )
 
 # Set all CORS enabled originsf
-#TODO Set this to the actual origin
+#TODO Set this to the actual origin of the frontend from GitHub Actions
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://neenacoredevwebst.z6.web.core.windows.net",  # Production origin
+        "http://localhost:5173",  # Development origin
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
 )
 
 if settings.LOG_APPINSIGHTS:        
