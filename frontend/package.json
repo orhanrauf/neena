@@ -9,7 +9,7 @@
     "typecheck": "vue-tsc --noEmit",
     "lint": "eslint . -c .eslintrc.cjs --fix --rulesdir eslint-internal-rules/ --ext .ts,.js,.cjs,.vue,.tsx,.jsx",
     "build:icons": "tsx src/plugins/iconify/build-icons.ts",
-    "postinstall": "npm run build:icons && npm run msw:init"
+    "postinstall": "npm run build:icons"
   },
   "dependencies": {
     "@auth0/auth0-vue": "^2.3.3",
