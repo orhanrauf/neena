@@ -44,7 +44,7 @@ resource "azurerm_key_vault_access_policy" "sp_policy" {
   key_vault_id = azurerm_key_vault.kv.id
 
   tenant_id = var.tenant_id
-  object_id = var.service_app_principal_id
+  object_id = var.service_principal_id
 
   secret_permissions = [
     "Get",
