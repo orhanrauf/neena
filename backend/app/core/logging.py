@@ -6,7 +6,7 @@ from opencensus.ext.azure.log_exporter import AzureLogHandler
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 if settings.LOG_APPINSIGHTS:        
-    ai_handler = AzureLogHandler(connection_string=f'InstrumentationKey={settings.APPINSIGHTS_INSTRUMENTATIONKEY}')
+    ai_handler = AzureLogHandler(connection_string=settings.APPLICATIONINSIGHTS_CONNECTION_STRING)
     logger.addHandler(ai_handler)
 else:
     # Print logs to the console

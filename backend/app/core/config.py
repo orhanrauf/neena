@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     AUTH0_RULE_NAMESPACE: str
     
     LOG_APPINSIGHTS: bool = False
-    APPINSIGHTS_INSTRUMENTATIONKEY: str
+    APPLICATIONINSIGHTS_CONNECTION_STRING: str
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
