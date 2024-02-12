@@ -35,7 +35,7 @@ async def validation_exception_handler(request, exc):
     )
 
 # Set all CORS enabled originsf
-#TODO Set this to the actual origin of the frontend from GitHub Actions
+#TODO Set this to the actual origin of the fronetend from GitHub Actions
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -48,7 +48,7 @@ app.add_middleware(
 )
 
 if settings.LOG_APPINSIGHTS:        
-    ai_handler = AzureLogHandler(connection_string=f'InstrumentationKey={settings.APPINSIGHTS_INSTRUMENTATIONKEY}')
+    ai_handler = AzureLogHandler(connection_string=settings.APPLICATIONINSIGHTS_CONNECTION_STRING)
     logger.addHandler(ai_handler)
 
 @app.middleware("http")
