@@ -8,7 +8,7 @@ output "service_principal_id" {
   description = "The ID of the created service principal."
 }
 
-output "service_principal_password" {
+output "service_principal_secret" {
   value       = azuread_service_principal_password.service_principal.value
   description = "The password of the created service principal."
 }

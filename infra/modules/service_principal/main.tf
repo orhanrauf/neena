@@ -7,6 +7,6 @@ resource "azuread_service_principal" "service_principal" {
 }
 
 resource "azuread_service_principal_password" "service_principal" {
-  service_principal_id = azuread_service_principal.example.id
+  service_principal_id = azuread_service_principal.service_principal.id
   end_date            = var.password_end_date
 }
