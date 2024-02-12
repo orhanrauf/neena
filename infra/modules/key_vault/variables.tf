@@ -46,3 +46,8 @@ variable "service_app_principal_id" {
   description = "The principal ID of the service app."
   type        = string
 }
+
+variable "service_principal_id" {
+  description = "The value of the service principal id"
+  type        = string
+}

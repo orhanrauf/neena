@@ -2,6 +2,9 @@ provider "azurerm" {
   features {}
 }
 
+provider "azuread" {}
+
+
 terraform {
   backend "azurerm" {
     resource_group_name   = "neena-core-tf-state-rg"
@@ -9,18 +12,22 @@ terraform {
     container_name        = "tfstate"
     key                   = "terraform.tfstate"
   }
-
+  
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.52" # Specify an appropriate version
+    }
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = ">= 2.0"
     }
   }
 }
 
 locals {
   resource_prefix = "${var.organization}-${var.project_name}-${var.environment}"
-  resource_prefiex_no_hyphens = "${replace(local.resource_prefix, "-", "")}"
+  resource_prefix_no_hyphens = "${replace(local.resource_prefix, "-", "")}"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -28,12 +35,17 @@ resource "azurerm_resource_group" "rg" {
   location = var.location
 }
 
+module "service_principal" {
+  source            = "./modules/service_principal"
+  application_name  = "${local.resource_prefix}-sp"
+}
+
 module "function_app" {
   source = "./modules/function_app"
   resource_group_name         = azurerm_resource_group.rg.name
   location                    = var.location
   function_app_name           = "${local.resource_prefix}-func"
-  storage_account_name        = "${local.resource_prefiex_no_hyphens}funcst"
+  storage_account_name        = "${local.resource_prefix_no_hyphens}funcst"
   log_analytics_workspace_id  = module.log_analytics_workspace.log_analytics_workspace_id
   function_app_plan_tier      = var.function_app_plan_tier
   function_app_plan_size      = var.function_app_plan_size 
@@ -57,13 +69,16 @@ module "service_app" {
   postgresql_database_name    = module.postgresql.database_name
   postgresql_admin_username   = var.psql_admin_username
   postgresql_admin_password   = var.psql_admin_password
-  first_superuser            = var.first_superuser
-  first_superuser_auth_id    = var.first_superuser_auth_id
+  first_superuser             = var.first_superuser
+  first_superuser_auth_id     = var.first_superuser_auth_id
   postgresql_server_name      = module.postgresql.postgresql_server_name
   auth0_domain                = var.auth0_domain
   auth0_client_id             = var.auth0_client_id
   auth0_api_identifier        = var.auth0_api_identifier
   auth0_rule_namespace        = var.auth0_rule_namespace
+  service_principal_id        = module.service_principal.service_principal_id
+  service_principal_secret    = module.service_principal.service_principal_secret
+  tenant_id                   = var.tenant_id
 }
 
 module "log_analytics_workspace" {
@@ -83,6 +98,7 @@ module "key_vault" {
   sku_name                    = var.kv_sku_name
   function_app_principal_id   = module.function_app.principal_id
   service_app_principal_id    = module.service_app.service_app_principal_id
+  service_principal_id        = module.service_principal.service_principal_id
 }
 
 module "application_insights" {
@@ -112,5 +128,5 @@ module "static_website" {
   source                  = "./modules/static_website"
   resource_group_name     = azurerm_resource_group.rg.name
   location                = var.location
-  storage_account_name    = "${local.resource_prefiex_no_hyphens}webst"
+  storage_account_name    = "${local.resource_prefix_no_hyphens}webst"
 }

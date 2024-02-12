@@ -40,6 +40,9 @@ resource "azurerm_linux_web_app" "app_service" {
     "AUTH0_CLIENT_ID" = var.auth0_client_id
     "AUTH0_API_IDENTIFIER" = var.auth0_api_identifier
     "AUTH0_RULE_NAMESPACE" = var.auth0_rule_namespace
+    "AZURE_CLIENT_ID" = var.service_principal_id
+    "AZURE_CLIENT_SECRET" = var.service_principal_secret
+    "AZURE_TENANT_ID" = var.tenant_id
     "ALGORITHM" = "RS256"
     "PROJECT_NAME" = "Neena"
     "LOG_APPINSIGHTS": "true"

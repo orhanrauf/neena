@@ -99,3 +99,18 @@ variable "auth0_rule_namespace" {
   description = "The namespace for Auth0 rules"
   type        = string
 }
+
+variable "tenant_id" {
+  description = "The tenant ID"
+  type        = string
+}
+
+variable "service_principal_id" {
+  description = "The ID of the service principal"
+  type        = string
+}
+
+variable "service_principal_secret" {
+  description = "The secret of the service principal"
+  type        = string
+}
