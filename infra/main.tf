@@ -79,6 +79,7 @@ module "service_app" {
   service_principal_id        = module.service_principal.service_principal_id
   service_principal_secret    = module.service_principal.service_principal_secret
   tenant_id                   = var.tenant_id
+  key_vault_name              = module.key_vault.name
 }
 
 module "log_analytics_workspace" {

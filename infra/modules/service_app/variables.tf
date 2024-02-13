@@ -114,3 +114,8 @@ variable "service_principal_secret" {
   description = "The secret of the service principal"
   type        = string
 }
+
+variable "key_vault_name" {
+  description = "The name of the key vault"
+  type        = string
+}

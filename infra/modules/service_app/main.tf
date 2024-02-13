@@ -43,6 +43,7 @@ resource "azurerm_linux_web_app" "app_service" {
     "AZURE_CLIENT_ID" = var.service_principal_id
     "AZURE_CLIENT_SECRET" = var.service_principal_secret
     "AZURE_TENANT_ID" = var.tenant_id
+    "AZURE_KEYVAULT_NAME" = var.key_vault_name
     "ALGORITHM" = "RS256"
     "PROJECT_NAME" = "Neena"
     "LOG_APPINSIGHTS": "true"
