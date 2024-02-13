@@ -76,7 +76,7 @@ module "service_app" {
   auth0_client_id             = var.auth0_client_id
   auth0_api_identifier        = var.auth0_api_identifier
   auth0_rule_namespace        = var.auth0_rule_namespace
-  service_principal_id        = module.service_principal.service_principal_id
+  service_principal_id        = module.service_principal.application_id
   service_principal_secret    = module.service_principal.service_principal_secret
   tenant_id                   = var.tenant_id
   key_vault_name              = module.key_vault.name
