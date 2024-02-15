@@ -25,6 +25,7 @@ argon2-cffi = "^21.3.0"
 attrs = "^22.0.0"
 opencensus-ext-azure = "^1.1.13"
 fastapi-auth0 = "^0.5.0"
+openai = "^1.12.0"
 
 
 [tool.poetry.dev-dependencies]
