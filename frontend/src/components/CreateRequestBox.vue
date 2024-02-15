@@ -64,9 +64,8 @@ const submitRequest = async () => {
 
   console.log(flowRequest)
   
-  const response = await http.post('flow_requests', flowRequest);
+  const response = await http.post('flow_requests/', flowRequest);
 
-  // Corrected 'response' spelling
   flowRequest = response.data;
 
   store.commit('setRequest', flowRequest);
