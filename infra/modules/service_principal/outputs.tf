@@ -4,7 +4,7 @@ output "application_id" {
 }
 
 output "service_principal_id" {
-  value       = azuread_service_principal.service_principal.principal_id
+  value       = azuread_service_principal.service_principal.id
   description = "The ID of the created service principal."
 }
 
