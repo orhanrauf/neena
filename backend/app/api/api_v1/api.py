@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.api_v1.endpoints import task_definitions, users, flow_requests, task_operations, flows, flow_runs, dependencies, task_runs, task_prep_prompts, task_prep_answers, integration_credentials, integrations
+from app.api.api_v1.endpoints import task_definitions, users, flow_requests, task_operations, flows, flow_runs, dependencies, task_runs, task_prep_prompts, task_prep_answers, integration_credentials, integrations, execution
 
 api_router = APIRouter()
 api_router.include_router(users.router, prefix="/users", tags=["users"])
@@ -15,4 +15,4 @@ api_router.include_router(task_prep_prompts.router, prefix="/task_prep_prompts",
 api_router.include_router(task_prep_answers.router, prefix="/task_prep_answers", tags=["task_prep_answers"])
 api_router.include_router(integration_credentials.router, prefix="/integration_credentials", tags=["integration_credentials"])
 api_router.include_router(integrations.router, prefix="/integrations", tags=["integrations"])
-api_router.include_router(integrations.router, prefix="/execution", tags=["execution"])
+api_router.include_router(execution.router, prefix="/execution", tags=["execution"])
