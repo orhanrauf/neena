@@ -46,6 +46,8 @@ class Settings(BaseSettings):
     
     LOG_APPINSIGHTS: bool = False
     APPLICATIONINSIGHTS_CONNECTION_STRING: str
+    
+    OPENAI_API_KEY: str
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
