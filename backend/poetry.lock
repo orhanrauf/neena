@@ -161,6 +161,17 @@ pyflakes = ">=3.0.0"
 tomli = {version = ">=2.0.1", markers = "python_version < \"3.11\""}
 
 [[package]]
+name = "azure-common"
+version = "1.1.28"
+description = "Microsoft Azure Client Library for Python (Common)"
+optional = false
+python-versions = "*"
+files = [
+    {file = "azure-common-1.1.28.zip", hash = "sha256:4ac0cd3214e36b6a1b6a442686722a5d8cc449603aa833f3f0f40bda836704a3"},
+    {file = "azure_common-1.1.28-py2.py3-none-any.whl", hash = "sha256:5c12d3dcf4ec20599ca6b0d3e09e86e146353d443e7fcc050c9a19c1f9df20ad"},
+]
+
+[[package]]
 name = "azure-core"
 version = "1.29.6"
 description = "Microsoft Azure Core Library for Python"
@@ -196,6 +207,23 @@ azure-core = ">=1.23.0,<2.0.0"
 cryptography = ">=2.5"
 msal = ">=1.24.0,<2.0.0"
 msal-extensions = ">=0.3.0,<2.0.0"
+
+[[package]]
+name = "azure-keyvault-secrets"
+version = "4.7.0"
+description = "Microsoft Azure Key Vault Secrets Client Library for Python"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "azure-keyvault-secrets-4.7.0.zip", hash = "sha256:77ee2534ba651a1f306c85d7b505bc3ccee8fea77450ebafafc26aec16e5445d"},
+    {file = "azure_keyvault_secrets-4.7.0-py3-none-any.whl", hash = "sha256:a16c7e6dfa9cba68892bb6fcb905bf2e2ec1f2a6dc05522b61df79621e050901"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+azure-core = ">=1.24.0,<2.0.0"
+isodate = ">=0.6.1"
+typing-extensions = ">=4.0.1"
 
 [[package]]
 name = "bcrypt"
@@ -1113,6 +1141,20 @@ files = [
     {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
     {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
 ]
+
+[[package]]
+name = "isodate"
+version = "0.6.1"
+description = "An ISO 8601 date/time/duration parser and formatter"
+optional = false
+python-versions = "*"
+files = [
+    {file = "isodate-0.6.1-py2.py3-none-any.whl", hash = "sha256:0751eece944162659049d35f4f549ed815792b38793f07cf73381c1c87cbed96"},
+    {file = "isodate-0.6.1.tar.gz", hash = "sha256:48c5881de7e8b0a0d648cb024c8062dc84e7b840ed81e864c7614fd3c127bde9"},
+]
+
+[package.dependencies]
+six = "*"
 
 [[package]]
 name = "isort"
@@ -2430,4 +2472,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9.4"
-content-hash = "7707371b9e6347eecca45e3ee8346e93f61335585ba13e484145b22e1ee398a4"
+content-hash = "f70339763a2ddba7eed74645ad2a6991ceff351bac4424a1389d59992d774be5"

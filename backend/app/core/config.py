@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
+    KEY_VAULT_NAME: str
     
     AUTH0_DOMAIN: str
     AUTH0_CLIENT_ID: str
