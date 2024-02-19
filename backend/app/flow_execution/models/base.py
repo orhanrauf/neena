@@ -5,8 +5,6 @@ from pydantic import BaseModel
 This file contains the base classes for the models used for integrations.
 """
     
-
-
 class BaseAPIModel(BaseModel):
     """
     Base class for API models.

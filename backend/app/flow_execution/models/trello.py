@@ -55,7 +55,7 @@ class TrelloCardUpdate(BaseIntegrationActionModel):
     """
     Model for updating an existing Card.
     """
-    id: Annotated[str, Field(strict=True, description="The ID of the Card")],
+    id: Annotated[str, Field(strict=True, description="The ID of the Card")]
     name: Annotated[Optional[StrictStr], Field(description="The new name for the card")] = None
     desc: Annotated[Optional[StrictStr], Field(description="The new description for the card")] = None
     closed: Annotated[Optional[StrictBool], Field(description="Whether the card should be archived (closed: true)")] = None
@@ -89,9 +89,6 @@ class TrelloList(BaseAPIModel):
     soft_limit: Annotated[Optional[StrictStr], Field(default=None, alias="softLimit")] = None
     id_board: Annotated[Optional[StrictStr], Field(default=None, alias="idBoard")] = None
     subscribed: Annotated[Optional[StrictBool], Field(strict=True)] = None
-
-
-    
 
 class TrelloListCreate(BaseIntegrationActionModel):
     """

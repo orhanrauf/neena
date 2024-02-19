@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
-from sqlalchemy import Column, DateTime, String, ForeignKey
+from sqlalchemy import Column, DateTime, String, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -14,10 +14,13 @@ if TYPE_CHECKING:
 
 class IntegrationCredential(Base):
     __tablename__ = 'integration_credential'
+    __table_args__ = (
+        UniqueConstraint('intergation', 'modified_by_email', name='uix_integration_modified_by'),
+        UniqueConstraint('intergation', 'created_by_email', name='uix_integration_created_by')   
+    )
 
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
     intergation: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("integration.id"), nullable=False)
-    credential: Mapped[str] = mapped_column(String, nullable=False)
     created_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=False)
     modified_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=False)
     created_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)

@@ -2,6 +2,9 @@ from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 from app.core.config import settings
 
+from app.db.session import SessionLocal
+from app import crud
+
 class AzureKeyVault:
     def __init__(self):
         self.vault_url = f"https://{settings.KEY_VAULT_NAME}.vault.azure.net/"
@@ -28,3 +31,28 @@ class AzureKeyVault:
         self.client.set_secret(secret_name, secret_value)
 
 key_vault = AzureKeyVault()
+
+
+class IntegrationSecretsService:
+    """
+    Service class for retrieving secrets for enabled integrations of a user.
+    """
+    def __init__(self):
+        self.key_vault = key_vault
+        self.db = SessionLocal()
+        
+    def get_secret(self, user_email: str, integration_short_name: str) -> str:
+        """
+        Retrieves a secret from Azure Key Vault based on the user email and integration short name.
+
+        :param user_email: The email of the user.
+        :param integration_short_name: The short name of the integration.
+        
+        :return: The value of the secret.
+        """
+        
+        integration_credential = crud.integration_credential.get_by_integration_short_name_and_user_email(self.db, integration_short_name, user_email)
+        
+        return key_vault.get_secret(integration_credential.id)
+
+secrets_service = IntegrationSecretsService()

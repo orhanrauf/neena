@@ -55,3 +55,10 @@ def task(max_attempts: int = 3, delay_seconds: int = 2):
         return wrapper
     return decorator
 
+
+def integration(cls):
+    """
+    Class decorator to mark a class as representing a Neena integration.
+    """
+    cls.is_integration = True
+    return cls
