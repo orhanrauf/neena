@@ -11,11 +11,11 @@ from app.core.auth import Auth0User, auth
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.FlowRequest)
+@router.post("/", response_model=str)
 def execute_flow_request(
     *,
     db: Session = Depends(deps.get_db),
-    flow_request_in: schemas.FlowRequestCreate = Body(...),
+    request: str,
     current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
@@ -24,7 +24,7 @@ def execute_flow_request(
     
     ### SANDBOX CODE ###
     
-    open_ai_service.method_that_allows_for_talking_to_openai(flow_request_in)
+    open_ai_service.method_that_allows_for_talking_to_openai(request)
     
     ### SANDBOX CODE ###
     
