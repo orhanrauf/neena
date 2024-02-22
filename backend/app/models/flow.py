@@ -21,6 +21,9 @@ class Flow(Base):
     
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
     name: Mapped[str] = mapped_column(String, index=True, default=uuid4, nullable=True)
+    
+    sorted: Mapped[bool] = mapped_column(Boolean, default=False)
+    
     organization: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("organization.id"), nullable=True)
     created_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     modified_date: Mapped[datetime] = mapped_column(

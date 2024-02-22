@@ -5,7 +5,7 @@ from app import crud, schemas
 from app.api import deps
 
 from app.core.auth import Auth0User, auth
-from app.core.keyvault import key_vault
+from app.core.secrets import key_vault
 from app.models import Integration, IntegrationCredential
 
 router = APIRouter()

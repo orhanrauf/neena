@@ -33,14 +33,14 @@ class TaskDefinitionInDBBase(TaskDefinitionBase):
     deleted_at: Optional[datetime] = None  # New field to support soft deletes
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Additional properties to return via API
 class TaskDefinition(TaskDefinitionInDBBase):
 
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
 
 
 # Additional properties stored in DB

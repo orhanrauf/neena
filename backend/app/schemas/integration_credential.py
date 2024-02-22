@@ -26,7 +26,7 @@ class IntegrationCredentialInDBBase(IntegrationCredentialBase):
     modified_date: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Additional properties to return via API
 class IntegrationCredential(IntegrationCredentialInDBBase):

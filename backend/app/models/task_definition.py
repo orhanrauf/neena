@@ -46,8 +46,8 @@ class TaskDefinition(Base):
     integration: Mapped[str] = mapped_column(UUID, ForeignKey("integration.id"), nullable=False)
     parameters: Mapped[list[TaskParameter]] = mapped_column(TaskParameterType)
     python_method_name: Mapped[str] = mapped_column(String)
-    python_code: Mapped[str] = mapped_column(String)
-    output_type: Mapped[str] = mapped_column(String) # Should make pydantic type that has JSON and YML as serializable types
+    output_class: Mapped[str] = mapped_column(String)
+    output_yml: Mapped[str] = mapped_column(String) # Should make pydantic type that has JSON and YML as serializable types
     description: Mapped[str] = mapped_column(String)
     created_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=True)
     modified_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=True)

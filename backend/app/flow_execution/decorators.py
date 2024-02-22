@@ -1,3 +1,4 @@
+from enum import Enum
 from functools import wraps
 import time
 from typing import Callable, Generic, Optional, TypeVar
@@ -6,7 +7,7 @@ from pydantic import BaseModel, Field
 
 T = TypeVar('T')
 
-class TaskStatus:
+class TaskStatus(Enum):
     SUCCESS = 'success'
     FAILURE = 'failure'
     RETRY = 'retry'
@@ -27,10 +28,12 @@ class TaskResponse(BaseModel, Generic[T]):
 
 R = TypeVar('R', bound=Callable[..., TaskResponse])
 
-def task(max_attempts: int = 3, delay_seconds: int = 2):
+def task(task_name: str, max_attempts: int = 3, delay_seconds: int = 2):
     """
-    Decorator to make a task retryable and ensure its return value is standardized.
-
+    Decorator to mark a method as a Neena task. 
+    Allows for automatic retrying of the task in case of failure.
+    
+    :param task_name: The name of the task as 
     :param max_attempts: The maximum number of attempts to retry the task.
     :param delay_seconds: The delay between retries in seconds.
     """
@@ -52,7 +55,9 @@ def task(max_attempts: int = 3, delay_seconds: int = 2):
                     if attempt == max_retries:
                         return TaskResponse.failure(error=str(e))
                     time.sleep(delay)
+        wrapper._is_task = True
         return wrapper
+        
     return decorator
 
 

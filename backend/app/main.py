@@ -15,6 +15,7 @@ from app.api.api_v1.api import api_router
 from app.core.config import settings
 from app.db.init_db import init_db
 from app.db.session import SessionLocal
+from app.flow_execution.sync import sync_integrations_and_tasks
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json")
 
@@ -59,7 +60,7 @@ async def log_requests(request: Request, call_next):
     logger.info(f"Handled request {request.method} {request.url} in {duration:.2f} seconds. Response code: {response.status_code}")
 
     return response
-    
+     
 # Add exception handling to also log it
 @app.middleware("http")
 async def exception_logging_middleware(request: Request, call_next):
@@ -77,13 +78,14 @@ async def exception_logging_middleware(request: Request, call_next):
             content={"detail": "Internal Server Error"}
         )
 
-app.include_router(api_router, prefix=settings.API_V1_STR)
+
 
 @app.on_event("startup")
 async def startup_event():
     db = SessionLocal()
+    sync_integrations_and_tasks('app/flow_execution/integrations', db)
     try:
         init_db(db)
     finally:
         db.close()
-        
+

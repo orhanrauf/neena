@@ -34,7 +34,7 @@ class BaseIntegration(ABC):
         raise NotImplementedError
     
     @abstractmethod
-    def fetch_credentials(self) -> Any:
+    def _fetch_credentials(self) -> Any:
         """
         Fetch the credentials for the integration.
         """

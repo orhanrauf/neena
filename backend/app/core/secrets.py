@@ -4,6 +4,7 @@ from app.core.config import settings
 
 from app.db.session import SessionLocal
 from app import crud
+from app.schemas.user import User
 
 class AzureKeyVault:
     def __init__(self):
@@ -41,7 +42,7 @@ class IntegrationSecretsService:
         self.key_vault = key_vault
         self.db = SessionLocal()
         
-    def get_secret(self, user_email: str, integration_short_name: str) -> str:
+    def get_secret(self, user: User, integration_short_name: str) -> str:
         """
         Retrieves a secret from Azure Key Vault based on the user email and integration short name.
 
@@ -51,8 +52,9 @@ class IntegrationSecretsService:
         :return: The value of the secret.
         """
         
-        integration_credential = crud.integration_credential.get_by_integration_short_name_and_user_email(self.db, integration_short_name, user_email)
+        integration_credential = crud.integration_credential.get_by_integration_short_name_and_user_email(self.db, integration_short_name, user.email)
         
         return key_vault.get_secret(integration_credential.id)
+
 
 secrets_service = IntegrationSecretsService()
