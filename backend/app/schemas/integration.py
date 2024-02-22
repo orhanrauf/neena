@@ -5,11 +5,10 @@ from pydantic import BaseModel
 
 # Shared properties
 class IntegrationBase(BaseModel):
+    class_name: str
     name: str
     short_name: str
-    uses_api_key: bool
-    uses_sso_key: Optional[bool] = False
-
+    
 # Properties to receive via API on creation
 class IntegrationCreate(IntegrationBase):
     pass
@@ -25,6 +24,8 @@ class IntegrationInDBBase(IntegrationBase):
     id: Optional[UUID] = None
     created_date: datetime
     modified_date: datetime
+    uses_api_key: Optional[bool] = None
+    uses_sso_key: Optional[bool] = None
 
     class Config:
         from_attributes = True

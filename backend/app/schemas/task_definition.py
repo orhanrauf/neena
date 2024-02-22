@@ -10,10 +10,12 @@ class TaskDefinitionBase(BaseModel):
     task_name: constr(min_length=6, max_length=64)
     integration: UUID
     parameters: list[TaskParameter]
-    python_code: str
+    input_type: str
+    input_yml: str
     description: str
     python_method_name: str
     output_type: str
+    output_yml: str
     
 
 # Properties to receive via API on creation

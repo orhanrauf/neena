@@ -28,6 +28,8 @@ class CRUDTaskDefinition(CRUDBase[TaskDefinition, TaskDefinitionCreate, TaskDefi
     
     def sync(task_definitions: List[TaskDefinitionCreate], db: Session) -> None:
         
+        #TODO Fix this method
+        
         # Create a dictionary for quick lookup
         task_definitions_dict = {
             td.task_name: td 

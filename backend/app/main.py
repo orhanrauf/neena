@@ -18,6 +18,7 @@ from app.db.session import SessionLocal
 from app.flow_execution.sync import sync_integrations_and_tasks
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json")
+app.include_router(api_router, prefix=settings.API_V1_STR)
 
 # Custom exception handler for RequestValidationError
 @app.exception_handler(RequestValidationError)

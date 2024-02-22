@@ -8,7 +8,7 @@ from pydantic import BaseModel, EmailStr, constr
 class FlowRequestBase(BaseModel):
     request_metadata: Optional[List[Dict]] = None
     request_instructions: constr(min_length=8, max_length=512)
-    request_name: constr(max_length=64) = None
+    request_name: Optional[constr(max_length=64)] = None
     flow: Optional[UUID] = None
     organization: Optional[UUID] = None
 

@@ -2,10 +2,12 @@ import os
 import importlib
 import inspect
 from typing import List, Dict, Type
+from uuid import UUID, uuid4
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app import crud
 from app.schemas import TaskDefinitionBase, TaskParameter
+from app import schemas
 
 def get_integration_tasks(directory: str) -> Dict[str, List[Type[BaseModel]]]:
     """
@@ -26,52 +28,74 @@ def get_integration_tasks(directory: str) -> Dict[str, List[Type[BaseModel]]]:
                     for method_name, method in inspect.getmembers(cls, inspect.isfunction):
                         if getattr(method, '_is_task', False):  # Check if method is a task
                             tasks.append(method)
-                    integrations[cls.__name__] = tasks
+                    if cls.__name__ not in integrations:
+                        integrations[cls.__name__] = {}
+                    integrations[cls.__name__]['tasks'] = tasks
+                    integrations[cls.__name__]['name'] = getattr(cls, '_name', None)
+                    integrations[cls.__name__]['short_name'] = getattr(cls, '_short_name', None)
+                    
     return integrations
 
 def extract_parameters_from_model(model: Type[BaseModel]) -> List[TaskParameter]:
-    """
-    Extracts parameters from a Pydantic model.
-    """
     parameters = []
-    for field_name, field in model.__fields__.items():
+    # Use model.__annotations__ to get type information
+    for i, (field_name, field_type) in enumerate(model.__annotations__.items()):
+        field_info = model.model_fields[field_name]
+        
         parameters.append(
             TaskParameter(
                 name=field_name,
-                data_type=field.type_.__name__,
-                position=field.field_info.extra.get('position', 0),
-                doc_string=field.field_info.description or "",
-                optional=field.allow_none
+                data_type=str(field_type),
+                position=i,  # Adjust position if needed
+                doc_string=field_info.description or "",
+                optional=field_info.default is not None or field_info.default_factory is not None  # Adjust based on your needs
             )
         )
     return parameters
 
+
 def sync_integrations_and_tasks(directory: str, db: Session):
-    """
-    Synchronizes integration classes and their tasks with the database.
-    """
-    integrations = get_integration_tasks(directory)
-    for integration_name, tasks in integrations.items():
+    integrations = get_integration_tasks(directory)  # Assume this function is defined elsewhere
+    for integration_name in integrations.items():
+
+        tasks = integrations[integration_name]['tasks']
+        name = integrations[integration_name]['name']
+        short_name = integrations[integration_name]['short_name']
+        
+        integration_create = schemas.IntegrationCreate(
+            class_name=integration_name,
+            name=name,
+            short_name=short_name
+        )
+        
+        # Fetch or create the integration GUID based on the integration name
+        integration_guid = crud.integration.get_or_create_integration(integration_name, db, integration_create)
+
         for task in tasks:
-            # Assume the first argument after 'self' is the input model
-            input_model = inspect.getfullargspec(task).annotations.get('return', None)
-            task_params = extract_parameters_from_model(input_model) if input_model else []
-            # Create or update the task definition in the database
-            task_definition = TaskDefinitionBase(
-                task_name=task.__name__,
-                integration=integration_name,
-                parameters=task_params,
-                python_method_name=task.__module__ + "." + task.__name__,
-                # Other fields as necessary
-            )
-            # Assuming a CRUD utility to sync task definitions
-            crud.task_definition.sync(task_definition, db)
+            if hasattr(task, '_task_name'):
+                task_name = getattr(task, '_task_name')
+                input_type = getattr(task, '_input_type', None)
+                output_type = getattr(task, '_output_type', None)
+                description = getattr(task, '_description', None)
+                
+                input_model = inspect.getfullargspec(task).annotations.get('return', None)
+                
+                parameters = extract_parameters_from_model(input_model)
 
+                input_yml = input_type.generate_example_yaml() if input_type else ''
+                output_yml = output_type.generate_example_yaml() if output_type else ''
 
-#TODO:
-# Add integration and task booleans to decorator wrappers
-# Add other fields to task_definition
-# Add position for parameters
-# Add field name for task definition
-# Check __name__ usage currently with __module__ + "." + __name__ stuff
-# Add step to get YML definition of output models
+                task_definition = TaskDefinitionBase(
+                    task_name=task_name,
+                    integration=integration_guid,
+                    description= description,
+                    parameters=parameters,  # Assume parameters extraction logic is handled elsewhere
+                    python_method_name=f"{task.__module__}.{task.__name__}",
+                    input_type=str(input_type.__name__) if input_type else None,
+                    input_yml=input_yml,
+                    output_type=str(output_type.__name__) if output_type else None,
+                    output_yml=output_yml,
+                    # Other necessary fields
+                )
+                # Sync the task definition with the database
+                crud.task_definition.sync(task_definition, db)

@@ -11,9 +11,10 @@ class Integration(Base):
     __tablename__ = 'integration'
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
+    class_name = Column(String, nullable=False)
     name = Column(String, nullable=False)
     short_name = Column(String, nullable=False)
-    uses_api_key = Column(Boolean, default=False, nullable=False)
+    uses_api_key = Column(Boolean, default=False, nullable=True)
     uses_sso_key = Column(Boolean, default=False, nullable=True)
     created_date = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     modified_date = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now(), nullable=False)

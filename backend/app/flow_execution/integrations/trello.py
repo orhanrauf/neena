@@ -24,7 +24,7 @@ from app.flow_execution.models.trello import (
     TrelloBoardDelete
 )
 
-@integration
+@integration(name="Trello", short_name="trello")
 class TrelloIntegration(BaseIntegration):
     """
     Integration class for Trello. 
@@ -33,14 +33,6 @@ class TrelloIntegration(BaseIntegration):
     
     key: str
     token: str
-    
-    @property
-    def name(self) -> str:
-        return 'Trello'
-    
-    @property
-    def short_name(self) -> str:
-        return 'trello'
     
     def __init__(self, user: schemas.User):
         self.key = settings.TRELLO_API_KEY
@@ -96,10 +88,11 @@ class TrelloIntegration(BaseIntegration):
         return response.status_code == 200
     
     @task('Get Boards')
-    def get_boards(self) -> List[TrelloBoard]:
+    def get_boards(self, trello_board_get: TrelloBoardGet) -> List[TrelloBoard]:
         """
         Fetches the boards for the user.
         """
+        # TODO: Implement right url 
         
         url = f"{self.base_url}members/me/boards"
         

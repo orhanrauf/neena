@@ -10,22 +10,6 @@ class BaseIntegration(ABC):
     
     user: schemas.User
     
-    @property
-    @abstractmethod
-    def name(self) -> str:
-        """
-        The name of the integration.
-        """
-        raise NotImplementedError
-
-    @property
-    @abstractmethod
-    def short_name(self) -> str:
-        """
-        A short, unique name for the integration.
-        """
-        raise NotImplementedError
-    
     @abstractmethod
     def check_connectivity() -> bool:
         """

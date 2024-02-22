@@ -1,5 +1,6 @@
 from enum import Enum
 from functools import wraps
+import inspect
 import time
 from typing import Callable, Generic, Optional, TypeVar
 
@@ -56,14 +57,33 @@ def task(task_name: str, max_attempts: int = 3, delay_seconds: int = 2):
                         return TaskResponse.failure(error=str(e))
                     time.sleep(delay)
         wrapper._is_task = True
-        return wrapper
+        wrapper._task_name = task_name
+        wrapper._description = func.__doc__.strip() if func.__doc__ else "No description available"
+        wrapper._max_attempts = max_attempts
+        wrapper._delay_seconds = delay_seconds
         
+        sig = inspect.signature(func)
+        parameters = list(sig.parameters.values())
+        if len(parameters) > 1:
+            wrapper._input_type = parameters[1].annotation
+        else:
+            wrapper._input_type = 'None'
+        wrapper._output_type = sig.return_annotation
+        return wrapper
+
     return decorator
 
 
-def integration(cls):
+def integration(name: str, short_name: str):
     """
     Class decorator to mark a class as representing a Neena integration.
+    
+    :param name: The name of the integration.
+    :param short_name: The short name of the integration.
     """
-    cls.is_integration = True
-    return cls
+    def decorator(cls):
+        cls._is_integration = True
+        cls._name = name
+        cls._short_name = short_name
+        return cls
+    return decorator
