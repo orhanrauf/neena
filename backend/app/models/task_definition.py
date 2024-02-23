@@ -44,12 +44,14 @@ class TaskDefinition(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)  # Ensure uuid is imported
     task_name = Column(String(64), nullable=False)  # Adjusted length according to Pydantic model constraints
     integration = Column(UUID(as_uuid=True), ForeignKey("integration.id"), nullable=False)  # Ensure it points to the integration table
-    # Assuming parameters and TaskParameterType handling is elsewhere or requires adjustment
+    parameters: Mapped[list[TaskParameter]] = mapped_column(TaskParameterType)
     python_method_name = Column(String, nullable=False)
-    # Assuming output_class is meant to be output_type
+    input_type = Column(String, nullable=False)
+    input_yml = Column(String, nullable=False)  
     output_type = Column(String, nullable=False)
-    output_yml = Column(String, nullable=False)  # Assuming storage of YML as string; adjust if needed
+    output_yml = Column(String, nullable=False)  
     description = Column(String, nullable=False)
+    
     created_by_email = Column(String, ForeignKey("user.email"))  # Nullable by default, matches Pydantic
     modified_by_email = Column(String, ForeignKey("user.email"))  # Nullable by default, matches Pydantic
     created_date = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)

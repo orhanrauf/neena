@@ -64,11 +64,10 @@ def task(task_name: str, max_attempts: int = 3, delay_seconds: int = 2):
         
         sig = inspect.signature(func)
         parameters = list(sig.parameters.values())
-        if len(parameters) > 1:
+        if len(parameters) == 2:
             wrapper._input_type = parameters[1].annotation
         else:
-            wrapper._input_type = 'None'
-        wrapper._output_type = sig.return_annotation
+            ValueError("Task must have exactly one parameter")
         return wrapper
 
     return decorator

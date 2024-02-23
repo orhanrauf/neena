@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, DateTime, String, Boolean, ForeignKey
+from sqlalchemy import Column, DateTime, String, Boolean, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -9,6 +9,9 @@ from app.db.base_class import Base
 
 class Integration(Base):
     __tablename__ = 'integration'
+    __table_args__ = (
+        UniqueConstraint('short_name', name='short_name_unique_constraint'),
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
     class_name = Column(String, nullable=False)

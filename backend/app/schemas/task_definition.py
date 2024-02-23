@@ -30,8 +30,8 @@ class TaskDefinitionInDBBase(TaskDefinitionBase):
     id: UUID
     created_date: datetime
     modified_date: datetime
-    created_by_email: EmailStr = None
-    modified_by_email: EmailStr = None
+    created_by_email: Optional[EmailStr] = None
+    modified_by_email: Optional[EmailStr] = None
     deleted_at: Optional[datetime] = None  # New field to support soft deletes
     
     class Config:
