@@ -84,7 +84,7 @@ async def exception_logging_middleware(request: Request, call_next):
 @app.on_event("startup")
 async def startup_event():
     db = SessionLocal()
-    sync_integrations_and_tasks('app/flow_execution/integrations', db)
+    # sync_integrations_and_tasks('app/flow_execution/integrations', db)
     try:
         init_db(db)
     finally:
