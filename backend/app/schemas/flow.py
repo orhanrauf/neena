@@ -3,7 +3,6 @@ from uuid import UUID
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr
-from pydantic.datetime_parse import date
 
 from .task_operation import TaskOperationBase
 
@@ -18,11 +17,11 @@ class FlowBase(BaseModel):
 class FlowCreate(FlowBase):
     created_by_human: bool = True
     modified_by_human: bool = True
-    pass
+    sorted: bool = False
 
 # Properties to receive via API on update
 class FlowUpdate(FlowCreate):
-    pass
+    sorted: bool
 
 
 class FlowInDBBase(FlowBase):
@@ -32,9 +31,10 @@ class FlowInDBBase(FlowBase):
     created_by_email: EmailStr
     modified_by_email: EmailStr
     organization: Optional[UUID] = None
+    sorted: bool
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Additional properties to return via API

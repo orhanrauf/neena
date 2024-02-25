@@ -21,14 +21,14 @@ class UserInDBBase(UserBase):
     id: UUID
     permissions: Optional[list[str]] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Additional properties to return via API
 class User(UserInDBBase):
     hashed_password: bool = Field(default=False, alias="password")
 
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
 
     @validator("hashed_password", pre=True)
     def evaluate_hashed_password(cls, hashed_password):

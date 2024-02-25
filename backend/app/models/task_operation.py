@@ -32,7 +32,7 @@ class TaskOperation(Base):
     flow: Mapped[UUID] = mapped_column(UUID, ForeignKey("flow.id"), nullable=False)
     task_definition: Mapped[UUID] = mapped_column(UUID, ForeignKey("task_definition.id"), nullable=False)
     instruction: Mapped[Optional[str]] = mapped_column(String)
-    
+    execution_position: Mapped[int] = mapped_column(Integer, nullable=True)
     
     x: Mapped[float] = mapped_column(Float)
     y: Mapped[float] = mapped_column(Float)

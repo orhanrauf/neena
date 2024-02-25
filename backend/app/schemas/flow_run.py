@@ -30,7 +30,7 @@ class FlowRunInDBBase(FlowRunBase):
     task_runs: Optional[List[TaskRunBase]] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Additional properties to return via API
 class FlowRun(FlowRunInDBBase):

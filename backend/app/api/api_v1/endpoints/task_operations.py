@@ -3,7 +3,8 @@ from typing import Any, List
 from fastapi import APIRouter, Body, Depends
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
+from app import crud, schemas
+from app.core.shared_models import Argument
 from app.api import deps
 from app.core.auth import Auth0User, auth
 
@@ -16,7 +17,7 @@ def create_task_operation(
     db: Session = Depends(deps.get_db),
     name: str = Body(...),
     task_definition: str = Body(...),
-    arguments: list[schemas.Argument] = Body(...),
+    arguments: list[Argument] = Body(...),
     flow: str = Body(...),
     explanation: str = Body(...),
     current_user: Auth0User = Depends(auth.get_user),
