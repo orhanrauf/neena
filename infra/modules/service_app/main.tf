@@ -47,6 +47,7 @@ resource "azurerm_linux_web_app" "app_service" {
     "LOG_APPINSIGHTS": "true"
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = var.azurerm_application_insights_connection_string
     "TRELLO_API_KEY" = var.trello_api_key
+    "PORT" = "8000"
   }
 
   identity {
