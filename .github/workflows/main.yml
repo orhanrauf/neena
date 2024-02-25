@@ -52,6 +52,7 @@ jobs:
         TF_VAR_auth0_domain: ${{ secrets.VITE_APP_AUTH0_DOMAIN }}
         TF_VAR_auth0_rule_namespace: ${{ secrets.AUTH0_RULE_NAMESPACE }}
         TF_VAR_auth0_client_id: ${{ secrets.VITE_APP_AUTH0_CLIENT_ID }}
+        TF_VAR_trello_api_key: ${{ vars.TRELLO_API_KEY }}
 
       working-directory: infra
 

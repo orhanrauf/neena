@@ -106,3 +106,8 @@ variable "auth0_rule_namespace" {
   description = "The namespace for Auth0 rules"
   type        = string
 }
+
+variable "trello_api_key" {
+  description = "The API key for Neena's Trello integration"
+  type        = string
+}

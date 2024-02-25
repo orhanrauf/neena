@@ -44,6 +44,7 @@ resource "azurerm_linux_web_app" "app_service" {
     "AZURE_CLIENT_SECRET" = var.service_principal_secret
     "AZURE_TENANT_ID" = var.tenant_id
     "AZURE_KEYVAULT_NAME" = var.key_vault_name
+    "TRELLO_API_KEY" = var.trello_api_key
     "ALGORITHM" = "RS256"
     "PROJECT_NAME" = "Neena"
     "LOG_APPINSIGHTS": "true"
