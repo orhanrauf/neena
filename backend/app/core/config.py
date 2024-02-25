@@ -30,22 +30,23 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     PROJECT_NAME: str
-    
+    DTAP_ENVIRONMENT: str
     FIRST_SUPERUSER: str
     FIRST_SUPERUSER_AUTH_ID: str
 
     POSTGRES_SERVER: str
+    POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    POSTGRES_DB: str
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
-    KEY_VAULT_NAME: str
     
     AUTH0_DOMAIN: str
     AUTH0_CLIENT_ID: str
     AUTH0_API_IDENTIFIER: str
     AUTH0_RULE_NAMESPACE: str
     
+    AZURE_TENANT_ID: str
+    AZURE_KEYVAULT_NAME: str
     LOG_APPINSIGHTS: bool = False
     APPLICATIONINSIGHTS_CONNECTION_STRING: str
     

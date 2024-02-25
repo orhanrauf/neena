@@ -8,7 +8,7 @@ from app.schemas.user import User
 
 class AzureKeyVault:
     def __init__(self):
-        self.vault_url = f"https://{settings.KEY_VAULT_NAME}.vault.azure.net/"
+        self.vault_url = f"https://{settings.AZURE_KEYVAULT_NAME}.vault.azure.net/"
         self.credential = DefaultAzureCredential()
         self.client = SecretClient(vault_url=self.vault_url, credential=self.credential)
 

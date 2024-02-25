@@ -28,14 +28,14 @@ resource "azurerm_linux_web_app" "app_service" {
   }
 
   app_settings = {
-    "APPLICATIONINSIGHTS_CONNECTION_STRING" = var.azurerm_application_insights_connection_string
+    "PROJECT_NAME" = "Neena"
     "DTAP_ENVIRONMENT" = var.environment
+    "FIRST_SUPERUSER" = var.first_superuser
+    "FIRST_SUPERUSER_AUTH_ID" = var.first_superuser_auth_id
     "POSTGRES_SERVER" = var.postgresql_server_url
     "POSTGRES_DB" = var.postgresql_database_name
     "POSTGRES_USER" = "${var.postgresql_admin_username}@${var.postgresql_server_name}"
     "POSTGRES_PASSWORD" = var.postgresql_admin_password
-    "FIRST_SUPERUSER" = var.first_superuser
-    "FIRST_SUPERUSER_AUTH_ID" = var.first_superuser_auth_id
     "AUTH0_DOMAIN" = var.auth0_domain
     "AUTH0_CLIENT_ID" = var.auth0_client_id
     "AUTH0_API_IDENTIFIER" = var.auth0_api_identifier
@@ -44,10 +44,9 @@ resource "azurerm_linux_web_app" "app_service" {
     "AZURE_CLIENT_SECRET" = var.service_principal_secret
     "AZURE_TENANT_ID" = var.tenant_id
     "AZURE_KEYVAULT_NAME" = var.key_vault_name
-    "TRELLO_API_KEY" = var.trello_api_key
-    "ALGORITHM" = "RS256"
-    "PROJECT_NAME" = "Neena"
     "LOG_APPINSIGHTS": "true"
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = var.azurerm_application_insights_connection_string
+    "TRELLO_API_KEY" = var.trello_api_key
   }
 
   identity {
