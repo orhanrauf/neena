@@ -119,3 +119,8 @@ variable "key_vault_name" {
   description = "The name of the key vault"
   type        = string
 }
+
+variable "trello_api_key" {
+  description = "The API key for Trello"
+  type        = string
+}
