@@ -2,6 +2,7 @@ from uuid import UUID
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 
 
 # Shared properties
@@ -11,10 +12,12 @@ class TaskOperationBase(BaseModel):
     instruction: str
     x: Optional[float] = None
     y: Optional[float] = None
+    index: int
 
     class Config:
         from_attributes = True
-    
+
+
 # Properties to receive via API on creation
 class TaskOperationCreate(TaskOperationBase):
     flow: UUID
@@ -29,7 +32,7 @@ class TaskOperationUpdate(TaskOperationCreate):
 class TaskOperationInDBBase(TaskOperationBase):
     id: UUID
     flow: UUID
-    
+
     created_date: datetime
     modified_date: datetime
     created_by_email: EmailStr
