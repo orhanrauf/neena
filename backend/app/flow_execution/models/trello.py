@@ -143,8 +143,8 @@ class TrelloBoardCreate(BaseIntegrationActionModel):
     Model for creating a new Trello Board.
     """
     name: str = Field(min_length=1, max_length=16384, description="The new name for the board.")
-    default_labels: Optional[StrictBool] = Field(default=None, description="Determines whether to use the default set of labels.")
-    default_lists: Optional[StrictBool] = Field(default=None, description="Determines whether to add the default set of lists to a board (To Do, Doing, Done).")
+    default_labels: Optional[StrictBool] = Field(default=None, description="Determines whether to use the default set of labels.", alias="defaultLabels")
+    default_lists: Optional[StrictBool] = Field(default=None, description="Determines whether to add the default set of lists to a board (To Do, Doing, Done).", alias="defaultLists")
     desc: Optional[str] = Field(default=None, min_length=0, max_length=16384, description="A new description for the board, 0 to 16384 characters long")
     
 class TrelloBoardGet(BaseIntegrationActionModel):

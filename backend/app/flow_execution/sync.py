@@ -152,8 +152,12 @@ def sync_integrations_and_tasks(directory: str, db: Session):
                     output_yml = generate_example_yaml_for_list(output_model)
                     output_type = f"List[{output_model.__args__[0].__name__}]"
                 else:
-                    output_yml = output_model.generate_example_yaml() if output_model else ''
-                    output_type = str(output_model.__name__)
+                    if output_model == typing.Any:
+                        output_yml = "Any"
+                        output_type = "Any"
+                    else:
+                        output_yml = output_model.generate_example_yaml() if output_model else ''
+                        output_type = str(output_model.__name__)
 
                 task_definition = TaskDefinitionCreate(
                     task_name=task_name,
