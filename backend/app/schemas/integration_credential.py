@@ -5,15 +5,16 @@ from pydantic import BaseModel, EmailStr
 
 # Shared properties
 class IntegrationCredentialBase(BaseModel):
-    credential: str
+    integration: UUID
 
 # Properties to receive via API on creation
 class IntegrationCredentialCreate(IntegrationCredentialBase):
-    integration: UUID
+    credential: str
+    
 
 # Properties to receive via API on update
 class IntegrationCredentialUpdate(IntegrationCredentialBase):
-    integration: Optional[UUID] = None
+    credential: str
 
 class IntegrationCredentialInDBBase(IntegrationCredentialBase):
     id: Optional[UUID] = None
@@ -25,7 +26,7 @@ class IntegrationCredentialInDBBase(IntegrationCredentialBase):
     modified_date: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Additional properties to return via API
 class IntegrationCredential(IntegrationCredentialInDBBase):
@@ -34,3 +35,7 @@ class IntegrationCredential(IntegrationCredentialInDBBase):
 # Additional properties stored in DB
 class IntegrationCredentialInDB(IntegrationCredentialInDBBase):
     pass
+
+class IntegrationCredentialInKeyVault(IntegrationCredentialCreate, IntegrationCredentialInDBBase):
+    pass
+    

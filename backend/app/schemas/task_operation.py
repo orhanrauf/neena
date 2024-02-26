@@ -1,10 +1,7 @@
-from typing import Optional
 from uuid import UUID
 from datetime import datetime
-from app.core.shared_models import Argument
 
 from pydantic import BaseModel, EmailStr
-from pydantic.datetime_parse import date
 
 
 # Shared properties
@@ -16,7 +13,7 @@ class TaskOperationBase(BaseModel):
     y: Optional[float] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
     
 # Properties to receive via API on creation
 class TaskOperationCreate(TaskOperationBase):

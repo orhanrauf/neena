@@ -17,4 +17,4 @@ class TaskLog(TaskLogBase):
     flow_run_id: UUID
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -2,7 +2,8 @@ import os
 import secrets
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn, validator
+from pydantic import AnyHttpUrl, PostgresDsn, validator
+from pydantic_settings import BaseSettings
 
 # Check if DTAP_ENV is set in the environment, indicating a cloud environment
 # if "DTAP_ENVIRONMENT" not in os.environ:
@@ -29,14 +30,14 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     PROJECT_NAME: str
-    
+    DTAP_ENVIRONMENT: str
     FIRST_SUPERUSER: str
     FIRST_SUPERUSER_AUTH_ID: str
 
     POSTGRES_SERVER: str
+    POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    POSTGRES_DB: str
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
     
     AUTH0_DOMAIN: str
@@ -44,8 +45,12 @@ class Settings(BaseSettings):
     AUTH0_API_IDENTIFIER: str
     AUTH0_RULE_NAMESPACE: str
     
+    AZURE_TENANT_ID: str
+    AZURE_KEYVAULT_NAME: str
     LOG_APPINSIGHTS: bool = False
     APPLICATIONINSIGHTS_CONNECTION_STRING: str
+    
+    TRELLO_API_KEY: str
     
     OPENAI_API_KEY: str
 
@@ -55,10 +60,10 @@ class Settings(BaseSettings):
             return v
         return PostgresDsn.build(
             scheme="postgresql",
-            user=values.get("POSTGRES_USER"),
+            username=values.get("POSTGRES_USER"),
             password=values.get("POSTGRES_PASSWORD"),
             host=values.get("POSTGRES_SERVER"),
-            path=f"/{values.get('POSTGRES_DB') or ''}",
+            path=f"{values.get('POSTGRES_DB') or ''}",
         )
 
 

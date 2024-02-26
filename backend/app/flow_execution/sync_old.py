@@ -43,7 +43,7 @@ def construct_task_definitions_from_task_methods(functions: List[Tuple[str, Call
                 data_type=get_type_hint_str(arg_type_hints.get(p, 'No type hint')),
                 position=i
             )
-            for i, p in enumerate(arg_spec.args)
+            for i, p in enumerate(arg_spec.args) 
         ]
         
         task_def = TaskDefinitionBase(

@@ -24,7 +24,7 @@ class DependencyInDBBase(DependencyBase):
     target_task_operation: UUID
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Additional properties to return via API
 class Dependency(DependencyInDBBase):

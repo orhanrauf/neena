@@ -14,7 +14,7 @@ class TaskRunBase(BaseModel):
     end_time: Optional[datetime] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TaskRunCreate(TaskRunBase):
     pass
@@ -29,7 +29,7 @@ class TaskRunInDBBase(TaskRunBase):
     
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TaskRun(TaskRunInDBBase):
     pass

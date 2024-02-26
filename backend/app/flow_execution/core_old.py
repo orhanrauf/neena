@@ -9,7 +9,7 @@ import importlib
 from uuid import UUID
 from app import schemas, crud
 from app.core.utils.graph import Graph
-from app.execution.decorators import TaskResult
+from app.flow_execution.decorators import TaskResult
 from app.schemas.task_definition import TaskDefinitionBase
 from app.schemas.task_log import TaskLog
 from app.schemas.task_run import TaskRunCreate
