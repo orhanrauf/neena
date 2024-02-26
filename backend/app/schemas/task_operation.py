@@ -12,8 +12,8 @@ class TaskOperationBase(BaseModel):
     name: str
     task_definition: UUID
     instruction: str
-    x: float
-    y: float
+    x: Optional[float] = None
+    y: Optional[float] = None
 
     class Config:
         orm_mode = True

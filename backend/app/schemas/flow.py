@@ -6,12 +6,14 @@ from pydantic import BaseModel, EmailStr
 from pydantic.datetime_parse import date
 
 from .task_operation import TaskOperationBase
+from .dependency import DependencyBase
 
 
 # Shared properties
 class FlowBase(BaseModel):
     name: Optional[str]
     task_operations: list[TaskOperationBase]
+    dependencies: list[DependencyBase]
     
 
 # Properties to receive via API on creation
