@@ -89,7 +89,8 @@ def remove_flow(
 
 
 # @router.get("/generate", response_model=schemas.FlowBase)
-@router.get("/generate", response_model=list[schemas.TaskDefinitionBase])
+# @router.get("/generate", response_model=list[schemas.TaskOperationBase])
+@router.get("/generate", response_model=str)
 def generate_flow(
     *,
     db: Session = Depends(deps.get_db),
@@ -99,7 +100,6 @@ def generate_flow(
     """
     Generate flow from request
     """
-    response = flow_generator.generate_flow_from_request(request)
     # flow = FlowBase(
     #     name="foo",
     #     task_operations=[
@@ -121,4 +121,7 @@ def generate_flow(
     #     ],
     # )
 
+    # return flow
+
+    response = flow_generator.generate_flow_from_request(request)
     return response

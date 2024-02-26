@@ -25,7 +25,14 @@ class CRUDTaskDefinition(CRUDBase[TaskDefinition, TaskDefinitionCreate, TaskDefi
             db.add(obj)
             db.commit()
         return obj
-    
+
+    def get_by_names(self, db: Session, task_definition_names: List[str]) -> List[TaskDefinition]:
+        return (
+            db.query(self.model)
+            .filter(self.model.task_name.in_(task_definition_names), self.model.deleted_at == None)
+            .all()
+        )
+
     def sync(self, task_definitions: List[TaskDefinitionCreate], db: Session) -> None:
         task_definitions_dict = {td.task_name: td for td in task_definitions if td.task_name is not None}
 
@@ -37,15 +44,15 @@ class CRUDTaskDefinition(CRUDBase[TaskDefinition, TaskDefinitionCreate, TaskDefi
 
                 # Check if any field has changed and needs update
                 changes = {
-                    'parameters': task_def.parameters,
-                    'input_type': task_def.input_type,
-                    'input_yml': task_def.input_yml,
-                    'output_type': task_def.output_type,
-                    'output_yml': task_def.output_yml,
-                    'description': task_def.description,
-                    'python_method_name': task_def.python_method_name,
+                    "parameters": task_def.parameters,
+                    "input_type": task_def.input_type,
+                    "input_yml": task_def.input_yml,
+                    "output_type": task_def.output_type,
+                    "output_yml": task_def.output_yml,
+                    "description": task_def.description,
+                    "python_method_name": task_def.python_method_name,
                 }
-                
+
                 needs_update = any(getattr(td, attr) != value for attr, value in changes.items())
 
                 if needs_update:
@@ -54,7 +61,7 @@ class CRUDTaskDefinition(CRUDBase[TaskDefinition, TaskDefinitionCreate, TaskDefi
                         setattr(td, attr, value)
                     td.deleted_at = None  # Ensure the task definition is marked as active
                 continue  # Move to the next iteration without creating a new entry
-            
+
             # If the task definition no longer exists, mark it as deleted
             td.deleted_at = datetime.now()
 
@@ -75,5 +82,6 @@ class CRUDTaskDefinition(CRUDBase[TaskDefinition, TaskDefinitionCreate, TaskDefi
                 db.add(new_td)
 
         db.commit()
+
 
 task_definition = CRUDTaskDefinition(TaskDefinition)
