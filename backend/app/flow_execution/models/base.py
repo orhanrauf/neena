@@ -10,11 +10,12 @@ import yaml
 This file contains the base classes for the models used for integrations.
 """
 
+
 class BaseNeenaModel(BaseModel):
     """
     Contains common functionality for Neena models.
     """
-    
+
     @classmethod
     def generate_example_yaml(cls) -> str:
         """
@@ -36,7 +37,7 @@ class BaseNeenaModel(BaseModel):
             else:
                 inner_type = field_type
 
-            if field_name == 'id':
+            if field_name == "id":
                 example_value = str(uuid.uuid4())
             elif inner_type in [str, StrictStr]:
                 example_value = f"{field_name}_example"
@@ -51,30 +52,34 @@ class BaseNeenaModel(BaseModel):
             elif inner_type == datetime:
                 example_value = datetime.now().isoformat()
             elif inner_type == list:
-                example_value = ['item1', 'item2']
+                example_value = ["item1", "item2"]
 
             if field.alias:
                 field_name = field.alias
             example[field_name] = example_value
 
         return yaml.dump(example, sort_keys=False)
-            
+
+    class Config:
+        populate_by_name = True
+
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
         return json.dumps(self.model_dump(by_alias=True))
-    
+
+
 class BaseAPIModel(BaseNeenaModel):
     """
     Base class for API models.
     """
 
-    
+
 class BaseIntegrationActionModel(BaseNeenaModel):
     """
     Base class for integration action models.
-    
-    These models are used to represent the data that is sent to a Neena task and usually take the form of 
+
+    These models are used to represent the data that is sent to a Neena task and usually take the form of
     CRUD operations.
-    
+
     Example: CardCreate, CardUpdate, CardDelete for Trello integration.
     """

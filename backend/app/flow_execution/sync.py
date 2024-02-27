@@ -51,6 +51,9 @@ def extract_parameters_from_model(model: Union[Type[BaseNeenaModel], List[Type[B
         List[TaskParameter]: A list of TaskParameter objects representing the extracted parameters.
     """
     
+    if model is None:
+        return []
+    
     if typing.get_origin(model) is list:
         args = typing.get_args(model)
         if len(args) != 1:
@@ -165,7 +168,7 @@ def sync_integrations_and_tasks(directory: str, db: Session):
                     description= description,
                     parameters=parameters,
                     python_method_name=f"{task.__module__}.{task.__name__}",
-                    input_type=str(input_type.__name__),
+                    input_type= str(input_type.__name__) if input_type else '',
                     input_yml=input_yml,
                     output_type=output_type,
                     output_yml=output_yml,

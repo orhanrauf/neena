@@ -5,6 +5,8 @@ from app.schemas import IntegrationCredentialCreate, IntegrationCredentialUpdate
 from app.crud.base import CRUDBase
 from sqlalchemy.orm import Session
 
+from app.models.integration import Integration
+
 
 class CRUDIntegrationCredential(
     CRUDBase[IntegrationCredential, IntegrationCredentialCreate, IntegrationCredentialUpdate]
@@ -19,23 +21,26 @@ class CRUDIntegrationCredential(
 
         return (
             db.query(self.model)
-            .filter(self.model.intergation == integration_id, self.model.modified_by_email == modified_by_email)
+            .filter(self.model.integration == integration_id, self.model.modified_by_email == modified_by_email)
             .first()
         )
         
-    def get_by_integration_short_name_and_user_email(
-        self, db: Session, integration_short_name: str, modified_by_email: str
+    def get_by_integration_short_name_and_user_email(self,
+        db: Session, integration_short_name: str, modified_by_email: str
     ) -> Optional[IntegrationCredential]:
         """
         Get integration credential by integration short name and user email.
         """
-
         return (
-            db.query(self.model)
-            .filter(self.model.intergation.has(short_name=integration_short_name), self.model.modified_by_email == modified_by_email)
+            db.query(IntegrationCredential)
+            .join(IntegrationCredential.credential_of)  # Join with the Integration model via credential_of relationship
+            .filter(
+                Integration.short_name == integration_short_name,  # Filter by short_name of the Integration
+                IntegrationCredential.modified_by_email == modified_by_email  # and by modified_by_email
+            )
             .first()
-    )
-        
+        )
+            
 
     def update_by_integration_and_user_email(
         self, db: Session, modified_by_email: str, credential_update: IntegrationCredentialUpdate
