@@ -88,40 +88,17 @@ def remove_flow(
     return crud.flow.remove(db=db, id=id)
 
 
-# @router.get("/generate", response_model=schemas.FlowBase)
+@router.get("/generate", response_model=schemas.FlowBase)
 # @router.get("/generate", response_model=list[schemas.TaskOperationBase])
-@router.get("/generate", response_model=str)
+# @router.get("/generate", response_model=str)
 def generate_flow(
     *,
     db: Session = Depends(deps.get_db),
     request: str,  # should ultimately be ID
     current_user: Auth0User = Depends(auth.get_user),
-) -> Any:
+) -> FlowBase:
     """
     Generate flow from request
     """
-    # flow = FlowBase(
-    #     name="foo",
-    #     task_operations=[
-    #         TaskOperationBase(
-    #             name="bar",
-    #             task_definition="026dce4d-33ad-4bcb-99a7-eaf69cb9c01a",
-    #             instruction="do this for that",
-    #             index=1,
-    #         ),
-    #         TaskOperationBase(
-    #             name="bars",
-    #             task_definition="77291c9e-d193-4290-80f9-41f82971b8cb",
-    #             instruction="do this for that too",
-    #             index=2,
-    #         ),
-    #     ],
-    #     dependencies=[
-    #         DependencyBase(instruction="connect this to that", source_task_operation=1, target_task_operation=2)
-    #     ],
-    # )
-
-    # return flow
-
     response = flow_generator.generate_flow_from_request(request)
     return response

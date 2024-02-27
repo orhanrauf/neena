@@ -39,3 +39,7 @@ class Dependency(DependencyInDBBase):
 # Additional properties stored in DB
 class DependencyInDB(DependencyInDBBase):
     pass
+
+
+class DependencyList(BaseModel):
+    dependencies: list[DependencyBase]
