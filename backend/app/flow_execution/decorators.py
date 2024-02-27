@@ -20,13 +20,13 @@ class TaskResponse(BaseModel, Generic[T]):
     metadata: Optional[dict] = Field(default_factory=dict)
 
     @classmethod
-    def success(cls, data: T, **metadata) -> 'TaskResponse':
+    def success(cls, data: T, **metadata) -> 'TaskResponse[T]':
         return cls(status=TaskStatus.SUCCESS, data=data, metadata=metadata)
 
     @classmethod
-    def failure(cls, error: str, **metadata) -> 'TaskResponse':
+    def failure(cls, error: str, **metadata) -> 'TaskResponse[T]':
         return cls(status=TaskStatus.FAILURE, error=error, metadata=metadata)
-
+    
 R = TypeVar('R', bound=Callable[..., TaskResponse])
 
 def task(task_name: str, max_attempts: int = 3, delay_seconds: int = 2):

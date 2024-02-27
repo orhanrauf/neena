@@ -21,7 +21,9 @@ def create_integration_credential(
     Create an integration credential.
     """
 
-    integration_credential = crud.integration_credential.create(db, obj_in=integration_credential_in, current_user=current_user)
+    integration_credential = crud.integration_credential.create(db, 
+                                                                obj_in=integration_credential_in.model_dump(exclude={"credential"}), 
+                                                                current_user=current_user)
     key_vault.set_secret(integration_credential.id, integration_credential_in.credential)
     
     return integration_credential
