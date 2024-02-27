@@ -5,7 +5,7 @@ description = "Neena Core project"
 authors = ["Rauf <rauf@neena.io>"]
 
 [tool.poetry.dependencies]
-python = "^3.9.4"
+python = "^3.10.0"
 inboard = "^0.37.0"
 python-multipart = "^0.0.5"
 fastapi = "^0.109.2"
@@ -31,6 +31,7 @@ pyyaml = "^6.0.1"
 pydantic = "^2.6.1"
 pydantic-settings = "^2.2.1"
 openai = "^1.12.0"
+instructor = "^0.6.1"
 
 
 [tool.poetry.dev-dependencies]
