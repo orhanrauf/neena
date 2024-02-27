@@ -6,11 +6,11 @@ from pydantic import BaseModel, EmailStr
 # Shared properties
 class IntegrationCredentialBase(BaseModel):
     integration: UUID
+    
 
 # Properties to receive via API on creation
 class IntegrationCredentialCreate(IntegrationCredentialBase):
     credential: str
-    
 
 # Properties to receive via API on update
 class IntegrationCredentialUpdate(IntegrationCredentialBase):
@@ -38,4 +38,3 @@ class IntegrationCredentialInDB(IntegrationCredentialInDBBase):
 
 class IntegrationCredentialInKeyVault(IntegrationCredentialCreate, IntegrationCredentialInDBBase):
     pass
-    

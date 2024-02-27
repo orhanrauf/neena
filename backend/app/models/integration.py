@@ -23,4 +23,5 @@ class Integration(Base):
     modified_date = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now(), nullable=False)
     
     task_definitions = relationship('TaskDefinition', back_populates='belongs_to_integration')
+    credentials = relationship('IntegrationCredential', back_populates='credential_of')
     

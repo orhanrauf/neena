@@ -13,7 +13,7 @@ class TaskOperationBase(BaseModel):
     y: float
 
     class Config:
-        from_attributes = True
+        orm_mode = True
     
 # Properties to receive via API on creation
 class TaskOperationCreate(TaskOperationBase):

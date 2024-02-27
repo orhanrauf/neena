@@ -15,17 +15,19 @@ if TYPE_CHECKING:
 class IntegrationCredential(Base):
     __tablename__ = 'integration_credential'
     __table_args__ = (
-        UniqueConstraint('intergation', 'modified_by_email', name='uix_integration_modified_by'),
-        UniqueConstraint('intergation', 'created_by_email', name='uix_integration_created_by')   
+        UniqueConstraint('integration', 'modified_by_email', name='uix_integration_modified_by'),
+        UniqueConstraint('integration', 'created_by_email', name='uix_integration_created_by')   
     )
 
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
-    intergation: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("integration.id"), nullable=False)
+    integration: Mapped[UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("integration.id"), nullable=False)
+    
     created_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=False)
     modified_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=False)
     created_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     modified_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), server_onupdate=func.now(), nullable=False)
 
+    credential_of: Mapped["Integration"] = relationship("Integration", back_populates="credentials")
     # Relationship to User model for 'created_by' and 'modified_by'
     creator: Mapped["User"] = relationship("User", back_populates="created_credentials", foreign_keys=[created_by_email])
     modifier: Mapped["User"] = relationship("User", back_populates="modified_credentials", foreign_keys=[modified_by_email])
