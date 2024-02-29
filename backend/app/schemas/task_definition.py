@@ -5,6 +5,7 @@ from app.core.shared_models import TaskParameter
 
 from pydantic import BaseModel, EmailStr, constr
 
+
 # Shared properties
 class TaskDefinitionBase(BaseModel):
     task_name: constr(min_length=6, max_length=64)
@@ -16,15 +17,17 @@ class TaskDefinitionBase(BaseModel):
     python_method_name: str
     output_type: str
     output_yml: str
-    
+
 
 # Properties to receive via API on creation
 class TaskDefinitionCreate(TaskDefinitionBase):
     pass
 
+
 # Properties to receive via API on update
 class TaskDefinitionUpdate(TaskDefinitionBase):
     pass
+
 
 class TaskDefinitionInDBBase(TaskDefinitionBase):
     id: UUID
@@ -33,7 +36,7 @@ class TaskDefinitionInDBBase(TaskDefinitionBase):
     created_by_email: Optional[EmailStr] = None
     modified_by_email: Optional[EmailStr] = None
     deleted_at: Optional[datetime] = None  # New field to support soft deletes
-    
+
     class Config:
         from_attributes = True
 
@@ -48,3 +51,7 @@ class TaskDefinition(TaskDefinitionInDBBase):
 # Additional properties stored in DB
 class TaskDefinitionInDB(TaskDefinitionInDBBase):
     pass
+
+
+class TaskDefinitionNamesList(BaseModel):
+    task_definitions: list[str]

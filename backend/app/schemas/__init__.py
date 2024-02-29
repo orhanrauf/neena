@@ -16,6 +16,7 @@ from .task_definition import (
     TaskDefinitionInDB,
     TaskDefinitionInDBBase,
     TaskDefinitionUpdate,
+    TaskDefinitionNamesList,
 )
 from .user import User, UserCreate, UserInDB, UserUpdate
 from .flow_run import FlowRunBase, FlowRunInDBBase, FlowRun, FlowRunCreate, FlowRunUpdate
