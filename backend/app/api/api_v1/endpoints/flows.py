@@ -89,8 +89,6 @@ def remove_flow(
 
 
 @router.get("/generate", response_model=schemas.FlowBase)
-# @router.get("/generate", response_model=list[schemas.TaskOperationBase])
-# @router.get("/generate", response_model=str)
 def generate_flow(
     *,
     db: Session = Depends(deps.get_db),

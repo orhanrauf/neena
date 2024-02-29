@@ -11,6 +11,10 @@ class DependencyBase(BaseModel):
     target_task_operation: int
 
 
+class DependencyList(BaseModel):
+    dependencies: list[DependencyBase]
+
+
 # Properties to receive via API on creation
 class DependencyCreate(DependencyBase):
     flow: UUID
@@ -39,7 +43,3 @@ class Dependency(DependencyInDBBase):
 # Additional properties stored in DB
 class DependencyInDB(DependencyInDBBase):
     pass
-
-
-class DependencyList(BaseModel):
-    dependencies: list[DependencyBase]
