@@ -32,3 +32,6 @@ class LoggerConfigurator:
                 logger.addHandler(console_handler)
 
         return logger
+
+
+logger = LoggerConfigurator.configure_logger

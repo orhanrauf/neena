@@ -3,7 +3,7 @@ import instructor
 
 from sqlalchemy.orm import Session
 
-from app.core.logging import LoggerConfigurator
+from app.core.logging import logger
 from app.core.config import settings
 from app.db.session import SessionLocal
 from app.crud.crud_task_definition import task_definition
@@ -16,7 +16,7 @@ from app.schemas import (
     DependencyList,
 )
 
-logger = LoggerConfigurator.configure_logger(__name__)
+logger = logger(__name__)
 
 
 class PatchedOpenAIClient:
@@ -141,8 +141,8 @@ class FlowGenerator:
         Returns:
             flow (FlowBase): Flow DAG-form with task operations (nodes) and dependencies (edges, vertices).
         """
-        task_definitions = self._get_task_definitions_from_database(request)
-        requested_task_operations = self._convert_task_definitions_to_task_operations(task_definitions)
+        request_task_definitions = self._get_task_definitions_from_database(request)
+        requested_task_operations = self._convert_task_definitions_to_task_operations(request_task_definitions)
         dependencies = self._generate_dependencies(request, requested_task_operations)
         return self._construct_flow(requested_task_operations, dependencies)
 
@@ -308,13 +308,13 @@ class FlowGenerator:
         return flow
 
 
-database_session = SessionLocal()
+_database_session = SessionLocal()  # TODO: is this best practice wrt data privacy?
 patched_openai_client = PatchedOpenAIClient(settings.OPENAI_API_KEY)
 task_getter_client = TaskGetterPatchedOpenAIClient(settings.OPENAI_API_KEY)
 flow_generator = FlowGenerator(
     task_getter_client=task_getter_client,
     patched_openai_client=patched_openai_client,
-    database_session=database_session,
+    database_session=_database_session,
 )
 
 # Example requests to test with:
