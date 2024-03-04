@@ -241,17 +241,24 @@ class FlowGenerator:
                     )
                     
                     Based on the user-provided request and list of task operations, you must form a valid Directed Acyclic Graph (DAG) by connecting the given task operations by edges referred to as dependencies.
+                    Not all task operations are dependent on each other, and some task operations may be dependent on multiple other task operations.
+                    Some task operations may not have any dependencies at all.
+                    
+                    The task operation indices are unique and range from 0 to n-1, where n is the number of task operations.
+                    
+                    They do not necessarily correspond to the order of the task operations in the list.
+                    
                     You must return the list of dependencies between task operations in valid JSON format as demonstrated below:
                     {
                     "dependencies":[
                         {
-                            "instruction": <string instruction body that explains dependency between source and target task operation>,
+                            "instruction": <optional, string instruction body that explains dependency between source and target task operation>,
                             "source_task_operation": <int source task operation index>,
                             "target_task_operation":<int target task operation index>
                         },
                         ...
                         {
-                            "instruction": <string instruction body that explains dependency between source and target task operation>,
+                            "instruction": <optional,string instruction body that explains dependency between source and target task operation>,
                             "source_task_operation": <int source task operation index>,
                             "target_task_operation":<int target task operation index>
                         }
@@ -273,20 +280,15 @@ class FlowGenerator:
                 {
                     "dependencies":[
                         {
-                            "instruction":"Get Boards before anything else",
-                            "source_task_operation":3,
+                            "instruction":"Get List after Get Boards",
+                            "source_task_operation":2,
                             "target_task_operation":1
                         },
                         {
-                            "instruction":"Get List after Get Boards",
+                            "instruction":"Get Card after Get List",
                             "source_task_operation":1,
                             "target_task_operation":0
                         },
-                        {
-                            "instruction":"Get Card after Get List",
-                            "source_task_operation":0,
-                            "target_task_operation":2
-                        }
                     ]
                     }
                 """,
