@@ -10,9 +10,11 @@ from app import crud, models, schemas
 from app.api import deps
 from app.core.auth import Auth0User, auth
 from app.core.flow_generator import flow_generator
-from app.schemas.flow import FlowBase
+from app.schemas.flow import Flow, FlowBase, FlowInDBBase
 from app.schemas.task_operation import TaskOperationBase
 from app.schemas.dependency import DependencyBase
+from app.flow_execution.core import ExecutionContext
+
 
 router = APIRouter()
 
@@ -88,15 +90,31 @@ def remove_flow(
     return crud.flow.remove(db=db, id=id)
 
 
+<<<<<<< Updated upstream
 @router.get("/generate", response_model=schemas.FlowBase)
 def generate_flow(
+=======
+@router.get("/generate_flow_and_execute", response_model=schemas.FlowBase)
+def generate_flow_and_execute(
+>>>>>>> Stashed changes
     *,
     db: Session = Depends(deps.get_db),
     request: str,  # should ultimately be ID
     current_user: Auth0User = Depends(auth.get_user),
-) -> FlowBase:
+) -> Flow:
     """
     Generate flow from request
     """
-    response = flow_generator.generate_flow_from_request(request)
-    return response
+    # TODO: encapsulate this in a service that handles the flow generation and execution
+    generated_flow_in = flow_generator.generate_flow_from_request(request)
+
+    generated_flow_in.task_operations = generated_flow_in.topological_sort()
+    generated_flow_db = crud.flow.create(db=db, flow=generated_flow_in, current_user=current_user)
+    user = crud.user.get_by_email(db, email=current_user.email)
+
+    generate_flow_schema = schemas.Flow.from_orm(generated_flow_db)
+
+    execution_context = ExecutionContext(user=user, flow=generate_flow_schema)
+    flow_run = execution_context.run_flow()
+
+    return flow_run

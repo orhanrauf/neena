@@ -33,6 +33,7 @@ const store = createStore({
         }
       },
       taskDefinitions: [],
+      integrations: []
     };
   },
   getters: {
@@ -63,6 +64,18 @@ const store = createStore({
       );
 
       return taskDefinition || null; // Return the found definition or null if not found
+    },
+    // Getter for finding an integration by id
+    getIntegrationById: (state) => (id) => {
+      // Assuming integrations is an array in state
+      const integrations = state.integrations;
+
+      // Find the integration with the matching id
+      const integration = integrations.find(
+        (integration) => integration.id === id
+      );
+
+      return integration || null; // Return the found integration or null if not found
     },
     getDependenciesBySourceNodeId: (state) => (sourceNodeId) => {
       const dependencies = state.flowCreation.flow.dependencies;
@@ -166,30 +179,25 @@ const store = createStore({
       );
       state.flowCreation.flow.dependencies.splice(index, 1);
     },
+    setIntegrations(state, integrations) {
+      state.integrations = integrations;
+    }
 
   },
   actions: {
     fetchTaskDefinitions: async ({ commit, state }) => {
       if (state.taskDefinitions.length === 0) {
-        setTimeout(() => {
-          const taskDefinitions = [
-            { id: 1, output_type: 'Customer', name: 'Ask question', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Ask a question using Chat-GPT integration', source: 'chat-gpt' },
-            { id: 2, output_type: 'Customer', name: 'Generate image', human_readable_id: 'generate-image-chat-gpt', yml_output: 'zeker boot ja', description: 'Create images based on specified parameters', source: 'chat-gpt' },
-            { id: 3, output_type: 'Customer', name: 'Send Email', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Send an email to a specified list of recipients.', source: 'gmail' },
-            { id: 4, output_type: 'Customer', name: 'Create Quote', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Generate a sales quote for a customer', source: 'salesforce' },
-            { id: 5, output_type: 'Customer', name: 'Log New Lead', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Log a new sales lead in the CRM', source: 'salesforce' },
-            { id: 6, output_type: 'Customer', name: 'Record Interaction', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Record a customer interaction in the system', source: 'salesforce' },
-            { id: 7, output_type: 'Customer', name: 'Resolve Case', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Handle and resolve a customer support case', source: 'salesforce' },
-            { id: 8, output_type: 'Customer', name: 'Renew Contract', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Initiate the process for contract renewal', source: 'salesforce' },
-            { id: 9, output_type: 'Customer', name: 'Upload File', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Upload a file to a cloud storage service', source: 'google-drive' },
-            { id: 10, output_type: 'Customer', name: 'Share Document', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Share a document from cloud storage with specified users', source: 'google-drive' },
-            { id: 11, output_type: 'Customer', name: 'Create Folder', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Create a new folder in a cloud storage service', source: 'google-drive' },
-            { id: 12, output_type: 'Customer', name: 'Delete File', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Delete a file from cloud storage', source: 'google-drive' },
-            { id: 13, output_type: 'Customer', name: 'Rename File', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Change the name of a file in cloud storage', source: 'google-drive' },
-            { id: 14, output_type: 'Customer', name: 'List Contacts', human_readable_id: 'ask-question-chat-gpt', yml_output: 'zeker boot ja', description: 'Retrieve a list of contacts from an email service', source: 'gmail' },
-          ];
-          commit('setTaskDefinitions', taskDefinitions);
-        }, 100);
+        const response = await http.get('/task_definitions/all');
+        const taskDefinitions = response.data; 
+        commit('setTaskDefinitions', taskDefinitions);
+      }
+    },
+    fetchIntegrations: async ({ commit, state }) => {
+      if (state.integrations.length === 0) {
+        const response = await http.get('/integrations/all');
+        const integrations = response.data; 
+        console.log('Integrations', integrations);
+        commit('setIntegrations', integrations);
       }
     }
   },

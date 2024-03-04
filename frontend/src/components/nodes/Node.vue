@@ -10,9 +10,10 @@ const nodeId = ref(0);
 const taskOp = ref({});
 const showDrawer = ref(false);
 const taskDefinition = ref(null);
+const integration = ref(null);
 const isDataLoaded = ref(false); // to track data loading status
 const computedTaskDefinition = computed(() => taskDefinition.value);
-const computedTaskOp = computed(() => taskOp.value);
+const computedIntegration = computed(() => integration.value);
 
 let df = null;
 
@@ -26,16 +27,19 @@ const dynamicHeaderClass = (source) => {
   } else if (source.toLowerCase().includes('gmail') || source.toLowerCase().includes('google-drive')) {
     return 'g-suite';
   } else if (source.toLowerCase().includes('salesforce')) {
-    return 'salesforce';
+    return 'salesforce'; 
   }
   return ''; // Default case, no additional class
 };
 
 onMounted(async () => {
   await nextTick();
+  store.dispatch('fetchIntegrations');
+  store.dispatch('fetchTaskDefinitions');
   nodeId.value = el.value.parentElement.parentElement.id.slice(5);
   taskOp.value = store.getters.getTaskOperationByNodeId(parseInt(nodeId.value));
   taskDefinition.value = store.getters.getTaskDefinitionById(taskOp.value.task_definition);
+  integration.value = store.getters.getIntegrationById(taskDefinition.value.integration);
   isDataLoaded.value = true;
 });
 
@@ -50,8 +54,8 @@ const getIconUrl = (integration) => {
   <div ref="el" @dblclick="showDrawer = true">
     <template v-if="isDataLoaded">
       <div class="main-container">
-        <div :class="['header', dynamicHeaderClass(computedTaskDefinition.source)]">
-          <img :src="getIconUrl(computedTaskDefinition.source)" class="img" />
+        <div :class="['header', dynamicHeaderClass(computedIntegration.short_name)]" > 
+          <img :src="getIconUrl(computedIntegration.short_name)" class="img" />
           <div class="header-text">{{ taskOp.name }}</div>
         </div>
         <div class="description">{{ computedTaskDefinition.description }}</div>

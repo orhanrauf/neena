@@ -29,41 +29,46 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def get_multi(self, db: Session, *, skip: int = 0, limit: int = 100) -> List[ModelType]:
         return db.query(self.model).offset(skip).limit(limit).all()
-    
+
     def create(self, db: Session, *, obj_in: CreateSchemaType, current_user: User = None) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(**obj_in_data)  # type: ignore
-        
+
         if current_user:
             db_obj.created_by_email = current_user.email
             db_obj.modified_by_email = current_user.email
-            
+
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         return db_obj
 
-    def update(self, 
-               db: Session, 
-               *, db_obj: ModelType, 
-               obj_in: Union[UpdateSchemaType, Dict[str, Any]], 
-               current_user: User = None) -> ModelType:
-        obj_data = jsonable_encoder(db_obj)
-        
+    def update(
+        self,
+        db: Session,
+        *,
+        db_obj: ModelType,
+        obj_in: Union[UpdateSchemaType, Dict[str, Any]],
+        current_user: User = None
+    ) -> ModelType:
+        # If obj_in is a Pydantic model, convert it to a dictionary, excluding unset values
+        if not isinstance(obj_in, dict):
+            obj_in = obj_in.dict(exclude_unset=True)
+
+        # Iterate over the items in obj_in and update the db_obj attributes
+        for key, value in obj_in.items():
+            if hasattr(db_obj, key):
+                setattr(db_obj, key, value)
+
+        # Update modified_by_email field if current_user is provided
         if current_user:
             db_obj.modified_by_email = current_user.email
-            
-        if isinstance(obj_in, dict):
-            update_data = obj_in
-        else:
-            update_data = obj_in.dict(exclude_unset=True)
-        for field in obj_data:
-            if field in update_data:
-                setattr(db_obj, field, update_data[field])
-                
+
+        # Commit the changes to the database
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
+
         return db_obj
 
     def remove(self, db: Session, *, id: str) -> ModelType:

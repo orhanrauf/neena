@@ -1,33 +1,37 @@
-from typing import Optional
+from typing import Any, Optional
 from uuid import UUID
 from datetime import datetime
 from pydantic import BaseModel
 
 
+class TaskPrepParameterBase(BaseModel):
+    name: str
+    value: Any
+    explanation: Optional[str] = None
+
+
 # Shared properties
 class TaskPrepAnswerBase(BaseModel):
-    natural_language_explanation: str
-    body: str
-    has_python_execution: bool
+    parameters: list[TaskPrepParameterBase]
+
+    class Config:
+        from_attributes = True
+        from_orm = True
 
 
 # Properties to receive via API on creation
 class TaskPrepAnswerCreate(TaskPrepAnswerBase):
-    task_prep_prompt_id: UUID
-    task_run_id: UUID
+    task_prep_prompt: UUID
+    task_run: UUID
 
 
 # Properties to receive via API on update
 class TaskPrepAnswerUpdate(TaskPrepAnswerBase):
-    task_prep_prompt_id: Optional[UUID] = None
-    task_run_id: Optional[UUID] = None
-    natural_language_explanation: Optional[str] = None
-    body: Optional[str] = None
-    has_python_execution: Optional[bool] = None
+    pass
 
 
 class TaskPrepAnswerInDBBase(TaskPrepAnswerBase):
-    id: Optional[UUID] = None
+    id: UUID
     created_date: datetime
 
     class Config:
