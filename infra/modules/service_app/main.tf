@@ -23,7 +23,7 @@ resource "azurerm_linux_web_app" "app_service" {
   site_config {
     app_command_line = "./startup.sh"
     application_stack {
-      python_version = "3.9"
+      python_version = "3.10"
     }
   }
 
