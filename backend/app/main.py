@@ -1,4 +1,4 @@
-from app.core.logging import LoggerConfigurator
+from app.core.logging import logger
 import time
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -16,8 +16,6 @@ from app.core.config import settings
 from app.db.init_db import init_db
 from app.db.session import SessionLocal
 from app.flow_execution.sync import sync_integrations_and_tasks
-
-logger = LoggerConfigurator.configure_logger(__name__)
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json")
 app.include_router(api_router, prefix=settings.API_V1_STR)
@@ -51,10 +49,6 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
-
-if settings.LOG_APPINSIGHTS:
-    ai_handler = AzureLogHandler(connection_string=settings.APPLICATIONINSIGHTS_CONNECTION_STRING)
-    logger.addHandler(ai_handler)
 
 
 @app.middleware("http")

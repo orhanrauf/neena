@@ -12,8 +12,6 @@ from app.schemas.task_definition import TaskDefinition
 from app.schemas.task_operation import TaskOperationBase
 from app.schemas.task_prep_answer import TaskPrepAnswerBase
 
-logger = logger(__name__)
-
 
 class TaskPreparationGenerator:
     """
