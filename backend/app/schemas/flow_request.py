@@ -12,9 +12,11 @@ class FlowRequestBase(BaseModel):
     flow: Optional[UUID] = None
     organization: Optional[UUID] = None
 
+
 # Properties to receive via API on creation
 class FlowRequestCreate(FlowRequestBase):
     pass
+
 
 # Properties to receive via API on update
 class FlowRequestUpdate(FlowRequestCreate):
@@ -22,12 +24,12 @@ class FlowRequestUpdate(FlowRequestCreate):
 
 
 class FlowRequestInDBBase(FlowRequestBase):
-    id: Optional[UUID] = None
+    id: UUID
     created_date: datetime
     modified_date: datetime
     created_by_email: EmailStr
     modified_by_email: EmailStr
-    
+
     class Config:
         from_attributes = True
 

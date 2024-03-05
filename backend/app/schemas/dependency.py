@@ -26,13 +26,12 @@ class DependencyUpdate(DependencyBase):
 
 
 class DependencyInDBBase(DependencyBase):
-    id: Optional[UUID] = None
+    id: UUID
     flow: UUID
-    source_task_operation: UUID
-    target_task_operation: UUID
 
     class Config:
         from_attributes = True
+        from_orm = True
 
 
 # Additional properties to return via API

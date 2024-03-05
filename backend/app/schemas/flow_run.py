@@ -1,10 +1,10 @@
-from typing import Optional, List
+from typing import Any, Dict, Optional, List
 from uuid import UUID
 from datetime import datetime
 from pydantic import BaseModel
 
 # Assuming FlowStatus is an enum or a valid Pydantic type, and TaskRunBase is defined elsewhere
-from app.schemas.task_run import TaskRunBase
+from app.schemas.task_run import TaskRunBase, TaskRunInDBBase
 from app.core.shared_models import FlowStatus
 
 
@@ -13,10 +13,9 @@ class FlowRunBase(BaseModel):
     flow: UUID
     status: FlowStatus
     triggered_time: Optional[datetime] = None
-    start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
     triggered_by: Optional[str] = None
-    task_runs: Optional[List[TaskRunBase]] = None
+    task_runs: list[TaskRunBase] = []
 
 
 # Properties to receive via API on creation
@@ -32,7 +31,7 @@ class FlowRunUpdate(FlowRunBase):
 # Database model base
 class FlowRunInDBBase(FlowRunBase):
     id: UUID
-    task_runs: Optional[List[TaskRunBase]] = []
+    task_runs: Optional[List[TaskRunInDBBase]] = []
 
     class Config:
         from_attributes = True

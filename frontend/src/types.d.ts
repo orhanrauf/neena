@@ -98,20 +98,23 @@ interface TaskParameter {
   optional: boolean; // Corresponds to Python's bool
 }
 
+
 export interface TaskDefinition {
-  id: string; 
-  integration: string;
+  id: string;
   task_name: string;
+  integration: string;
   parameters: TaskParameter[];
-  human_readable_id: string;
-  yml_output: string; 
-  output_type: string;
+  input_type: string;
+  input_yml: string;
   description: string;
-  created_date?: string; // Optional
-  modified_date?: string; // Optional
-  created_by_email?: string; // Optional
-  modified_by_email?: string; // Optional
-  deleted_at?: string;
+  python_method_name: string;
+  output_type: string;
+  output_yml: string;
+  created_date: string;
+  modified_date: string;
+  created_by_email?: string;
+  modified_by_email?: string;
+  deleted_at?: string | null;
 }
 
 export interface TaskOperation {

@@ -18,6 +18,7 @@ const props = defineProps<{
 
 const taskOp = ref(null);
 const taskDefinition = ref(null);
+const integration = ref(null);
 const incomingDependencyTuples = ref([]);
 const outgoingDependencyTuples = ref([]);
 
@@ -93,9 +94,10 @@ const loadDependencies = () => {
     console.log('Task Operation clicked:', taskOperation);
   };
 
-  const getIconUrl = (source: string) => {
-    return `/images/icons/integrations/${source}.svg`;
-  }
+  const getIconUrl = (integration) => {
+    console.log('integration:', integration);
+  return `${import.meta.env.VITE_APP_BASE_URL}images/icons/integrations/${integration}.svg`;
+};
 
   watch(show, (newValue) => {
     if (newValue) {
@@ -116,6 +118,7 @@ const loadDependencies = () => {
   onMounted(() => {
     taskOp.value = store.getters.getTaskOperationByNodeId(parseInt(props.nodeId));
     taskDefinition.value = store.getters.getTaskDefinitionById(taskOp.value.task_definition);
+    integration.value = store.getters.getIntegrationById(taskDefinition.value.integration);
   });
 
 
@@ -131,8 +134,8 @@ const loadDependencies = () => {
     <el-drawer v-model="show" direction="rtl" class="full-screen-drawer" title="Task">
       <input class="task-operation-name-input" v-model="taskOp.name" />
       <div class="task-definition">
-        <img :src="getIconUrl(store.getters.getTaskDefinitionById(taskOp.task_definition).source)" class="task-definition-img" />
-        <div class="task-definition-text">{{ store.getters.getTaskDefinitionById(taskOp.task_definition).name }}</div>
+        <img :src="getIconUrl(integration.short_name)" class="task-definition-img" />
+        <div class="task-definition-text">{{ store.getters.getTaskDefinitionById(taskOp.task_definition).task_name }}</div>
       </div>
       <div class="divider"></div>
       <div class="instruction-box-header">

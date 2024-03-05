@@ -13,13 +13,14 @@ const taskDefinitions = computed(() => store.getters.taskDefinitions);
 // Computed property for filtering tasks based on search query
 const filteredTaskDefinitions = computed(() => {
     return taskDefinitions.value.filter((taskDefinition: TaskDefinition) =>
-    taskDefinition.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    taskDefinition.task_name.toLowerCase().includes(searchQuery.value.toLowerCase())
     );
 });
 
 // Fetch tasks when the component is mounted
 onMounted(() => {
     store.dispatch('fetchTaskDefinitions');
+    store.dispatch('fetchIntegrations');
 });
 
 const emit = defineEmits<{
@@ -39,7 +40,7 @@ function emitCloseCard() {
 }
 
 function getIconUrl(integration: string): string {
-  return `${import.meta.env.VITE_APP_BASE_URL}images/icons/integrations/${integration}.svg`;
+  return `${import.meta.env.VITE_APP_BASE_URL}images/icons/integrations/${store.getters.getIntegrationById(integration).short_name}.svg`;
 }
 
 </script>
@@ -56,8 +57,8 @@ function getIconUrl(integration: string): string {
         <ul class="task-list">
             <li v-for="task in filteredTaskDefinitions" :key="task.id" class="task-item">
                 <!-- Assuming you have icons as components or elements -->
-                <img :src="getIconUrl(task.source)" alt="" class="icon">
-                <span class="task-name" @click="addTask(task)">{{ task.name }}</span>
+                <img :src="getIconUrl(task.integration)" alt="" class="icon">
+                <span class="task-name" @click="addTask(task)">{{ task.task_name }}</span>
             </li>
         </ul>
     </div>
