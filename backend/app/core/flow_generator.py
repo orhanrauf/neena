@@ -147,7 +147,7 @@ class FlowGenerator:
         return self._construct_flow(requested_task_operations, dependencies)
 
     def _get_task_definitions_from_database(self, request: str) -> list[TaskDefinition]:
-        # TODO: Placeholder for actual task definition retrieval logic
+        # TODO: Placeholder for actual task definition retrieval augmented generation (RAG) logic
         all_task_definiton_names = [
             "Create Board",
             "Create Card",
