@@ -5,7 +5,7 @@ description = "Neena Core project"
 authors = ["Rauf <rauf@neena.io>"]
 
 [tool.poetry.dependencies]
-python = "^3.9.4"
+python = "^3.10.0"
 inboard = "^0.37.0"
 python-multipart = "^0.0.5"
 fastapi = "^0.109.2"
@@ -30,6 +30,8 @@ azure-keyvault-secrets = "^4.7.0"
 pyyaml = "^6.0.1"
 pydantic = "^2.6.1"
 pydantic-settings = "^2.2.1"
+openai = "^1.12.0"
+instructor = "^0.6.1"
 
 
 [tool.poetry.dev-dependencies]
@@ -41,6 +43,10 @@ flake8 = "^6.0.0"
 pytest = "^7.2.0"
 sqlalchemy2-stubs = "^0.0.2a29"
 pytest-cov = "^4.0.0"
+
+[tool.poetry.group.dev.dependencies]
+sqlalchemy-stubs = "^0.4"
+respx = "^0.20.2"
 
 [tool.isort]
 multi_line_output = 3

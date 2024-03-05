@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 from uuid import UUID
 from datetime import datetime
 from app.core.shared_models import TaskStatus
@@ -16,7 +16,7 @@ class TaskRunBase(BaseModel):
     task_prep_prompt: Optional[TaskPrepPromptBase] = None
     task_prep_answer: Optional[TaskPrepAnswerBase] = None
     start_time: datetime
-    result: dict
+    result: Any
     end_time: Optional[datetime] = None
 
     class Config:

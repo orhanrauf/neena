@@ -3,6 +3,7 @@
 
 # Python local development
 .venv
+.venv_py310
 
 **/__pycache__
 

@@ -1,4 +1,4 @@
-from app.core.logging import logger
+from app.core.logging import LoggerConfigurator
 import time
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -17,8 +17,11 @@ from app.db.init_db import init_db
 from app.db.session import SessionLocal
 from app.flow_execution.sync import sync_integrations_and_tasks
 
+logger = LoggerConfigurator.configure_logger(__name__)
+
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json")
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
 
 # Custom exception handler for RequestValidationError
 @app.exception_handler(RequestValidationError)
@@ -32,12 +35,12 @@ async def validation_exception_handler(request, exc):
         error_messages.append({field: message})
 
     return JSONResponse(
-        status_code=422,  # HTTP status code for Unprocessable Entity
-        content={"errors": error_messages}
+        status_code=422, content={"errors": error_messages}  # HTTP status code for Unprocessable Entity
     )
 
+
 # Set all CORS enabled originsf
-#TODO Set this to the actual origin of the fronetend from GitHub Actions
+# TODO Set this to the actual origin of the fronetend from GitHub Actions
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -49,19 +52,23 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-if settings.LOG_APPINSIGHTS:        
+if settings.LOG_APPINSIGHTS:
     ai_handler = AzureLogHandler(connection_string=settings.APPLICATIONINSIGHTS_CONNECTION_STRING)
     logger.addHandler(ai_handler)
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
     duration = time.time() - start_time
-    logger.info(f"Handled request {request.method} {request.url} in {duration:.2f} seconds. Response code: {response.status_code}")
+    logger.info(
+        f"Handled request {request.method} {request.url} in {duration:.2f} seconds. Response code: {response.status_code}"
+    )
 
     return response
-     
+
+
 # Add exception handling to also log it
 @app.middleware("http")
 async def exception_logging_middleware(request: Request, call_next):
@@ -74,19 +81,14 @@ async def exception_logging_middleware(request: Request, call_next):
         logger.error(f"Unhandled exception: {exc}\n{traceback.format_exc()}")
 
         # Return a generic error response
-        return JSONResponse(
-            status_code=500,
-            content={"detail": "Internal Server Error"}
-        )
-
+        return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 
 
 @app.on_event("startup")
 async def startup_event():
     db = SessionLocal()
-    sync_integrations_and_tasks('app/flow_execution/integrations', db)
+    sync_integrations_and_tasks("app/flow_execution/integrations", db)
     try:
         init_db(db)
     finally:
         db.close()
-
