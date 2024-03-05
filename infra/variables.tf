@@ -111,3 +111,8 @@ variable "trello_api_key" {
   description = "The API key for Neena's Trello integration"
   type        = string
 }
+
+variable "openai_api_key" {
+  description = "The API key for OpenAI"
+  type        = string
+}

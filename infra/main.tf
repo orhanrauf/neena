@@ -81,6 +81,7 @@ module "service_app" {
   tenant_id                   = var.tenant_id
   key_vault_name              = module.key_vault.name
   trello_api_key              = var.trello_api_key
+  openai_api_key              = var.openai_api_key
 }
 
 module "log_analytics_workspace" {
