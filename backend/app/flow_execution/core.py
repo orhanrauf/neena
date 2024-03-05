@@ -71,7 +71,8 @@ class ExecutionContext:
         """
         flow_run.status = FlowStatus.COMPLETED
         flow_run.end_time = datetime.now()
-        return crud.flow_run.update(self.database, flow_run)
+        flow_run_db = crud.flow_run.get(db=self.database, id=flow_run.id)
+        return crud.flow_run.update(db=self.database, db_obj=flow_run_db, obj_in=flow_run, current_user=self.user)
 
     def _run_task(self, task_op: TaskOperationBase) -> TaskRun:
         """
