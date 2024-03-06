@@ -55,3 +55,8 @@ class TaskDefinitionInDB(TaskDefinitionInDBBase):
 
 class TaskDefinitionNamesList(BaseModel):
     task_definitions: list[str]
+
+
+# TODO: Placeholder for data class to represent vectorized task definition in VDB
+class TaskDefinitionInVectorDBBase(TaskDefinitionBase):
+    pass

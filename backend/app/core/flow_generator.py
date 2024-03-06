@@ -144,6 +144,7 @@ class FlowGenerator:
         request_task_definitions = self._get_task_definitions_from_database(request)
         requested_task_operations = self._convert_task_definitions_to_task_operations(request_task_definitions)
         dependencies = self._generate_dependencies(request, requested_task_operations)
+
         return self._construct_flow(requested_task_operations, dependencies)
 
     def _get_task_definitions_from_database(self, request: str) -> list[TaskDefinition]:
@@ -318,7 +319,3 @@ flow_generator = FlowGenerator(
     patched_openai_client=patched_openai_client,
     database_session=_database_session,
 )
-
-# Example requests to test with:
-# find update the project planning card by adding the following item: "migrate database"
-# find and delete the project planning card about migrating the sql database
