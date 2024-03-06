@@ -50,6 +50,7 @@ resource "azurerm_linux_web_app" "app_service" {
     "OPENAI_API_KEY" = var.openai_api_key
     "PORT" = "8000"
     "WEBSITES_CONTAINER_START_TIME_LIMIT" = "300"
+    "ENABLE_ORYX_BUILD" = "true"
   }
 
   identity {
