@@ -15,4 +15,4 @@ echo "========================================"
 echo "Running the application"
 
 
-gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4 --reload
