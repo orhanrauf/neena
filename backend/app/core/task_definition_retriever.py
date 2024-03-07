@@ -42,22 +42,18 @@ class TaskDefinitionRetriever:
         self.create_embeddings()
         self.index = self.initialize_index()
         self.populate_vector_database()
-        chunks = self.get_most_similar_chunks_for_query(
-            query="Find all cards about the database migration assigned to Lennert and delete them."
-        )
-        self.delete_index()
+        # self.delete_index()
 
-    def retrieve_all_task_defintion(self) -> None:
-        pass
+    def retrieve_task_definitions(self, request: str) -> Any:
+        chunks = self.get_most_similar_chunks_for_query(query=request)
+        return chunks
 
     def get_all_task_definitions(self) -> list[str]:
         output_task_defintions = []
         all_task_defintions = task_definition.get_multi(db=self.database_session)
         for one_task_definition in all_task_defintions:
-            simple_oops = TaskDefinition.from_orm(one_task_definition)
+            simple_oops = TaskDefinition.model_validate(one_task_definition, from_attributes=True)
             output_task_defintions.append(simple_oops.model_dump_json(indent=2))
-            # print(simple_oops.model_dump_json(indent=2))
-            # print(120 * "-")
         return output_task_defintions
 
     def initialize_index(self) -> Any:

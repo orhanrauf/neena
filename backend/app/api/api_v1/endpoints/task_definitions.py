@@ -83,16 +83,17 @@ def remove_task_definition(
     return crud.task_definition.remove(db=db, id=id)
 
 
-@router.get("/retrieve", response_model=list[str])
+@router.get("/retrieve", response_model=list[tuple[str, str]])
 def retrieve_task_definitions(
     *,
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
     current_user: Auth0User = Depends(auth.get_user),
+    request: str,
 ) -> Any:
     """
     Retrieve task definitions by request.
     """
 
-    return task_definition_retriever.get_all_task_definitions()
+    return task_definition_retriever.retrieve_task_definitions(request)
