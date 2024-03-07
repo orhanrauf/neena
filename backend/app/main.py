@@ -5,7 +5,6 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 import traceback
-import os
 
 from pydantic import ValidationError
 
@@ -51,31 +50,31 @@ app.add_middleware(
 )
 
 
-# @app.middleware("http")
-# async def log_requests(request: Request, call_next):
-#     start_time = time.time()
-#     response = await call_next(request)
-#     duration = time.time() - start_time
-#     logger.info(
-#         f"Handled request {request.method} {request.url} in {duration:.2f} seconds. Response code: {response.status_code}"
-#     )
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+    logger.info(
+        f"Handled request {request.method} {request.url} in {duration:.2f} seconds. Response code: {response.status_code}"
+    )
 
-#     return response
+    return response
 
 
-# # Add exception handling to also log it
-# @app.middleware("http")
-# async def exception_logging_middleware(request: Request, call_next):
-#     try:
-#         # Try processing the request
-#         response = await call_next(request)
-#         return response
-#     except Exception as exc:
-#         # Log the exception with traceback
-#         logger.error(f"Unhandled exception: {exc}\n{traceback.format_exc()}")
+# Add exception handling to also log it
+@app.middleware("http")
+async def exception_logging_middleware(request: Request, call_next):
+    try:
+        # Try processing the request
+        response = await call_next(request)
+        return response
+    except Exception as exc:
+        # Log the exception with traceback
+        logger.error(f"Unhandled exception: {exc}\n{traceback.format_exc()}")
 
-#         # Return a generic error response
-#         return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
+        # Return a generic error response
+        return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
 
 
 @app.on_event("startup")
