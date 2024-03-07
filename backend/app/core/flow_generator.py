@@ -3,6 +3,7 @@ import instructor
 
 from sqlalchemy.orm import Session
 
+from app.core.task_definition_retriever import task_definition_retriever, TaskDefinitionRetriever
 from app.core.logging import logger
 from app.core.config import settings
 from app.db.session import SessionLocal
@@ -66,53 +67,6 @@ class PatchedOpenAIClient:
             raise
 
 
-class TaskGetterPatchedOpenAIClient:
-    """
-    A client for interfacing with OpenAI's API using a patched version of the OpenAI client.
-
-    This class wraps the OpenAI client provided by the `openai` library, applying a custom patch
-    via the `instructor` module. It is designed to facilitate making chat completion requests to
-    the OpenAI API, handling any errors that may arise during the request process.
-
-    Attributes:
-        client (openai.OpenAI): The patched OpenAI client instance configured with the provided API key.
-
-    Args:
-        api_key (str): The API key for authenticating requests to OpenAI's API.
-    """
-
-    def __init__(self, api_key: str) -> None:
-        self.client = instructor.patch(openai.OpenAI(api_key=api_key))
-
-    def create_chat_completion(self, model: str, messages: list[dict]) -> TaskDefinitionNamesList:
-        """
-        Creates a chat completion request to the OpenAI API using the specified model and message sequence.
-
-        This method sends a request to the OpenAI API to generate chat completions based on a sequence
-        of messages. It is designed to handle and log any errors encountered during the request process,
-        raising exceptions for any unhandled errors to be addressed by the calling context.
-
-        Args:
-            model (str): The model to be used for generating chat completions (e.g., "gpt-4" or "gpt-3.5-turbo").
-            messages (list[dict]): A list of message dictionaries representing the conversation history,
-                                   where each message is a dict with keys "role" (str) and "content" (str).
-
-        Returns:
-            TaskDefinitionNamesList: An instance of TaskDefinitionNamesList...
-
-        Raises:
-            openai.Error: If an error occurs during the request to the OpenAI API.
-        """
-        try:
-            response = self.client.chat.completions.create(
-                model=model, messages=messages, response_model=TaskDefinitionNamesList
-            )
-            return response
-        except openai.Error as e:
-            logger.error(f"OpenAI API error: {e}")
-            raise
-
-
 class FlowGenerator:
     """
     Worker class containing logic for Flow generation for natural language requests.
@@ -120,14 +74,14 @@ class FlowGenerator:
 
     def __init__(
         self,
-        task_getter_client: TaskGetterPatchedOpenAIClient,
         patched_openai_client: PatchedOpenAIClient,
+        task_definiton_retriever: TaskDefinitionRetriever,
         database_session: Session,
         model: str = "gpt-4",
     ) -> None:
         self.model = model
-        self.task_getter_client = task_getter_client
         self.patched_openai_client = patched_openai_client
+        self.task_definition_retriever = task_definition_retriever
         self.database_session = database_session
 
     def generate_flow_from_request(self, request: str) -> FlowBase:
@@ -148,67 +102,9 @@ class FlowGenerator:
         return self._construct_flow(requested_task_operations, dependencies)
 
     def _get_task_definitions_from_database(self, request: str) -> list[TaskDefinition]:
-        # TODO: Placeholder for actual task definition retrieval augmented generation (RAG) logic
-        all_task_definiton_names = [
-            "Create Board",
-            "Create Card",
-            "Create List",
-            "Delete Board",
-            "Delete Card",
-            "Get Board",
-            "Get Boards",
-            "Get Card",
-            "Get Cards in List",
-            "Get List",
-            "Get Lists in Board",
-            "Update Board",
-            "Update Card",
-            "Update List",
-        ]
-        messages = [
-            {
-                "role": "system",
-                "content": """
-                    You are part of an application that enables its users to construct and automate complex flows in Trello. 
-                    The user will give you a natural language request describing the desired overarching flow to be constructed.
-                    
-                    You must select the necessary tasks to construct the flow requested by the user.
-                    You can only select tasks from the given exhaustive list of permissible task names.
-                    Your response is considered incorrect if it contains a task name that is not in the list of permissible names.
-                    Incorrect responses result in the application breaking.
-                    
-                    List of permissible task names:
-                        Create Board
-                        Create Card
-                        Create List
-                        Delete Board
-                        Delete Card
-                        Get Board
-                        Get Boards
-                        Get Card
-                        Get Cards in List
-                        Get List
-                        Get Lists in Board
-                        Update Board
-                        Update Card
-                        Update List
-                    
-                    You must only return a list containing the task names, perserving the capitalization as shown in the list.
-                    The list cannot contain any duplicate elements.
-                    Your response must solely consist of the desired list. 
-                    Do not add anything else to your response, because it will impede the extraction process of subsequent modules. 
-                    Your output must adhere to the following format:
-                    
-                    ["Task Name 1", "Task Name 2", ..., "Task Name 3"]
-                    
-                """,
-            },
-            {"role": "user", "content": "Find and delete the project planning card about migrating the sql database."},
-            {"role": "assistant", "content": '["Get Boards", "Get List", "Get Card", "Delete Card"]'},
-            {"role": "user", "content": f"{request}"},
-        ]
-        requested_task_definitions_names = self.task_getter_client.create_chat_completion(self.model, messages)
-        return task_definition.get_by_names(self.database_session, requested_task_definitions_names.task_definitions)
+        requested_task_definitions = self.task_definition_retriever.retrieve_task_definitions(request)
+        requested_task_definitions_names = [name for name, _ in requested_task_definitions]
+        return task_definition.get_by_names(self.database_session, requested_task_definitions_names)
 
     def _convert_task_definitions_to_task_operations(
         self, task_definitions: list[TaskOperationBase]
@@ -313,9 +209,8 @@ class FlowGenerator:
 
 _database_session = SessionLocal()  # TODO: is this best practice wrt data privacy?
 patched_openai_client = PatchedOpenAIClient(settings.OPENAI_API_KEY)
-task_getter_client = TaskGetterPatchedOpenAIClient(settings.OPENAI_API_KEY)
 flow_generator = FlowGenerator(
-    task_getter_client=task_getter_client,
     patched_openai_client=patched_openai_client,
+    task_definiton_retriever=task_definition_retriever,
     database_session=_database_session,
 )
