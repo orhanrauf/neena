@@ -89,10 +89,11 @@ jobs:
         VITE_APP_AUTH0_AUDIENCE: ${{ secrets.VITE_APP_AUTH0_AUDIENCE }}
         VITE_APP_BASE_URL: /
         VITE_API_BASE_URL: https://${{ env.service_app_base_url }}
-        
+          
     - name: Deploy to Azure Static Web Apps
       uses: Azure/static-web-apps-deploy@v1
       with:
+        action: "upload"
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         app_location: "/frontend" 
         app_artifact_location: "/dist"
