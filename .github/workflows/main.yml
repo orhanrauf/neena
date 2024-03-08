@@ -65,7 +65,7 @@ jobs:
         TF_VAR_auth0_client_id: ${{ secrets.VITE_APP_AUTH0_CLIENT_ID }}
         TF_VAR_trello_api_key: ${{ vars.TRELLO_API_KEY }}
         TF_VAR_openai_api_key: ${{ secrets.OPENAI_API_KEY }}
-        TF_VAR_domain_name: ${{ env.DOMAIN_NAME }}
+        TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
 
       working-directory: infra
 
