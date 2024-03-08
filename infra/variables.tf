@@ -116,3 +116,8 @@ variable "openai_api_key" {
   description = "The API key for OpenAI"
   type        = string
 }
+
+variable "domain_name" {
+  description = "The custom domain name"
+  type        = string
+}

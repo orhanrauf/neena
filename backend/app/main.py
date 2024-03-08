@@ -41,8 +41,14 @@ async def validation_exception_handler(request, exc):
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://neenacoredevwebst.z6.web.core.windows.net",  # Production origin
-        "http://localhost:5173",  # Development origin
+        "https://lively-bay-03ebfda03-preview.westeurope.4.azurestaticapps.net",  # Production origin
+        "http://localhost:5173",
+        "neena.io",
+        "https://neena.io",
+        "https://www.neena.io",
+        "http://neena.io",
+        "http://www.neena.io"
+        # Development origin
     ],
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
