@@ -116,3 +116,9 @@ variable "openai_api_key" {
   description = "The API key for OpenAI"
   type        = string
 }
+
+variable "github_token" {
+  description = "The GitHub token to use for authenticating to the repository"
+  type        = string
+  
+}

@@ -54,6 +54,7 @@ jobs:
         TF_VAR_auth0_client_id: ${{ secrets.VITE_APP_AUTH0_CLIENT_ID }}
         TF_VAR_trello_api_key: ${{ vars.TRELLO_API_KEY }}
         TF_VAR_openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+        TF_VAR_git_hub_token: ${{ secrets.GITHUB_TOKEN }}
 
       working-directory: infra
 
@@ -90,15 +91,12 @@ jobs:
         VITE_APP_BASE_URL: /
         VITE_API_BASE_URL: https://${{ env.service_app_base_url }}
         
-    # New step to copy staticwebapp.config.json to the dist folder
-    - name: Copy staticwebapp.config.json to dist
-      run: |
-        cp ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
-
-    - name: Deploy to Vue distribution Azure Blob Storage
-      run: |
-        cd ./frontend
-        az storage blob upload-batch -s dist -d "\$web" --connection-string "${{ secrets.STATIC_WEBSITE_CONNECTION_STRING }}" --overwrite
+    - name: Deploy to Azure Static Web Apps
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        app_location: "/frontend" 
+        app_artifact_location: "/dist"
 
     - name: Get Public IP
       run: echo "RUNNER_IP=$(curl -s ifconfig.me)" >> $GITHUB_ENV
