@@ -97,7 +97,7 @@ jobs:
         azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         app_location: "/frontend" 
-        app_artifact_location: "/dist"
+        app_artifact_location: "dist"
 
     - name: Get Public IP
       run: echo "RUNNER_IP=$(curl -s ifconfig.me)" >> $GITHUB_ENV
