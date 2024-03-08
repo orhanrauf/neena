@@ -7,7 +7,7 @@ from app import crud, models, schemas
 from app.api import deps
 from app.core.config import settings
 from app.core.auth import Auth0User, auth
-from app.core.task_definition_retriever import task_definition_retriever
+from app.core.task_definition_retriever import task_definition_retrieval_manager
 
 router = APIRouter()
 
@@ -83,7 +83,7 @@ def remove_task_definition(
     return crud.task_definition.remove(db=db, id=id)
 
 
-@router.get("/retrieve", response_model=list[tuple[str, str]])
+@router.get("/retrieve", response_model=list[schemas.TaskDefinition])
 def retrieve_task_definitions(
     *,
     db: Session = Depends(deps.get_db),
@@ -96,4 +96,4 @@ def retrieve_task_definitions(
     Retrieve task definitions by request.
     """
 
-    return task_definition_retriever.retrieve_task_definitions(request)
+    return task_definition_retrieval_manager.retrieve_similar_task_definitions(request)

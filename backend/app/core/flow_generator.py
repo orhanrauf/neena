@@ -3,7 +3,7 @@ import instructor
 
 from sqlalchemy.orm import Session
 
-from app.core.task_definition_retriever import task_definition_retriever, TaskDefinitionRetriever
+from app.core.task_definition_retriever import task_definition_retrieval_manager, TaskDefinitionRetrievalManager
 from app.core.logging import logger
 from app.core.config import settings
 from app.db.session import SessionLocal
@@ -75,13 +75,13 @@ class FlowGenerator:
     def __init__(
         self,
         patched_openai_client: PatchedOpenAIClient,
-        task_definiton_retriever: TaskDefinitionRetriever,
+        task_definiton_retriever: TaskDefinitionRetrievalManager,
         database_session: Session,
         model: str = "gpt-4",
     ) -> None:
         self.model = model
         self.patched_openai_client = patched_openai_client
-        self.task_definition_retriever = task_definition_retriever
+        self.task_definition_retriever = task_definition_retrieval_manager
         self.database_session = database_session
 
     def generate_flow_from_request(self, request: str) -> FlowBase:
@@ -102,9 +102,7 @@ class FlowGenerator:
         return self._construct_flow(requested_task_operations, dependencies)
 
     def _get_task_definitions_from_database(self, request: str) -> list[TaskDefinition]:
-        requested_task_definitions = self.task_definition_retriever.retrieve_task_definitions(request)
-        requested_task_definitions_names = [name for name, _ in requested_task_definitions]
-        return task_definition.get_by_names(self.database_session, requested_task_definitions_names)
+        return self.task_definition_retriever.retrieve_similar_task_definitions(request)
 
     def _convert_task_definitions_to_task_operations(
         self, task_definitions: list[TaskOperationBase]
@@ -211,6 +209,6 @@ _database_session = SessionLocal()  # TODO: is this best practice wrt data priva
 patched_openai_client = PatchedOpenAIClient(settings.OPENAI_API_KEY)
 flow_generator = FlowGenerator(
     patched_openai_client=patched_openai_client,
-    task_definiton_retriever=task_definition_retriever,
+    task_definiton_retriever=task_definition_retrieval_manager,
     database_session=_database_session,
 )

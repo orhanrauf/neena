@@ -1,11 +1,10 @@
-from pinecone import Pinecone, PodSpec
-from openai import OpenAI
-import tiktoken  # TODO: to avoid errors during runtime, use this to count and check no. tokens in input before passing to embedding model
 import time
 import json
 
-from sqlalchemy.orm import Session
 from typing import Any
+from openai import OpenAI
+from sqlalchemy.orm import Session
+from pinecone import Pinecone, PodSpec, Index
 
 from app.core.logging import logger
 from app.core.config import settings
@@ -16,114 +15,171 @@ from app.schemas import TaskDefinition
 logger = logger(__name__)
 
 
-class PineconeClient:
+class PineconeService:
+    """
+    Service class for managing Pinecone vector database operations.
+
+    Attributes:
+        client (Pinecone): An instance of the Pinecone client configured with the provided API key.
+    """
+
     def __init__(self, api_key: str) -> None:
         self.client = Pinecone(api_key=api_key)
 
+    def initialize_index(
+        self,
+        index_name: str,
+        dimension: int = 1536,
+        similarity_metric: str = "cosine",
+        environment: str = "gcp-starter",
+        pod_type: str = "starter",
+        timeout_threshold: int = 30,
+    ) -> Index:
+        """
+        Main entry point of PineconeService class.
+        Initializes a vector index in Pinecone. If the index does not exist, it is created with the specified
+        configuration. If the index already exists, the creation step is skipped.
 
-class OpenAIEmbedder:
-    def __init__(self) -> None:
-        self.client = OpenAI()
+        Args:
+            index_name (str): The name of the vector index to be created or verified.
+            dimension (int): The dimensionality of the vectors that will be stored in the index.
+            similarity_metric (str): The similarity metric to be used for comparing vectors in the index. Common
+                                     options include "cosine" for cosine similarity and "euclidean" for Euclidean distance.
+            environment (str): The Pinecone environment where the index is deployed, e.g., "gcp-starter".
+            pod_type (str): The type of pod to use for the index, e.g., "starter" for starter pods.
+            timeout_threshold (int): The maximum number of seconds to wait for the index to be ready. A TimeoutError
+                                     is raised if the index is not ready within this time frame.
+
+        Returns:
+            Index: An instance of the Pinecone Index class for the specified index name.
+
+        Raises:
+            TimeoutError: If the index is not ready within the specified timeout threshold.
+        """
+        if self._index_does_not_exist(index_name):
+            try:
+                self.client.create_index(
+                    name=index_name,
+                    dimension=dimension,
+                    metric=similarity_metric,
+                    spec=PodSpec(environment=environment, pod_type=pod_type),
+                    timeout=timeout_threshold,
+                )
+                logger.info(
+                    f"Successfully created index '{index_name}'. Index stats: {self.client.describe_index(name=index_name)}"
+                )
+            except TimeoutError as exception:
+                logger.error(f"Timeout occurred while initializing the Pinecone index '{index_name}'.", exc_info=True)
+                raise
+        else:
+            logger.info(f"Index '{index_name}' already exists. Skipping creation.")
+        return self.client.Index(name=index_name)
+
+    def _index_does_not_exist(self, index_name: str) -> bool:
+        return index_name not in self.client.list_indexes().names()
+
+    def delete_index(self, index_name: str) -> None:
+        if index_name in self.client.list_indexes().names():
+            logger.info(f"Deleting index '{index_name}' ...")
+            self.client.delete_index(name=index_name)
+        else:
+            logger.info(f"Index '{index_name}' not found in list of known indexes. No index to delete.")
+
+
+class OpenAIEmbeddingService:
+    """
+    Service class for embedding operations using OpenAI.
+    """
+
+    def __init__(self, api_key: str = None) -> None:
+        self.client = OpenAI(api_key=api_key)
 
     def get_embedding(self, text: str, model="text-embedding-3-small") -> list[float]:
         text = text.replace("\n", " ")
-        return self.client.embeddings.create(input=[text], model=model).data[0].embedding
+        response = self.client.embeddings.create(input=[text], model=model)
+        return response.data[0].embedding
 
 
-class TaskDefinitionRetriever:
+class TaskDefinitionRetrievalManager:
+    """
+    Manages the retrieval of task definitions from a vector database based on semantic similarity to user queries. This class
+    integrates with Pinecone for vector storage and querying, and utilizes embeddings from OpenAI for semantic understanding.
+
+    Attributes:
+        database_session (Session): SQLAlchemy database session for accessing task definitions.
+        pinecone_service (PineconeService): Service class for interacting with Pinecone vector databases.
+        openai_embedder (OpenAIEmbeddingService): Service class for generating embeddings using OpenAI models.
+        index_name (str): Name of the Pinecone vector index used for storing task definition embeddings.
+    """
+
     def __init__(
-        self, database_session: Session, pinecone_client: PineconeClient, openai_embedder: OpenAIEmbedder
+        self,
+        database_session: Session,
+        pinecone_service: PineconeService,
+        openai_embedder: OpenAIEmbeddingService,
+        index_name: str = "task-definitions-te3-small-quickstart",
     ) -> None:
         self.database_session = database_session
-        self.pinecone_client = pinecone_client
+        self.pinecone_service = pinecone_service
         self.openai_embedder = openai_embedder
-        self.index_name = "task-definitions-te3-small-quickstart"
-        self.all_task_definitions = self.get_all_task_definitions()
-        self.create_embeddings()
-        self.index = self.initialize_index()
-        self.populate_vector_database()
-        # self.delete_index()
+        self.index_name = index_name
+        self.all_task_definitions_jsons = self._get_all_task_definition_jsons()
+        self.index = self._initialize_index()
+        self._populate_vector_database()
 
-    def retrieve_task_definitions(self, request: str) -> Any:
-        chunks = self.get_most_similar_chunks_for_query(query=request)
-        return chunks
+    def retrieve_similar_task_definitions(
+        self, request: str, top_k: int = 5, include_metadata: bool = True
+    ) -> list[TaskDefinition]:
+        """
+        Main entry point of TaskDefinitionRetriever class.
+        Retrieves task definitions that are semantically similar to the given user query.
 
-    def get_all_task_definitions(self) -> list[str]:
-        output_task_defintions = []
+        Args:
+            request (str): User query describing the task flow to generate.
+            top_k (int, optional): The number of top similar task definitions to retrieve. Defaults to 5.
+            include_metadata (bool, optional): Flag to include metadata in the search results. Defaults to True.
+
+        Returns:
+            list[TaskDefinition]: A list of TaskDefinition instances matching the query.
+        """
+        query_embedding = self.openai_embedder.get_embedding(request)
+        search_results = self.index.query(vector=query_embedding, top_k=top_k, include_metadata=include_metadata)
+        retrieved_task_names = [search_result["metadata"]["task_name"] for search_result in search_results["matches"]]
+        return task_definition.get_by_names(self.database_session, retrieved_task_names)
+
+    def _get_all_task_definition_jsons(self) -> list[str]:
         all_task_defintions = task_definition.get_multi(db=self.database_session)
-        for one_task_definition in all_task_defintions:
-            simple_oops = TaskDefinition.model_validate(one_task_definition, from_attributes=True)
-            output_task_defintions.append(simple_oops.model_dump_json(indent=2))
-        return output_task_defintions
+        return [self._get_model_dump_json_from_task_definition(d) for d in all_task_defintions]
 
-    def initialize_index(self) -> Any:
-        existing_indexes = [index_names for index_names in self.pinecone_client.client.list_indexes().names()]
+    def _get_model_dump_json_from_task_definition(
+        self, task_definition: TaskDefinition, json_indent_level: int = 2
+    ) -> str:
+        return TaskDefinition.model_validate(task_definition, from_attributes=True).model_dump_json(
+            indent=json_indent_level
+        )
 
-        if self.index_doesnt_exist_yet(existing_indexes):
-            self.pinecone_client.client.create_index(
-                self.index_name,
-                dimension=1536,
-                metric="cosine",
-                spec=PodSpec(environment="gcp-starter", pod_type="starter"),
-            )
-            while self.index_not_ready_yet():
-                time.sleep(1)
-        index = self.pinecone_client.client.Index(self.index_name)
-        time.sleep(1)
-        print("\nDone initializing index.")
-        print(index.describe_index_stats())
-        return index
+    def _initialize_index(self) -> Index:
+        return self.pinecone_service.initialize_index(index_name=self.index_name)
 
-    def index_doesnt_exist_yet(self, existing_indexes: list[str]) -> bool:
-        return self.index_name not in existing_indexes
-
-    def index_not_ready_yet(self) -> bool:
-        return not self.pinecone_client.client.describe_index(self.index_name).status["ready"]
-
-    def populate_vector_database(self):
-        for id, task_definition in enumerate(self.all_task_definitions):
-            embedding = self.openai_embedder.get_embedding(text=task_definition)
-            task_definition_dict = json.loads(task_definition)
-            metadata = {
-                "task_name": task_definition_dict["task_name"],
-                "description": task_definition_dict["description"],
-                "body": task_definition,
+    def _populate_vector_database(self):
+        for serialized_task_definition in self.all_task_definitions_jsons:
+            embedding = self.openai_embedder.get_embedding(serialized_task_definition)
+            task_definition_map = json.loads(serialized_task_definition)
+            embedding_metadata = {
+                "task_name": task_definition_map["task_name"],
+                "description": task_definition_map["description"],
+                "serialized_task_description": serialized_task_definition,
             }
-            self.index.upsert(vectors=[{"id": str(id), "values": embedding, "metadata": metadata}])
-        print("\nDone populating vector index")
-        print("\nWaiting 5 seconds...")
-        time.sleep(5)
-        print(f"\nVector index stats:\n{self.index.describe_index_stats()}")
-
-    def create_embeddings(self) -> None:
-        embedding = self.openai_embedder.get_embedding(text=self.all_task_definitions[0])
-
-    def index_embeddings(self) -> None:
-        pass
-
-    def get_most_similar_chunks_for_query(self, query: str) -> Any:
-        print(f"\nQuery: {query}")
-        print("\nEmbedding query using OpenAI ...")
-        query_embedding = self.openai_embedder.get_embedding(query)
-
-        print("\nQuerying Pinecone index ...")
-        query_results = self.index.query(vector=query_embedding, top_k=3, include_metadata=True)
-        context_chunks = [(x["metadata"]["task_name"], x["metadata"]["description"]) for x in query_results["matches"]]
-        print(context_chunks)
-        return context_chunks
-
-    def delete_index(self) -> None:
-        if self.index_name in self.pinecone_client.client.list_indexes().names():
-            print("\nDeleting index ...")
-            self.pinecone_client.client.delete_index(name=self.index_name)
-            print(f"Index {self.index_name} deleted successfully")
-        else:
-            print("\nNo index to delete!")
+            self.index.upsert(
+                vectors=[{"id": task_definition_map["id"], "values": embedding, "metadata": embedding_metadata}]
+            )
 
 
 _database_session = SessionLocal()
-pinecone_client = PineconeClient(settings.PINECONE_API_KEY)
-openai_embedder = OpenAIEmbedder()
-task_definition_retriever = TaskDefinitionRetriever(
-    database_session=_database_session, pinecone_client=pinecone_client, openai_embedder=openai_embedder
+pinecone_service = PineconeService(settings.PINECONE_API_KEY)
+openai_embedder = OpenAIEmbeddingService()
+task_definition_retrieval_manager = TaskDefinitionRetrievalManager(
+    database_session=_database_session,
+    pinecone_service=pinecone_service,
+    openai_embedder=openai_embedder,
 )
