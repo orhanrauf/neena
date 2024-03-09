@@ -69,7 +69,6 @@ class PineconeService:
                     f"Successfully created index '{index_name}'. Index stats: {self.client.describe_index(name=index_name)}"
                 )
             except TimeoutError as exception:
-                logger.error(f"Timeout occurred while initializing the Pinecone index '{index_name}'.", exc_info=True)
                 raise
         else:
             logger.info(f"Index '{index_name}' already exists. Skipping creation.")
