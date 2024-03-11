@@ -16,4 +16,12 @@ variable "location" {
 variable "domain_name" {
   description = "The domain name for the static website"
   type        = string
+  default     = "example.com"
 }
+
+variable "domain_name_without_www" {
+  description = "The domain name without the www prefix"
+  type        = string
+  default     = replace(var.domain_name, "^www\\.", "")
+}
+
