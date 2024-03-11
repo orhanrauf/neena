@@ -12,8 +12,6 @@ from app.db.session import SessionLocal
 from app.crud.crud_task_definition import task_definition
 from app.schemas import TaskDefinition
 
-logger = logger(__name__)
-
 
 class PineconeService:
     """
