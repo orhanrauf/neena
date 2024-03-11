@@ -129,3 +129,8 @@ variable "openai_api_key" {
   description = "The API key for OpenAI"
   type        = string
 }
+
+variable "pinecone_api_key" {
+  description = "The API key for Pinecone"
+  type        = string
+}

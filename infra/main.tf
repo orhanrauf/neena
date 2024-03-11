@@ -82,6 +82,7 @@ module "service_app" {
   key_vault_name              = module.key_vault.name
   trello_api_key              = var.trello_api_key
   openai_api_key              = var.openai_api_key
+  pinecone_api_key            = var.pinecone_api_key
 }
 
 module "log_analytics_workspace" {

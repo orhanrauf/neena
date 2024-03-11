@@ -121,3 +121,8 @@ variable "domain_name" {
   description = "The custom domain name"
   type        = string
 }
+
+variable "pinecone_api_key" {
+  description = "The API key for Pinecone"
+  type        = string
+}
