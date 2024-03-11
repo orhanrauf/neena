@@ -10,17 +10,17 @@ from app.schemas.task_prep_answer import TaskPrepAnswerBase
 
 
 class TaskRunBase(BaseModel):
-    task_operation_id: UUID
-    flow_run_id: UUID
+    flow_run: UUID
+    task_operation_index: int
     status: TaskStatus
+    start_time: datetime
     task_prep_prompt: Optional[TaskPrepPromptBase] = None
     task_prep_answer: Optional[TaskPrepAnswerBase] = None
-    start_time: datetime
-    result: Any
+    result: Optional[dict | list] = None  # TODO: encapsulate this in a Result class
     end_time: Optional[datetime] = None
 
     class Config:
-        from_attributes = True
+        from_orm = True
 
 
 class TaskRunCreate(TaskRunBase):

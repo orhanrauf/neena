@@ -14,6 +14,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: |
+          {
+            "clientId": "${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}",
+            "clientSecret": "${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}",
+            "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}",
+            "tenantId": "${{ secrets.TENANT_ID }}"
+          }
+      
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
@@ -53,19 +64,11 @@ jobs:
         TF_VAR_auth0_rule_namespace: ${{ secrets.AUTH0_RULE_NAMESPACE }}
         TF_VAR_auth0_client_id: ${{ secrets.VITE_APP_AUTH0_CLIENT_ID }}
         TF_VAR_trello_api_key: ${{ vars.TRELLO_API_KEY }}
+        TF_VAR_openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+        TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
 
       working-directory: infra
 
-    - name: Login to Azure
-      uses: azure/login@v1
-      with:
-        creds: |
-          {
-            "clientId": "${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}",
-            "clientSecret": "${{ secrets.DEPLOYMENT_SP_CLIENT_SECRET }}",
-            "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}",
-            "tenantId": "${{ secrets.TENANT_ID }}"
-          }
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
@@ -88,16 +91,12 @@ jobs:
         VITE_APP_AUTH0_AUDIENCE: ${{ secrets.VITE_APP_AUTH0_AUDIENCE }}
         VITE_APP_BASE_URL: /
         VITE_API_BASE_URL: https://${{ env.service_app_base_url }}
-        
-    # New step to copy staticwebapp.config.json to the dist folder
-    - name: Copy staticwebapp.config.json to dist
-      run: |
-        cp ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
 
-    - name: Deploy to Vue distribution Azure Blob Storage
+    - name: Deploy tp Azure Static Web Apps
       run: |
-        cd ./frontend
-        az storage blob upload-batch -s dist -d "\$web" --connection-string "${{ secrets.STATIC_WEBSITE_CONNECTION_STRING }}" --overwrite
+        npm install -g @azure/static-web-apps-cli
+        swa deploy ./dist -d ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+      working-directory: frontend
 
     - name: Get Public IP
       run: echo "RUNNER_IP=$(curl -s ifconfig.me)" >> $GITHUB_ENV
@@ -116,7 +115,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.9' # Set this to your Python version
+        python-version: '3.10' # Set this to your Python version
 
     - name: Install Dependencies
       run: |

@@ -23,7 +23,7 @@ resource "azurerm_linux_web_app" "app_service" {
   site_config {
     app_command_line = "./startup.sh"
     application_stack {
-      python_version = "3.9"
+      python_version = "3.10"
     }
   }
 
@@ -47,7 +47,10 @@ resource "azurerm_linux_web_app" "app_service" {
     "LOG_APPINSIGHTS": "true"
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = var.azurerm_application_insights_connection_string
     "TRELLO_API_KEY" = var.trello_api_key
+    "OPENAI_API_KEY" = var.openai_api_key
     "PORT" = "8000"
+    "WEBSITES_CONTAINER_START_TIME_LIMIT" = "480"
+    "ENABLE_ORYX_BUILD" = "true"
   }
 
   identity {

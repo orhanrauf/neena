@@ -34,4 +34,4 @@ class LoggerConfigurator:
         return logger
 
 
-logger = LoggerConfigurator.configure_logger
+logger = LoggerConfigurator.configure_logger(__name__)

@@ -1,5 +1,5 @@
-variable "storage_account_name" {
-  description = "The name of the storage account"
+variable "static_website_name" {
+  description = "The name of the static website"
   type        = string
 }
 
@@ -10,5 +10,10 @@ variable "resource_group_name" {
 
 variable "location" {
   description = "The Azure location where resources will be created"
+  type        = string
+}
+
+variable "domain_name" {
+  description = "The domain name for the static website"
   type        = string
 }

@@ -1,6 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import importlib
-from typing import Any, Dict, List
+import inspect
+from pydantic import BaseModel
+from typing import Any, Dict, List, Type
 from uuid import UUID
 
 from app import crud, schemas
@@ -9,13 +11,21 @@ from app.flow_execution.integrations.base import BaseIntegration
 from app.schemas.task_definition import TaskDefinition
 from app.schemas.flow import Flow, FlowBase
 from app.schemas.flow_run import FlowRun, FlowRunBase
-from app.flow_execution.decorators import TaskResponse
+from app.flow_execution.decorators import TaskResult
+from app.schemas.task_prep_answer import TaskPrepAnswerBase
+from app.schemas.task_prep_prompt import TaskPrepPromptBase, TaskPrepPromptCreate
+from app.core.task_preparation_generator import task_preparation_generator
+from app.core.shared_models import FlowStatus, TaskStatus
+from app.schemas.task_operation import TaskOperationBase
+from app.schemas.task_run import TaskRun, TaskRunBase
+from app.models.task_prep_prompt import TaskPrepPrompt
+from app.models.task_prep_answer import TaskPrepAnswer
 
 
 class ExecutionContext:
     """
     The ExecutionContext class is responsible for running a flow and executing its tasks,
-    as well as managing the stat of the flow run.
+    as well as managing the state of the flow run.
     """
 
     def __init__(self, user: schemas.User, flow: Flow):
@@ -26,11 +36,139 @@ class ExecutionContext:
         self.path_to_integrations = "app.flow_execution.integrations"
         self.flow_run: FlowRun = None
 
+    def run_flow(self) -> FlowRun:
+        """
+        Executes all tasks in a flow. This is the main entry point for running a flow.
+
+        This method does the following:
+        1. Instantiates the flow run.
+        2. Iterates over and executes all tasks in the flow, interfacing with the integrations and
+           TaskPreparationGenerator and updating the task run states as needed.
+        3. Updates the flow run status to "completed" when all tasks have been executed successfully, or "failed" if any task fails.
+        """
+
+        flow_run = self._instantiate_flow_run(self.flow)
+
+        for task_op in self.flow.task_operations:
+            task_run = self._run_task(task_op)
+            if task_run.status == TaskStatus.FAILED:
+                return self._close_flow_run_failure(flow_run)
+
+        return self._close_flow_run_success(flow_run)
+
+    def _close_flow_run_failure(self, flow_run: FlowRun) -> FlowRun:
+        """
+        Updates the status of a flow run to "failed" and sets its end time.
+        """
+        flow_run.status = FlowStatus.FAILED
+        flow_run.end_time = datetime.now()
+        flow_run_db = crud.flow_run.get(db=self.database, id=flow_run.id)
+        return crud.flow_run.update(db=self.database, db_obj=flow_run_db, obj_in=flow_run, current_user=self.user)
+
+    def _close_flow_run_success(self, flow_run: FlowRun) -> FlowRun:
+        """
+        Updates the status of a flow run to "completed" and sets its end time.
+        """
+        flow_run.status = FlowStatus.COMPLETED
+        flow_run.end_time = datetime.now()
+        flow_run_db = crud.flow_run.get(db=self.database, id=flow_run.id)
+        return crud.flow_run.update(db=self.database, db_obj=flow_run_db, obj_in=flow_run, current_user=self.user)
+
+    def _run_task(self, task_op: TaskOperationBase) -> TaskRun:
+        """
+        Runs a task operation and returns the result.
+        """
+
+        task_run = self._instantiate_task_run(task_op)
+
+        task_definition = self._get_task_definition(task_op.task_definition)
+        task_prep_prompt, task_prep_answer = self._prepare_task(task_definition, task_op.index)
+
+        print(task_prep_prompt.messages[1])
+
+        task_result = self._execute_task(task_definition, task_prep_answer)
+
+        task_run = self._close_task_run(task_run, task_result, task_prep_prompt, task_prep_answer)
+
+        return task_run
+
+    def _close_task_run(
+        self,
+        task_run: TaskRun,
+        task_result: TaskResult,
+        task_prep_prompt: TaskPrepPromptBase,
+        task_prep_answer: TaskPrepAnswerBase,
+    ) -> TaskRun:
+        """
+        Closes a task run by updating its status and end time. Formats the task run from the task result.
+        """
+
+        # task_run.task_prep_prompt = TaskPrepPrompt(**task_prep_prompt.dict())
+        # task_run.task_prep_answer = TaskPrepAnswer(**task_prep_answer.dict())
+
+        task_run.task_prep_prompt = task_prep_prompt
+        task_run.task_prep_answer = task_prep_answer
+
+        if isinstance(task_result.data, list):
+            task_run.result = task_result.data
+        elif task_result.data is None:
+            task_run.result = None
+        else:
+            task_run.result = task_result.data.dict()
+
+        # task_run.result = task_result.data
+        task_run.status = task_result.status
+        task_run.end_time = datetime.now(tz=timezone.utc)
+
+        task_run_db = crud.task_run.get(db=self.database, id=task_run.id)
+
+        return crud.task_run.update_with_prep(
+            db=self.database, db_obj=task_run_db, obj_in=task_run, current_user=self.user
+        )
+
+    def _instantiate_task_run(self, task_op: TaskOperationBase) -> TaskRun:
+        """
+        Instantiates a task run for the given task operation.
+        Writes to DB, updates self, and returns the task run object.
+
+        Args:
+            task_op (TaskOperationBase): The task operation for which the task run is being instantiated.
+
+        Returns:
+            TaskRun: The instantiated task run.
+        """
+        task_run = TaskRunBase(
+            flow_run=self.flow_run.id,
+            task_operation_index=task_op.index,
+            status=TaskStatus.IN_PROGRESS,
+            start_time=datetime.now(),
+        )
+        task_run_db = crud.task_run.create(db=self.database, obj_in=task_run, current_user=self.user)
+
+        task_run = TaskRun.from_orm(task_run_db)
+
+        self.flow_run.task_runs.append(task_run)
+
+        self.current_task_run = task_run
+
+        return task_run
+
+    def _prepare_task(
+        self, task_definition: TaskDefinition, task_operation_index: int
+    ) -> tuple[TaskPrepPromptBase, TaskPrepAnswerBase]:
+        """
+        Prepares a task for execution by generating a prompt and sending it to the TaskPreparationGenerator.
+        """
+        task_prep_prompt, task_prep_answer = task_preparation_generator.generate(
+            self.flow, self.flow_run, task_operation_index, task_definition
+        )
+        return task_prep_prompt, task_prep_answer
+
     def _get_task_definition(self, task_definition_id: UUID) -> TaskDefinition:
         """
         Retrieves a task definition by its ID.
         """
-        return crud.task_definition.get(self.database, task_definition_id)
+        return schemas.TaskDefinition.from_orm(crud.task_definition.get(self.database, task_definition_id))
 
     def _instantiate_flow_run(self, flow: FlowBase) -> FlowRun:
         """
@@ -39,28 +177,55 @@ class ExecutionContext:
         """
 
         flow_run = FlowRunBase(
-            flow=flow.id, status="in_progress", triggered_time=datetime.now(), triggered_by=self.user.email
+            flow=flow.id, status=FlowStatus.IN_PROGRESS, triggered_time=datetime.now(), triggered_by=self.user.email
         )
 
-        self.flow_run = crud.flow_run.create(self.database, flow_run)
+        self.flow_run = schemas.FlowRun.from_orm(
+            crud.flow_run.create(db=self.database, obj_in=flow_run, current_user=self.user)
+        )
 
         return self.flow_run
 
-    def _update_flow_run_status(self, status: str):
+    def _execute_task(self, task_definition: TaskDefinition, task_prep_answer: TaskPrepAnswerBase) -> TaskResult:
         """
-        Updates the status of the flow run.
-        """
-        self.flow_run.status = status
-        crud.flow_run.update(self.database, self.flow_run)
+        Executes a task based on its definition and provided parameters.
 
-    def _update_flow_run_end_time(self):
+        Returns the result of the task execution, which is a TaskResponse object.
         """
-        Updates the end time of the flow run.
-        """
-        self.flow_run.end_time = datetime.now()
-        crud.flow_run.update(self.database, self.flow_run)
+        integration_instance = self._get_integration_instance(task_definition.integration)
 
-    def get_integration_instance(self, integration_id: UUID) -> BaseIntegration:
+        actual_python_name = task_definition.python_method_name.split(".")[-1]
+
+        method = getattr(integration_instance, actual_python_name)
+
+        input_type = self._get_method_input_type(integration_instance, actual_python_name)
+
+        if input_type is None:
+            return method()
+        else:
+            task_input_params = self._parse_parameters(task_prep_answer)
+            task_input = input_type(**task_input_params)
+            return method(task_input)
+
+    def _parse_parameters(self, task_prep_answer: TaskPrepAnswerBase) -> Dict[str, Any]:
+        """
+        Parses the parameters from the task preparation answer.
+        """
+        return {param.name: param.value for param in task_prep_answer.parameters}
+
+    def _get_method_input_type(self, integration_instance: BaseIntegration, method_name: str) -> Type[BaseModel] | None:
+        """
+        Introspectively fetches the input type of a Task of an Integration instance.
+        Assumes the task method has only one parameter besides 'self' and it's a Pydantic model
+        """
+        method = getattr(integration_instance, method_name)
+        sig = inspect.signature(method)
+
+        parameter = next(iter(sig.parameters.values()), None)
+
+        return parameter.annotation if parameter else None
+
+    def _get_integration_instance(self, integration_id: UUID) -> BaseIntegration:
         """
         Retrieves or creates an integration instance by its ID.
         """
@@ -77,42 +242,3 @@ class ExecutionContext:
         integration_instance = integration_class(self.user)
         self.integrations_cache[integration_id] = integration_instance
         return integration_instance
-
-    def execute_task(self, task_definition: TaskDefinition, parameters: Dict[str,]) -> TaskResponse:
-        """
-        Executes a task based on its definition and provided parameters.
-        """
-        integration_instance = self.get_integration_instance(task_definition.integration)
-
-        acutal_python_name = task_definition.python_method_name.split(".")[-1]
-        method = getattr(integration_instance, acutal_python_name)
-
-        return method(**parameters)
-
-    def run_flow(self):
-        """
-        Executes all tasks in a flow. This is the main entry point for running a flow.
-
-        This method does the following:
-        1. Instantiates the flow run.
-        2. Iterates over all tasks in the flow, interfacing with the integrations and
-           TaskPreparationGenerator and updating the task run states as needed.
-        3. Updates the flow run status to "completed" when all tasks have been executed successfully.
-        """
-
-        flow_run = self._instantiate_flow_run(self.flow)
-
-        for task_op in flow.task_operations:
-            task_definition = self._get_task_definition(task_op.task_definition)
-
-            # Parse parameters from `input_yml` or another source as appropriate
-            parameters = self.parse_parameters(task_definition.parameters)
-
-            result = self.execute_task(task_definition, parameters)
-            # Handle the result as needed
-
-    def parse_parameters(self, parameters: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """
-        Parses task parameters from a given source.
-        """
-        pass

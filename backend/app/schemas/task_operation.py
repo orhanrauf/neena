@@ -13,9 +13,11 @@ class TaskOperationBase(BaseModel):
     x: Optional[float] = None
     y: Optional[float] = None
     index: int
+    sorted_index: Optional[int] = None
 
     class Config:
         from_attributes = True
+        from_orm = True
 
 
 # Properties to receive via API on creation
@@ -37,6 +39,10 @@ class TaskOperationInDBBase(TaskOperationBase):
     modified_date: datetime
     created_by_email: EmailStr
     modified_by_email: EmailStr
+
+    class Config:
+        from_attributes = True
+        from_orm = True
 
 
 # Additional properties to return via API

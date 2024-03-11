@@ -110,10 +110,10 @@ const getNewTaskOpName = (taskDefinition: TaskDefinition): string => {
 
   Object.keys(nodes).forEach((key) => {
     const node = nodes[key];
-    if (node.name === taskDefinition.name) {
+    if (node.name === taskDefinition.task_name) {
       baseNameExists = true;
     }
-    if (node.name.startsWith(taskDefinition.name)) {
+    if (node.name.startsWith(taskDefinition.task_name)) {
       const matches = node.name.match(/_(\d+)$/);
       if (matches && matches.length > 1) {
         const number = parseInt(matches[1]);
@@ -125,9 +125,9 @@ const getNewTaskOpName = (taskDefinition: TaskDefinition): string => {
   });
 
   if (baseNameExists) {
-    return maxNumber > 0 ? `${taskDefinition.name}_${maxNumber + 1}` : `${taskDefinition.name}_2`;
+    return maxNumber > 0 ? `${taskDefinition.task_name}_${maxNumber + 1}` : `${taskDefinition.task_name}_2`;
   } else {
-    return taskDefinition.name;
+    return taskDefinition.task_name;
   }
 };
 

@@ -34,15 +34,6 @@ output "resource_group_name" {
   value = azurerm_resource_group.rg.name
 }
 
-output "static_website_endpoint" {
-  value = module.static_website.endpoint
-}
-
-output "static_website_blob_connection_string" {
-  value     = module.static_website.blob_connection_string
-  sensitive = true
-}
-
 output "postgresql_server_fqdn" {
   value = module.postgresql.postgresql_server_fqdn
 }

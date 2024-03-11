@@ -1,11 +1,10 @@
-from app.core.logging import LoggerConfigurator
+from app.core.logging import logger
 import time
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 import traceback
-import os
 
 from pydantic import ValidationError
 
@@ -16,8 +15,6 @@ from app.core.config import settings
 from app.db.init_db import init_db
 from app.db.session import SessionLocal
 from app.flow_execution.sync import sync_integrations_and_tasks
-
-logger = LoggerConfigurator.configure_logger(__name__)
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json")
 app.include_router(api_router, prefix=settings.API_V1_STR)
@@ -44,17 +41,19 @@ async def validation_exception_handler(request, exc):
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://neenacoredevwebst.z6.web.core.windows.net",  # Production origin
-        "http://localhost:5173",  # Development origin
+        "https://lively-bay-03ebfda03-preview.westeurope.4.azurestaticapps.net",  # Production origin
+        "http://localhost:5173",
+        "neena.io",
+        "https://neena.io",
+        "https://www.neena.io",
+        "http://neena.io",
+        "http://www.neena.io"
+        # Development origin
     ],
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
-
-if settings.LOG_APPINSIGHTS:
-    ai_handler = AzureLogHandler(connection_string=settings.APPLICATIONINSIGHTS_CONNECTION_STRING)
-    logger.addHandler(ai_handler)
 
 
 @app.middleware("http")

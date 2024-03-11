@@ -81,6 +81,7 @@ module "service_app" {
   tenant_id                   = var.tenant_id
   key_vault_name              = module.key_vault.name
   trello_api_key              = var.trello_api_key
+  openai_api_key              = var.openai_api_key
 }
 
 module "log_analytics_workspace" {
@@ -130,5 +131,6 @@ module "static_website" {
   source                  = "./modules/static_website"
   resource_group_name     = azurerm_resource_group.rg.name
   location                = var.location
-  storage_account_name    = "${local.resource_prefix_no_hyphens}webst"
+  static_website_name     = "${local.resource_prefix}-webst"
+  domain_name             = var.domain_name
 }

@@ -17,8 +17,6 @@ from app.schemas import (
     DependencyList,
 )
 
-logger = logger(__name__)
-
 
 class PatchedOpenAIClient:
     """
