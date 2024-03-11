@@ -9,7 +9,7 @@ from pydantic_settings import BaseSettings
 # if "DTAP_ENVIRONMENT" not in os.environ:
 #     from dotenv import load_dotenv
 #     load_dotenv('.env')  # Load environment variables from .env file
-    
+
 
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
@@ -19,7 +19,6 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 30
     JWT_ALGO: str = "HS512"
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
-
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
@@ -39,20 +38,22 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
-    
+
     AUTH0_DOMAIN: str
     AUTH0_CLIENT_ID: str
     AUTH0_API_IDENTIFIER: str
     AUTH0_RULE_NAMESPACE: str
-    
+
     AZURE_TENANT_ID: str
     AZURE_KEYVAULT_NAME: str
     LOG_APPINSIGHTS: bool = False
     APPLICATIONINSIGHTS_CONNECTION_STRING: str
-    
+
     TRELLO_API_KEY: str
-    
+
     OPENAI_API_KEY: str
+
+    PINECONE_API_KEY: str
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:

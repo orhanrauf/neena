@@ -25,9 +25,8 @@ class LoggerConfigurator:
         # Check if the logger already has handlers to avoid duplicates
         if not logger.handlers:
             if settings.LOG_APPINSIGHTS:
-                ai_handler = logging.StreamHandler()
-                # ai_handler = AzureLogHandler(connection_string=settings.APPLICATIONINSIGHTS_CONNECTION_STRING)
-                logger.addHandler(ai_handler)
+                app_insights_handler = AzureLogHandler(connection_string=settings.APPLICATIONINSIGHTS_CONNECTION_STRING)
+                logger.addHandler(app_insights_handler)
             else:
                 console_handler = logging.StreamHandler()
                 logger.addHandler(console_handler)
