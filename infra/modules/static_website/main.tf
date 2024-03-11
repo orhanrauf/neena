@@ -10,3 +10,9 @@ resource "azurerm_static_site_custom_domain" "custom_domain" {
   domain_name     = var.domain_name
   validation_type = "dns-txt-token"
 }
+
+resource "azurerm_static_site_custom_domain" "custom_domain_with_www" {
+  static_site_id  = azurerm_static_site.neena_core_static_app.id
+  domain_name     = var.domain_name_without_www
+  validation_type = "dns-txt-token"
+}
