@@ -29,7 +29,7 @@ jobs:
       uses: hashicorp/setup-terraform@v1
 
     - name: Terraform Init
-      run: terraform init
+      run: terraform init -upgrade
       working-directory: infra
       env:
         ARM_CLIENT_ID: ${{ secrets.DEPLOYMENT_SP_CLIENT_ID }}
