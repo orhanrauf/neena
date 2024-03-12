@@ -11,7 +11,7 @@ class BaseIntegration(ABC):
     user: schemas.User
     
     @abstractmethod
-    def check_connectivity() -> bool:
+    def check_connectivity(self) -> bool:
         """
         Check if the integration is reachable.
         """
@@ -23,4 +23,4 @@ class BaseIntegration(ABC):
         Fetch the credentials for the integration.
         """
         raise NotImplementedError
-        
+    
