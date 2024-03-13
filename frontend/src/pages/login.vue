@@ -1,4 +1,3 @@
-<!-- ❗Errors in the form are set on line 60 -->
 <script setup lang="ts">
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
 import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
@@ -12,50 +11,73 @@ import { themeConfig } from '@themeConfig'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import {watch} from 'vue';
+import { watch } from 'vue';
 import { User } from '@/types';
-
 
 const authThemeImg = useGenerateImageVariant(authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
 
-const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
+const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark);
 
-""
 definePage({
   meta: {
     layout: 'blank',
     unauthenticatedOnly: true,
   },
 })
+
 const { loginWithRedirect, isAuthenticated, getAccessTokenSilently, user } = useAuth0();
 const store = useStore();
 const router = useRouter();
 
-watch(() => isAuthenticated.value, async (newValue) => {
-  if (newValue) {
+
+
+// This watcher reacts to changes in the authentication state.
+watch(isAuthenticated, async (isLoggedIn) => {
+  // Check if user is logged in according to Auth0 and the store doesn't have a valid token yet.
+  if (isLoggedIn && !store.state.authToken) {
     try {
+      // Get the token silently without prompting the user again.
       const token = await getAccessTokenSilently();
-      console.log('user', user.value); 
       
-      store.commit('saveToken', token);
-      await store.commit('setUser', user.value);
-      await store.commit('setAuthDateTimestamp', Date.now());
+      // If you get a token, store it and other relevant user data.
+      if (token) {
+        console.log('user', user.value);
+        store.commit('saveToken', token);
+        
+        const userNeenaModel = {
+          email: user.value.email,
+          auth0_id: user.value.sub,
+          full_name: user.value.name,
+        };
 
-      const userNeenaModel: User = {
-        email: user.value.email,
-        auth0_id: user.value.sub,
-        full_name: user.value.name,
-      };
+        // Save the user information in your backend if it doesn't exist already.
+        const response = await http.post('users/create_if_not_exists', userNeenaModel);
+        console.log('response', response);
 
-      const response = await http.post('users/create_if_not_exists', userNeenaModel)
-      console.log('response', response);
-
-      router.push('/');
+        // If the user creation/check is successful, navigate to home and set the timestamp.
+        if (response.status === 200) {
+          store.commit('setUser', user.value);
+          store.commit('setAuthDateTimestamp', Date.now());
+          router.push('/');
+        } else {
+          console.error('API call failed:', response);
+        }
+      }
     } catch (error) {
       console.error('Error getting token or redirecting:', error);
     }
   }
 });
+
+const checkAuthInterval = setInterval(async () => {
+  const isLoggedIn = store.state.authDateTimestamp;
+
+  if (isLoggedIn) {
+    clearInterval(checkAuthInterval);
+    router.push('/')
+
+  }
+}, 300);
 
 const onLogin = async () => {
   await loginWithRedirect()
@@ -79,7 +101,7 @@ const onSignUp = async () => {
       <div class="position-relative bg-background rounded-lg w-100 ma-8 me-0">
         <div class="d-flex align-center justify-center w-100 h-100">
           <VImg
-            max-width="505"
+            max-width="1050"
             :src="authThemeImg"
             class="auth-illustration mt-16 mb-2"
           />

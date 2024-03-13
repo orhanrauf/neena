@@ -1,19 +1,25 @@
 // Write your overrides
-.full-screen-drawer  .el-drawer__title {
+.full-screen-drawer .el-drawer__title {
     font-weight: 500;
     font-size: 25px !important;
     color: #5d5a58;
     justify-content: right;
-
-  }
-  .full-screen-drawer  .el-drawer__header {
+}
+.full-screen-drawer .el-drawer__header {
     font-weight: 500;
     font-size: 25px !important;
     color: #5d5a58;
     margin-bottom: 0px !important;
-  }
+}
 
-  .full-screen-drawer  .el-drawer__close {
+.full-screen-drawer .el-drawer__close {
     color: #5d5a58;
     font-size: 25px !important;
-  }
+}
+
+// requests page table header
+.requests .v-data-table-header__content {
+    color: #5d586c;
+    font-weight: 500;
+    line-height: 15.87px;
+}
