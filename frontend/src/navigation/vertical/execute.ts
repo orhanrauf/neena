@@ -11,5 +11,11 @@ export default [
     title: 'Environment',
     to: null,
     icon: { icon: 'tabler-building' },
+  },
+  {
+    title: 'Integrations',
+    to: 'integrations',
+    icon: { icon: 'tabler-vector-triangle' },
   }
 ]
+

@@ -16,6 +16,7 @@ const userData = {
 
 const logout = async () => {
   store.commit('logOut')
+  console.log('Logged out')
 
   // Redirect to login page
   await router.push('/login')
