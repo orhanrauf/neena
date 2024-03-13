@@ -68,17 +68,29 @@ async function deleteRequest(id: string) {
     }
 }
 
-onMounted(async () => {
-    try {
-        await store.dispatch('fetchFlowRequests');
-        flowRequests.value = store.state.flowRequests;
-        allFlowRequests = store.state.flowRequests;
-        console.log(allFlowRequests);
-        isloading.value = false;
-    } catch (error) {
-        console.error('Error fetching FlowRequests:', error);
-    }
-});
+const fetchAndSetFlowRequests = async () => {
+  try {
+    isloading.value = true;
+    await store.dispatch('fetchFlowRequests');
+    flowRequests.value = store.state.flowRequests;
+    allFlowRequests = store.state.flowRequests;
+    isloading.value = false;
+  } catch (error) {
+    console.error('Error fetching FlowRequests:', error);
+    isloading.value = false;
+  }
+};
+
+onMounted(fetchAndSetFlowRequests);
+
+// Watch for route changes
+const route = useRoute();
+watch(() => route.path, async (newPath, oldPath) => {
+  // You can put more logic here to decide when to fetch new data
+  if (newPath !== oldPath) {
+    await fetchAndSetFlowRequests();
+  }
+}, { immediate: false });
 </script>
 
 <template>

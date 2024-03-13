@@ -118,13 +118,15 @@ def generate_flow_and_execute(
 def generate(
     *,
     db: Session = Depends(deps.get_db),
-    request: str,  # should ultimately be ID
+    flow_request_id: str,  # should ultimately be ID
     current_user: Auth0User = Depends(auth.get_user),
 ) -> Flow:
     """
     Generate flow from request
     """
-    generated_flow_in = flow_generator.generate_flow_from_request(request)
+    
+    flow_request = crud.flow_request.get(db, flow_request_id)
+    generated_flow_in = flow_generator.generate_flow_from_request(flow_request.request_instructions)
     generated_flow_in.task_operations = generated_flow_in.topological_sort()
     generated_flow_db = crud.flow.create(db=db, flow=generated_flow_in, current_user=current_user)
 

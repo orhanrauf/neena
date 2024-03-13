@@ -69,6 +69,7 @@ const submitRequest = async () => {
   flowRequest = response.data;
 
   store.commit('setRequest', flowRequest);
+  store.dispatch('generateFlow', flowRequest.id);
 
   router.push('/create-flow');
 };
