@@ -1,7 +1,8 @@
 from pydantic.fields import Field
 from datetime import datetime, date
-from typing import Optional, Union, Dict, Sequence
-from slack_sdk.models.metadata import Metadata
+from typing import Optional, Union, Dict, Sequence, Any
+
+# from slack_sdk.models.metadata import Metadata
 from pydantic import StrictBool, StrictStr
 
 from app.flow_execution.models.base import BaseAPIModel, BaseIntegrationActionModel
@@ -62,7 +63,8 @@ class SlackChatMessage(BaseAPIModel):
         Example: 1234567890.123456
         """,
     )
-    metadata: Optional[Union[Dict, Metadata]] = Field(
+    metadata: Optional[Union[Dict, Any]] = Field(
+        # TODO: type hint Any should actually be slack_sdk.models.metadata.Metadata
         default=None,
         description="""
         JSON object with event_type and event_payload fields, presented as a URL-encoded string. 
