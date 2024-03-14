@@ -122,6 +122,8 @@ def sync_integrations_and_tasks(directory: str, db: Session):
     
     integrations = get_integration_tasks(directory)
     
+    task_definitions = []
+    
     for integration_name, fields in integrations.items():
 
         tasks = integrations[integration_name]['tasks']
@@ -136,8 +138,6 @@ def sync_integrations_and_tasks(directory: str, db: Session):
         
         # Fetch or create the integration GUID based on the integration name
         integration_guid = crud.integration.get_or_create_integration(db, integration_create)
-        
-        task_definitions = []  # List to store task definitions
         
         for task in tasks:
             if hasattr(task, '_task_name'):
@@ -176,5 +176,4 @@ def sync_integrations_and_tasks(directory: str, db: Session):
                 
                 task_definitions.append(task_definition) 
         
-        # Sync the task definitions with the database
-        crud.task_definition.sync(task_definitions, db)
+    crud.task_definition.sync(task_definitions, db)
