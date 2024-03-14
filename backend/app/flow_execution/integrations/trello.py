@@ -38,7 +38,7 @@ class TrelloIntegration(BaseIntegration):
     key: str
     token: str
 
-    def __init__(self, user: schemas.User):
+    def __init__(self, user: schemas.User) -> None:
         self.key = settings.TRELLO_API_KEY
         self.user = user
         self.token = self._fetch_credentials()
