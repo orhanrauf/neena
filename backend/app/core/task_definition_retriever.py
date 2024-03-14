@@ -120,7 +120,6 @@ class TaskDefinitionRetrievalManager:
         self.pinecone_service = pinecone_service
         self.openai_embedder = openai_embedder
         self.index_name = index_name
-        self.pinecone_service.delete_index(self.index_name)
         self.all_task_definitions_jsons = self._get_all_task_definition_jsons()
         self.index = self._initialize_index()
         self._populate_vector_database()
