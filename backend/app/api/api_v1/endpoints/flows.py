@@ -134,7 +134,7 @@ def generate(
 
 
 @router.get("/execute", response_model=schemas.FlowRun)
-def generate(
+def execute(
     *,
     db: Session = Depends(deps.get_db),
     id: str,

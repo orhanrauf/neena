@@ -135,7 +135,7 @@ const loadDependencies = () => {
       <input class="task-operation-name-input" v-model="taskOp.name" />
       <div class="task-definition">
         <img :src="getIconUrl(integration.short_name)" class="task-definition-img" />
-        <div class="task-definition-text">{{ store.getters.getTaskDefinitionById(taskOp.task_definition).task_name }}</div>
+        <div class="task-definition-text">{{ taskDefinition.task_name }}</div>
       </div>
       <div class="divider"></div>
       <div class="instruction-box-header">
@@ -143,7 +143,7 @@ const loadDependencies = () => {
         <div class="instructions-box-header-optional">optional</div>
       </div>
       <textarea class="instructions-box-input"
-        placeholder="We need to get the user profile before we can process this person’s request. Use the customer’s email from the metadata to look up their account."></textarea>
+        placeholder="We need to get the user profile before we can process this person’s request. Use the customer’s email from the metadata to look up their account." v-model="taskOp.instructions"></textarea>
 
       <div class="dependencies-header-text">Dependencies</div>
 
@@ -191,7 +191,7 @@ const loadDependencies = () => {
         <div class="instructions-box-header-optional">example</div>
       </div>
       <div class="output-example-yaml">
-        <YamlCodeBlock :code="yamlData"> </YamlCodeBlock>
+        <YamlCodeBlock :code="taskDefinition.output_yml"> </YamlCodeBlock>
       </div>
     </el-drawer>
   </teleport>

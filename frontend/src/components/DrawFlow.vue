@@ -162,9 +162,9 @@ watch(() => store.state.flowCreation.flow, (newFlow, oldFlow) => {
         </VRow>
       </el-header>
       <!-- Actual Drawflow container -->
+      <div v-if="store.state.flowCreation.isGenerating" class="loader"></div>
       <el-container class="drawflow-container">
         <el-main>
-          <div v-if="store.state.flowCreation.isGenerating">Loading...</div>
           <TaskListCard v-if="cardVisible" class="task-list-card" @close-card="toggleTaskListCard"
             @add-task="addBlankTaskOp" />
 
@@ -178,7 +178,42 @@ watch(() => store.state.flowCreation.flow, (newFlow, oldFlow) => {
 
 <!-- <DependencyDrawer v-if="showDrawer" v-model="showDrawer" :source-node-id="selectedSourceNodeId" :target-node-id="selectedTargetNodeId"/> -->
 
+
+
 <style scoped>
+
+.loader {
+  width: 100%;
+  height: 4.8px;
+  display: inline-block;
+  position: relative;
+  background: #e3dad3;
+  overflow: hidden;
+}
+
+.loader::after {
+  content: '';
+  width: 192px;
+  height: 4.8px;
+  background: rgba(203, 185, 176, 0.857);
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  animation: animloader 2s linear infinite;
+}
+
+@keyframes animloader {
+  0% {
+    left: 0;
+    transform: translateX(-100%);
+  }
+  100% {
+    left: 100%;
+    transform: translateX(0%);
+  }
+}
+    
 .request-popup-overlay {
   position: fixed;
   inset: 0;
