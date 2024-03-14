@@ -70,14 +70,19 @@ watch(isAuthenticated, async (isLoggedIn) => {
 });
 
 const checkAuthInterval = setInterval(async () => {
-  const isLoggedIn = store.state.authDateTimestamp;
+  const authDateTimestamp = store.state.authDateTimestamp;
 
-  if (isLoggedIn) {
-    clearInterval(checkAuthInterval);
-    router.push('/')
 
+  if (authDateTimestamp) {
+    const currentTime = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    const isLessThanOneDayOld = currentTime - store.state.authDateTimestamp < oneDay;
+    if (isLessThanOneDayOld) {
+      clearInterval(checkAuthInterval);
+      router.push('/');
+    }
   }
-}, 300);
+}, 100);
 
 const onLogin = async () => {
   await loginWithRedirect()

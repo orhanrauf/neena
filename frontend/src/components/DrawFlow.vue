@@ -22,6 +22,7 @@ const internalInstance = getCurrentInstance() as ComponentInternalInstance;
 internalInstance.appContext.app._context.config.globalProperties.$df = editor;
 const emit = defineEmits(['close-card']);
 
+const isloading = ref(false);
 
 // Method to toggle the visibility of the pop-up
 const requestTogglePopup = () => {
@@ -68,12 +69,12 @@ onMounted(() => {
   editor.value.on("connectionRemoved", (connection) => {
     connectionRemoved(connection);
   });
-
+  
   editor.value.on("connectionCreated", (connection) => {
     // {output_id: '2', input_id: '1', output_class: 'output_1', input_class: 'input_1'}
     const source_node_id = parseInt(connection.output_id);
     const target_node_id = parseInt(connection.input_id);
-
+    
     var dependency: Dependency = {
       source_node_id: source_node_id,
       target_node_id: target_node_id,
@@ -81,13 +82,14 @@ onMounted(() => {
     }
     store.commit('addDependency', dependency);
   });
-
+  
   editor.value.on('connectionDoubleClicked', (connection) => {
-    console.log('botot')
     showDrawer.value = true;
     selectedSourceNodeId.value = connection.input_id;
     selectedTargetNodeId.value = connection.output_id;
   });
+  store.dispatch('fetchTaskDefinitions');
+  store.dispatch('fetchIntegrations');
 })
 
 const connectionRemoved = (connection) => {
@@ -102,61 +104,16 @@ const toggleTaskListCard = () => {
   cardVisible.value = !cardVisible.value;
 };
 
-const getNewTaskOpName = (taskDefinition: TaskDefinition): string => {
-  const exportData = editor.value.export();
-  const nodes = exportData.drawflow.Home.data;
-  let maxNumber = 0;
-  let baseNameExists = false;
-
-  Object.keys(nodes).forEach((key) => {
-    const node = nodes[key];
-    if (node.name === taskDefinition.task_name) {
-      baseNameExists = true;
-    }
-    if (node.name.startsWith(taskDefinition.task_name)) {
-      const matches = node.name.match(/_(\d+)$/);
-      if (matches && matches.length > 1) {
-        const number = parseInt(matches[1]);
-        if (number > maxNumber) {
-          maxNumber = number;
-        }
-      }
-    }
-  });
-
-  if (baseNameExists) {
-    return maxNumber > 0 ? `${taskDefinition.task_name}_${maxNumber + 1}` : `${taskDefinition.task_name}_2`;
-  } else {
-    return taskDefinition.task_name;
-  }
-};
-
 const addBlankTaskOp = (taskDefinition: TaskDefinition) => {
-  const taskOpName = getNewTaskOpName(taskDefinition);
-  var nextNodeId = editor.value.nodeId;
-  var taskOp: TaskOperation = {
-    drawflow_node_id: nextNodeId,
-    name: taskOpName,
-    task_definition: taskDefinition.id,
-    instructions: '',
-    x: 400,
-    y: 150
-  }
-
-  store.commit('addTaskOperation', taskOp);
-
-  editor.value.addNode(
-    taskOpName /* name */,
-    1 /* inputs */,
-    1 /* outputs */,
-    taskOp.x /* pos_x */,
-    taskOp.y /* pos_y */,
-    "node" /* class */,
-    {} /* data, retrieved from vuex state */,
-    "Node" /* html */,
-    "vue" /* typenode */
-  );
+  store.dispatch('addBlankTaskOp', taskDefinition);
 };
+
+watch(() => store.state.flowCreation.flow, (newFlow, oldFlow) => {
+  if (newFlow !== oldFlow) {
+    isloading.value = false;
+    store.dispatch('buildDrawFlowFromApi', newFlow);
+  }
+});
 
 </script>
 
@@ -205,9 +162,9 @@ const addBlankTaskOp = (taskDefinition: TaskDefinition) => {
         </VRow>
       </el-header>
       <!-- Actual Drawflow container -->
+      <div v-if="store.state.flowCreation.isGenerating" class="loader"></div>
       <el-container class="drawflow-container">
         <el-main>
-
           <TaskListCard v-if="cardVisible" class="task-list-card" @close-card="toggleTaskListCard"
             @add-task="addBlankTaskOp" />
 
@@ -221,7 +178,42 @@ const addBlankTaskOp = (taskDefinition: TaskDefinition) => {
 
 <!-- <DependencyDrawer v-if="showDrawer" v-model="showDrawer" :source-node-id="selectedSourceNodeId" :target-node-id="selectedTargetNodeId"/> -->
 
+
+
 <style scoped>
+
+.loader {
+  width: 100%;
+  height: 4.8px;
+  display: inline-block;
+  position: relative;
+  background: #e3dad3;
+  overflow: hidden;
+}
+
+.loader::after {
+  content: '';
+  width: 192px;
+  height: 4.8px;
+  background: rgba(203, 185, 176, 0.857);
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  animation: animloader 2s linear infinite;
+}
+
+@keyframes animloader {
+  0% {
+    left: 0;
+    transform: translateX(-100%);
+  }
+  100% {
+    left: 100%;
+    transform: translateX(0%);
+  }
+}
+    
 .request-popup-overlay {
   position: fixed;
   inset: 0;

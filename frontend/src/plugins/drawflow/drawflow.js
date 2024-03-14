@@ -1801,6 +1801,7 @@ export default class Drawflow {
 
   clear () {
     this.precanvas.innerHTML = "";
+    this.nodeId=1
     this.drawflow = { "drawflow": { "Home": { "data": {} }}};
   }
   export () {

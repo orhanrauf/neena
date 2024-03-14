@@ -29,9 +29,11 @@ const store = createStore({
                 drawflowEditor: null, // entire DrawFlow object
                 flow: {
                     // flow object
-                    taskOperations: [],
+                    task_operations: [],
                     dependencies: [],
                 },
+                isGenerating: false,
+                error: null,
             },
             taskDefinitions: [],
             integrations: [],
@@ -46,14 +48,21 @@ const store = createStore({
         // Getter to find a task operation by drawflow_node_id
         getTaskOperationByNodeId: (state) => (nodeId) => {
             // Assuming taskOperations is an array in state.flowCreation.flow
-            const taskOperations = state.flowCreation.flow.taskOperations;
+            const task_operations = state.flowCreation.flow.task_operations;
 
             // Find the task operation with the matching drawflow_node_id
-            const taskOperation = taskOperations.find(
+            const taskOperation = task_operations.find(
                 (operation) => operation.drawflow_node_id === nodeId
             );
 
             return taskOperation || null; // Return the found operation or null if not found
+        },
+        getTaskOperationByIndex: (state) => (index) => {
+            const task_operations = state.flowCreation.flow.task_operations;
+            const taskOperation = task_operations.find(
+                (operation) => operation.index === index
+            );
+            return taskOperation || null;
         },
         // Getter for finding a task definition by id
         getTaskDefinitionById: (state) => (id) => {
@@ -91,48 +100,58 @@ const store = createStore({
                 (dependency) => dependency.target_node_id === targetNodeId
             );
         },
-        getTaskOperationsThatThisTaskOperationDependsOn:
-            (state) => (taskOperation) => {
-                const dependencies = state.flowCreation.flow.dependencies;
-                const taskOperations = state.flowCreation.flow.taskOperations;
-                const dependencyIds = dependencies
-                    .filter(
-                        (dependency) =>
-                            dependency.target_node_id ===
-                            taskOperation.drawflow_node_id
-                    )
-                    .map((dependency) => dependency.source_node_id);
-                return taskOperations.filter((operation) =>
-                    dependencyIds.includes(operation.drawflow_node_id)
-                );
-            },
-        getTaskOperationsThatDependOnThisTaskOperation:
-            (state) => (taskOperation) => {
-                const dependencies = state.flowCreation.flow.dependencies;
-                const taskOperations = state.flowCreation.flow.taskOperations;
-                const dependencyIds = dependencies
-                    .filter(
-                        (dependency) =>
-                            dependency.source_node_id ===
-                            taskOperation.drawflow_node_id
-                    )
-                    .map((dependency) => dependency.target_node_id);
-                return taskOperations.filter((operation) =>
-                    dependencyIds.includes(operation.drawflow_node_id)
-                );
-            },
-        getDependencyBySourceAndTargetNodeId:
-            (state) => (sourceNodeId, targetNodeId) => {
-                const dependencies = state.flowCreation.flow.dependencies;
-                const index = dependencies.findIndex(
+        getTaskOperationsThatThisTaskOperationDependsOn: (state) => (taskOperation) => {
+            const dependencies = state.flowCreation.flow.dependencies;
+            const task_operations = state.flowCreation.flow.task_operations;
+            const dependencyIds = dependencies
+                .filter(
                     (dependency) =>
-                        dependency.source_node_id === sourceNodeId &&
-                        dependency.target_node_id === targetNodeId
-                );
-                return dependencies[index];
-            },
+                        dependency.target_node_id ===
+                        taskOperation.drawflow_node_id
+                )
+                .map((dependency) => dependency.source_node_id);
+            return task_operations.filter((operation) =>
+                dependencyIds.includes(operation.drawflow_node_id)
+            );
+        },
+        getTaskOperationsThatDependOnThisTaskOperation: (state) => (taskOperation) => {
+            const dependencies = state.flowCreation.flow.dependencies;
+            const task_operations = state.flowCreation.flow.task_operations;
+            const dependencyIds = dependencies
+                .filter(
+                    (dependency) =>
+                        dependency.source_node_id ===
+                        taskOperation.drawflow_node_id
+                )
+                .map((dependency) => dependency.target_node_id);
+            return task_operations.filter((operation) =>
+                dependencyIds.includes(operation.drawflow_node_id)
+            );
+        },
+        getDependencyBySourceAndTargetNodeId: (state) => (sourceNodeId, targetNodeId) => {
+            const dependencies = state.flowCreation.flow.dependencies;
+            const index = dependencies.findIndex(
+                (dependency) =>
+                    dependency.source_node_id === sourceNodeId &&
+                    dependency.target_node_id === targetNodeId
+            );
+            return dependencies[index];
+        },
     },
     mutations: {
+        startFlowGeneration(state) {
+            state.flowCreation.isGenerating = true;
+            state.flowCreation.flow = null;
+            state.flowCreation.error = null;
+        },
+        flowGenerationSuccess(state, flow) {
+            state.flowCreation.isGenerating = false;
+            state.flowCreation.flow = flow;
+        },
+        flowGenerationFailure(state, error) {
+            state.flowCreation.isGenerating = false;
+            state.flowCreation.error = error;
+        },
         saveToken(state, token) {
             state.auth.token = token;
         },
@@ -163,11 +182,18 @@ const store = createStore({
         },
         // Task operation mutations
         addTaskOperation(state, taskOperation) {
-            state.flowCreation.flow.taskOperations.push(taskOperation);
+            state.flowCreation.flow.task_operations.push(taskOperation);
+        },
+        addDrawFlowNodeIdToTaskOperation(state, { taskOperationId, drawflowNodeId }) {
+            const task_operations = state.flowCreation.flow.task_operations;
+            const index = task_operations.findIndex(
+                (operation) => operation.id === taskOperationId
+            );
+            task_operations[index].drawflow_node_id = drawflowNodeId;
         },
         editTaskOperation(state, taskOperation) {
-            const taskOperations = state.flowCreation.flow.taskOperations;
-            const index = taskOperations.findIndex(
+            const task_operations = state.flowCreation.flow.task_operations;
+            const index = task_operations.findIndex(
                 (operation) =>
                     operation.drawflow_node_id ===
                     taskOperation.drawflow_node_id
@@ -175,11 +201,11 @@ const store = createStore({
             state.flowCreation.flow.taskOperations[index] = taskOperation;
         },
         deleteTaskOperation(state, drawflowNodeId) {
-            const taskOperations = state.flowCreation.flow.taskOperations;
-            const index = taskOperations.findIndex(
+            const task_operations = state.flowCreation.flow.task_operations;
+            const index = task_operations.findIndex(
                 (operation) => operation.drawflow_node_id === drawflowNodeId
             );
-            state.flowCreation.flow.taskOperations.splice(index, 1);
+            state.flowCreation.flow.task_operations.splice(index, 1);
         },
         // Dependency mutations
         addDependency(state, dependency) {
@@ -203,13 +229,75 @@ const store = createStore({
         setIntegrations(state, integrations) {
             state.integrations = integrations;
         },
-
         setFlowRequests(state, flowRequests) {
             state.flowRequests = flowRequests;
         },
-
     },
     actions: {
+        buildDrawFlowFromApi: ({ state, commit }, flow) => {
+            const editor = state.flowCreation.drawflowEditor;
+            const { task_operations, dependencies } = flow;
+
+            // Clear existing nodes and connections
+            editor.clear();
+
+            var xPlus = 200;
+            var yPlus = 100;
+
+            task_operations.sort((a, b) => a.sorted_index - b.sorted_index);
+
+            task_operations.forEach((taskOperation) => {
+                // Manually manage nextNodeId to ensure consistency
+                const nextNodeId = editor.nodeId;
+
+                commit('addDrawFlowNodeIdToTaskOperation', {
+                    taskOperationId: taskOperation.id,
+                    drawflowNodeId: nextNodeId
+                });
+
+                editor.addNode(
+                    taskOperation.name,
+                    1, // inputs
+                    1, // outputs
+                    taskOperation.x || Math.floor(Math.random() * 100) + xPlus,
+                    taskOperation.y || Math.floor(Math.random() * 100) + yPlus,
+                    "node",
+                    {},
+                    "Node",
+                    "vue"
+                );
+
+                xPlus += 600;
+                yPlus += 150;
+            });
+
+            setTimeout(() => {
+                // Add dependencies using the drawflow node IDs
+                dependencies.forEach((dependency) => {
+                    const sourceNodeId = store.getters.getTaskOperationByIndex(dependency.source_task_operation).drawflow_node_id;
+                    const targetNodeId = store.getters.getTaskOperationByIndex(dependency.target_task_operation).drawflow_node_id;
+                    if (sourceNodeId && targetNodeId) {
+                    editor.addConnection(
+                        sourceNodeId.toString(),
+                        targetNodeId.toString(),
+                        "output_1", // output index
+                        "input_1", // input index
+                    );
+                    }
+                });
+              }, 50);
+
+            
+        },
+        async generateFlow({ commit }, flowRequestId) {
+            commit('startFlowGeneration');
+            try {
+              const response = await http.get(`flows/generate?flow_request_id=${flowRequestId}`);
+              commit('flowGenerationSuccess', response.data);
+            } catch (error) {
+              commit('flowGenerationFailure', error);
+            }
+          },
         fetchTaskDefinitions: async ({ commit, state }) => {
             if (state.taskDefinitions.length === 0) {
                 const response = await http.get('/task_definitions/all');
@@ -225,13 +313,10 @@ const store = createStore({
                 commit('setIntegrations', integrations);
             }
         },
-
         fetchFlowRequests: async ({ commit, state }) => {
-            if (state.flowRequests.length === 0) {
-                const response = await http.get('/flow_requests/all');
-                const flowRequests = response.data;
-                commit('setFlowRequests', flowRequests);
-            }
+            const response = await http.get('/flow_requests/all');
+            const flowRequests = response.data;
+            commit('setFlowRequests', flowRequests);
         },
         deleteFlowRequests: async ({ commit, state }, id) => {
             const response = await http.delete(`/flow_requests/?id=${id}`);
@@ -243,15 +328,83 @@ const store = createStore({
             }
             return response.status;
         },
-
         fetchFlowRequestDetail: async ({ commit, state }, id) => {
             const response = await http.get(`/flow_requests/?id=${id}`);
             const flowRequestDetail = response.data;
             return flowRequestDetail;
         },
+        fetchIntegrations: async ({ commit, state }) => {
+            if (state.integrations.length === 0) {
+                const response = await http.get('/integrations/all');
+                const integrations = response.data; 
+                console.log('Integrations', integrations);
+                commit('setIntegrations', integrations);
+            }
+        },
+        addBlankTaskOp: ({ state, rootGetters, commit }, taskDefinition) => {
+            const editor = state.flowCreation.drawflowEditor;
+            const taskOpName = getNewTaskOpName(state, taskDefinition);
+            const nextNodeId = editor.nodeId;
+            const taskOp = {
+                drawflow_node_id: nextNodeId,
+                name: taskOpName,
+                task_definition: taskDefinition.id,
+                instructions: '',
+                x: 400,
+                y: 150
+            };
 
+            commit('addTaskOperation', taskOp);
+
+            editor.addNode(
+                taskOpName /* name */,
+                1 /* inputs */,
+                1 /* outputs */,
+                taskOp.x /* pos_x */,
+                taskOp.y /* pos_y */,
+                "node" /* class */,
+                {} /* data, retrieved from vuex state */,
+                "Node" /* html */,
+                "vue" /* typenode */
+            );
+        },
+        saveFlowRequest: async ({ state, commit }) => {
+            const flow = state.flowCreation.flow;
+            const response = await http.post('/flow_requests/', flow);
+            return response;
+        },
     },
-    plugins: [vuexPersist.plugin],
+    plugins: [vuexPersist.plugin]
 });
 
-export default store;
+function getNewTaskOpName(state, taskDefinition) {
+    const editor = state.flowCreation.drawflowEditor;
+    const exportData = editor.export();
+    const nodes = exportData.drawflow.Home.data;
+    let maxNumber = 0;
+    let baseNameExists = false;
+    
+    Object.keys(nodes).forEach((key) => {
+      const node = nodes[key];
+      if (node.name === taskDefinition.task_name) {
+        baseNameExists = true;
+      }
+      if (node.name.startsWith(taskDefinition.task_name)) {
+        const matches = node.name.match(/_(\d+)$/);
+        if (matches && matches.length > 1) {
+          const number = parseInt(matches[1]);
+          if (number > maxNumber) {
+            maxNumber = number;
+          }
+        }
+      }
+    });
+    
+    if (baseNameExists) {
+      return maxNumber > 0 ? `${taskDefinition.task_name}_${maxNumber + 1}` : `${taskDefinition.task_name}_2`;
+    } else {
+      return taskDefinition.task_name;
+    }
+  }
+
+  export default store;

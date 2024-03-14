@@ -8,13 +8,13 @@
         <VBtn
             variant="outlined"
             class="start-blank-btn"
-            @click="submitRequest"
+            @click="submitRequestBlank"
           >
             Start Blank
           </VBtn>
           <VBtn
             class="generate-flow-btn"
-            @click="submitRequest"
+            @click="submitRequestGenerate"
           >
           Generate Flow
           </VBtn>
@@ -52,24 +52,30 @@ const startDotAnimation = () => {
 
 const submitRequest = async () => {
   if (!textareaInput.value.trim()) {
-    // You can also add an alert or some visual feedback to inform the user
     alert("Please enter a request before proceeding.");
-    return; // Exit the function if textarea is empty
+    return;
   }
 
-  // Note: No semicolon after the property assignment within the object
   var flowRequest = {
     request_instructions: textareaInput.value
   };
 
-  console.log(flowRequest)
-  
   const response = await http.post('flow_requests/', flowRequest);
 
   flowRequest = response.data;
 
   store.commit('setRequest', flowRequest);
+  return flowRequest;
+};
 
+const submitRequestGenerate = async () => {
+  const flowRequest = await submitRequest();
+  store.dispatch('generateFlow', flowRequest.id);
+  router.push('/create-flow');
+};
+
+const submitRequestBlank = async () => {
+  await submitRequest();
   router.push('/create-flow');
 };
 
