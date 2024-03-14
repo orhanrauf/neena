@@ -54,7 +54,7 @@ class TrelloCardCreate(BaseIntegrationActionModel):
     """
 
     name: str = Field(description="The name for the card")
-    id_list: str = Field(default=None, description="The ID of the list the card should be created in", alias="idList")
+    id_list: str = Field(description="The ID of the list the card should be created in", alias="idList")
     desc: Optional[str] = Field(default=None, description="The description for the card")
     pos: Optional[Any] = Field(
         default=None, description="The position of the new card. `top`, `bottom`, or a positive float"
