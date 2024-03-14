@@ -65,6 +65,22 @@ class PatchedOpenAIClient:
             raise
 
 
+class TaskRetrieverPatchedOpenAIClient:
+    """
+    A client for interfacing with OpenAI's API using a patched version of the OpenAI client.
+
+    This class wraps the OpenAI client provided by the `openai` library, applying a custom patch
+    via the `instructor` module. It is designed to facilitate making chat completion requests to
+    the OpenAI API, handling any errors that may arise during the request process.
+
+    Attributes:
+        client (openai.OpenAI): The patched OpenAI client instance configured with the provided API key.
+
+    Args:
+        api_key (str): The API key for authenticating requests to OpenAI's API.
+    """
+
+
 class FlowGenerator:
     """
     Worker class containing logic for Flow generation for natural language requests.
