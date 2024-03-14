@@ -1,8 +1,8 @@
 from pydantic.fields import Field
 from datetime import datetime, date
-from typing import Any, Optional, Union, Dict
+from typing import Optional, Union, Dict, Sequence
 from slack_sdk.models.metadata import Metadata
-from pydantic import StrictBool, StrictFloat, StrictInt, StrictStr
+from pydantic import StrictBool, StrictStr
 
 from app.flow_execution.models.base import BaseAPIModel, BaseIntegrationActionModel
 
@@ -23,7 +23,6 @@ class SlackChatMessage(BaseAPIModel):
     """
 
     channel: StrictStr = Field(
-        default=None,
         description="Channel, private group, or IM channel to send message to. Can be an encoded ID, or a name.",
     )
     as_user: Optional[StrictBool] = Field(
@@ -46,8 +45,16 @@ class SlackChatMessage(BaseAPIModel):
         Example: [{"type": "section", "text": {"type": "plain_text", "text": "Hello world"}}]
         """,
     )
+    file_ids: Optional[Union[str, Sequence[str]]] = Field(
+        default=None,
+        description="""
+        Array of new file ids that will be sent with this message. 
+        
+        Examples: F013GKY52QK,F013GL22D0T or ["F013GKY52QK","F013GL22D0T"]
+        """,
+    )
     link_names: Optional[StrictBool] = Field(default=None, description="Find and link user groups.")
-    message_ts: str = Field(
+    message_ts: Optional[str] = Field(
         default=None,
         description="""
         A message's ts (timestamp) value, uniquely identifying it within a channel
@@ -92,7 +99,7 @@ class SlackChatMessage(BaseAPIModel):
         The text field is not enforced as required when using blocks or attachments. 
         """,
     )
-    thread_ts: str = Field(
+    thread_ts: Optional[str] = Field(
         default=None,
         description="""
         ts=timestamp
@@ -118,13 +125,100 @@ class SlackChatMessageSend(BaseIntegrationActionModel):
     Action model for sending a message to a channel.
     """
 
-    channel: str
+    channel: StrictStr = Field(
+        description="Channel, private group, or IM channel to send message to. Can be an encoded ID, or a name.",
+    )
+    text: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        The content of the message. The usage of the text field changes depending on whether you're using blocks.
+        If you're using blocks, this is used as a fallback string to display in notifications. 
+        If you aren't, this is the main body text of the message. It can be formatted as plain text, 
+        or with the optional boolean argument mrkdwn.
+        The text field is not enforced as required when using blocks or attachments. 
+        """,
+    )
+    as_user: Optional[StrictBool] = Field(
+        default=None,
+        description="(Legacy) Pass true to post the message as the authed user instead of as a bot. Defaults to false.",
+    )
+    attachments: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        The message content in the form of a JSON-based array of structured attachments, 
+        presented as a URL-encoded string.
+        Example: [{"pretext": "pre-hello", "text": "text-world"}]
+        """,
+    )
+    blocks: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        The message content in the form of a JSON-based array of structured blocks, 
+        presented as a URL-encoded string.
+        Example: [{"type": "section", "text": {"type": "plain_text", "text": "Hello world"}}]
+        """,
+    )
+    thread_ts: str = Field(
+        default=None,
+        description="""
+        ts=timestamp
+        Timestamp of another message. Provide another message's ts value to make this message a reply. 
+        Avoid using a reply's ts value; use its parent instead.
+        
+        Example: 1234567890.123456
+        """,
+    )
+
+
+class SlackChatMessageUpdate(BaseIntegrationActionModel):
+    """
+    Action model for updating a message.
+    """
+
+    channel: StrictStr = Field(
+        description="""
+        Channel, private group, or IM channel containing the message to be updated. Can be an encoded ID, or a name. 
+        
+        Example: C1234567890
+        """,
+    )
+    message_ts: str = Field(
+        description="""
+        Timestamp of the message to be updated.
+        
+        Example: 1234567890.123456
+        """,
+    )
+    text: StrictStr = Field(
+        description="""
+        The content of the message to be updated. The usage of the text field changes depending on whether you're using blocks.
+        If you're using blocks, this is used as a fallback string to display in notifications. 
+        If you aren't, this is the main body text of the message. It can be formatted as plain text, 
+        or with the optional boolean argument mrkdwn.
+        The text field is not enforced as required when using blocks or attachments. 
+        """,
+    )
 
 
 class SlackChatMessageDelete(BaseIntegrationActionModel):
     """
     Action model for deleting a message.
     """
+
+    channel: StrictStr = Field(
+        description="""
+        Channel, private group, or IM channel containing the message to be deleted. Can be an encoded ID, or a name. 
+        
+        Example: C1234567890
+        """,
+    )
+    message_ts: str = Field(
+        description="""
+        Timestamp of the message to be deleted.
+        
+        Example: 1234567890.123456
+        """,
+    )
 
 
 class SlackChatMessageGetPermalink(BaseIntegrationActionModel):
@@ -137,12 +231,6 @@ class SlackChatMessageSendMe(BaseIntegrationActionModel):
     """
     Action model for sending a me message into a channel.
     """
-
-    channel: str = Field(
-        default=None,
-        description="Channel, private group, or IM channel to send message to. Can be an encoded ID, or a name.",
-    )
-    text: str = Field(default=None, description="The content of the message.")
 
 
 class SlackConversation(BaseAPIModel):
