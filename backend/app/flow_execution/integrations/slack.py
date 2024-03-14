@@ -31,7 +31,6 @@ class SlackIntegration(BaseIntegration):
     token: str
 
     def __init__(self, user: schemas.User) -> None:
-        self.key = settings.SLACK_APP_ID  # TODO: do we even need a key to connect to Slack API?
         self.user = user
         self.token = self._fetch_credentials()
 
@@ -44,7 +43,7 @@ class SlackIntegration(BaseIntegration):
         """
         Fetches the user-specific Slack token from the key vault.
         """
-        return os.environ["SLACK_OAUTH_TOKEN"]
+        return secrets_service.get_secret(self.user, self._short_name)
 
     def _construct_headers(self) -> dict:
         """
@@ -83,7 +82,7 @@ class SlackIntegration(BaseIntegration):
         return response.status_code == 200
 
     @task(task_name="Send Message")
-    def send_message(self, message_to_send: SlackChatMessageSend) -> SlackResponse:
+    def send_message(self, message_to_send: SlackChatMessageSend) -> Any:
         """
         Sends a message to a Slack channel.
         """
@@ -91,7 +90,7 @@ class SlackIntegration(BaseIntegration):
         return self.client.chat_postMessage(**params)
 
     @task(task_name="Update Message")
-    def update_message(self, message_to_update: SlackChatMessageUpdate) -> SlackResponse:
+    def update_message(self, message_to_update: SlackChatMessageUpdate) -> Any:
         """
         Updates a message in a Slack channel.
         """
@@ -99,7 +98,7 @@ class SlackIntegration(BaseIntegration):
         return self.client.chat_update(**params)
 
     @task(task_name="Delete Message")
-    def delete_message(self, message_to_delete: SlackChatMessageDelete) -> SlackResponse:
+    def delete_message(self, message_to_delete: SlackChatMessageDelete) -> Any:
         """
         Deletes a message in a Slack channel.
         """
