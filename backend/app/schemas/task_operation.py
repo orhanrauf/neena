@@ -9,7 +9,7 @@ from typing import Optional
 class TaskOperationBase(BaseModel):
     name: str
     task_definition: UUID
-    instruction: str
+    instruction: Optional [str] = None
     x: Optional[float] = None
     y: Optional[float] = None
     index: int
@@ -27,8 +27,8 @@ class TaskOperationCreate(TaskOperationBase):
 
 
 # Properties to receive via API on update
-class TaskOperationUpdate(TaskOperationCreate):
-    pass
+class TaskOperationUpdate(TaskOperationBase):
+    id: Optional[UUID] = None
 
 
 class TaskOperationInDBBase(TaskOperationBase):

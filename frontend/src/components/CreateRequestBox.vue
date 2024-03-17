@@ -76,6 +76,7 @@ const submitRequestGenerate = async () => {
 
 const submitRequestBlank = async () => {
   await submitRequest();
+  store.commit('setFlow', {name:'', task_operations: [], dependencies: [],});
   router.push('/create-flow');
 };
 
