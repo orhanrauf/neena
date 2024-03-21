@@ -13,17 +13,9 @@ from app.schemas.task_definition import TaskDefinition, TaskDefinitionBase
 from app.schemas.flow import FlowBase
 from app.schemas.task_operation import TaskOperationBase
 from app.flow_execution.integrations.trello import TrelloIntegration
-from app.flow_execution.models.trello import (
-    TrelloBoard,
-    TrelloBoardCreate,
-    TrelloBoardGet,
-    TrelloBoardUpdate,
-    TrelloCard,
-    TrelloCardCreate,
-    TrelloList,
-    TrelloListCreate,
-    TrelloListsInBoardGet,
-)
+from app.flow_execution.integrations.slack import SlackIntegration
+
+from app.flow_execution.models.slack import SlackChatMessageSend
 
 
 # Assuming your .env file is in the current directory or specify the path
@@ -35,20 +27,23 @@ load_dotenv(dotenv_path=dotenv_path)
 # Add the backend directory to the sys.path to allow for absolute imports
 sys.path.append(os.path.abspath("."))
 
+ssl_path = "/Users/raufakdemir/Documents/Neena AI/neena/backend/venv/lib/python3.10/site-packages/certifi/cacert.pem"
+os.environ["SSL_CERT_FILE"] = ssl_path
+os.environ["REQUESTS_CA_BUNDLE"] = ssl_path
+
 from app.core.config import settings
 
 db = SessionLocal()
 
 user = crud.user.get_by_email(db, email=settings.FIRST_SUPERUSER)
 
-execution_context = ExecutionContext(user)
+slack_integration_class = SlackIntegration(user)
 
-integration = execution_context.get_integration_instance("3eb7db14-a852-4b22-a17f-d408a53d2bc6")
+message_to_send = SlackChatMessageSend(channel="general", text="Test message")
 
-boards = integration.get_boards()
+response = slack_integration_class.send_message(message_to_send=message_to_send)
 
-board = TrelloBoard(**boards.data[0])
-
+print(response)
 
 # trello_integration_class = TrelloIntegration(user)
 

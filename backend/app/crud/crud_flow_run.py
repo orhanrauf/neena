@@ -31,6 +31,9 @@ class CRUDFlowRun(CRUDBase[FlowRun, FlowRunCreate, FlowRunUpdate]):
         db.refresh(db_obj)
 
         return db_obj
+    
+    def get_multi_by_flow_id(self, db: Session, flow_id: str, skip: int = 0, limit: int = 100) -> List[FlowRun]:
+        return db.query(self.model).filter(self.model.flow == flow_id).order_by(self.model.modified_date.desc()).offset(skip).limit(limit).all()
 
 
 flow_run = CRUDFlowRun(FlowRun)

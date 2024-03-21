@@ -65,4 +65,4 @@ def read_all_for_flow_id(
     Get all flow runs by flow_id.
     """
     
-    return crud.flow_run.get_multi_for_flow_id(db, flow_id, skip=skip, limit=limit)
+    return crud.flow_run.get_multi_by_flow_id(db, flow_id, skip=skip, limit=limit)

@@ -13,6 +13,7 @@ class FlowBase(BaseModel):
     name: Optional[str]
     task_operations: list[TaskOperationBase]
     dependencies: list[DependencyBase]
+    sorted: bool = False
 
     def topological_sort(self) -> list[TaskOperationBase]:
         graph = {task.index: [] for task in self.task_operations}
@@ -46,14 +47,9 @@ class FlowBase(BaseModel):
             task.sorted_index = sorted_idx
             sorted_tasks.append(task)
 
+        self.sorted = True
+        self.task_operations = sorted_tasks
         return sorted_tasks
-
-    def get_sorted_task_operations(self):
-
-        if not self.sorted:
-            self.task_operations = self.topological_sort()
-
-        return sorted(self.task_operations, key=lambda x: x.sorted_index)
 
     @validator("task_operations")
     def validate_task_operations_length(cls, task_operations):

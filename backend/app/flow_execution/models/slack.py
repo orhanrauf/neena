@@ -7,6 +7,24 @@ from pydantic import StrictBool, StrictStr
 
 from app.flow_execution.models.base import BaseAPIModel, BaseIntegrationActionModel
 
+class BaseSlackResponse(BaseAPIModel):
+    """
+    Base model for Slack API responses. All Slack API responses should inherit from this model.
+    """
+
+    ok: StrictBool = Field(description="Indicates the success of the API call.")
+    error: Optional[StrictStr] = Field(default=None, description="Error message if the API call was unsuccessful.")
+    warning: Optional[StrictStr] = Field(default=None, description="Warning message if the API call was successful but with warnings.")
+    response_metadata: Optional[Dict] = Field(default=None, description="Metadata about the response.")
+    
+class SlackChatMessageSendResponse(BaseSlackResponse):
+    """
+    Model for the response of the chat.postMessage API method.
+    """
+
+    channel: Optional[StrictStr] = Field(default=None, description="ID of the channel the message was posted in.")
+    ts: Optional[StrictStr] = Field(default=None, description="Timestamp of the message.")
+    message: Optional[dict] = Field(default=None, description="The message that was posted.")
 
 class SlackChatMessage(BaseAPIModel):
     """
@@ -160,7 +178,7 @@ class SlackChatMessageSend(BaseIntegrationActionModel):
         Example: [{"type": "section", "text": {"type": "plain_text", "text": "Hello world"}}]
         """,
     )
-    thread_ts: str = Field(
+    thread_ts: Optional[str] = Field(
         default=None,
         description="""
         ts=timestamp
