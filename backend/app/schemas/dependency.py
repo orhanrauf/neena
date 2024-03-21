@@ -22,6 +22,7 @@ class DependencyCreate(DependencyBase):
 
 # Properties to receive via API on update
 class DependencyUpdate(DependencyBase):
+    id: Optional[UUID] = None
     flow: Optional[UUID] = None
 
 

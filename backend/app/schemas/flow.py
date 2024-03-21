@@ -4,8 +4,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, validator
 
-from .task_operation import TaskOperationBase, TaskOperationInDBBase
-from .dependency import DependencyBase, DependencyInDBBase
+from .task_operation import TaskOperationBase, TaskOperationInDBBase, TaskOperationUpdate
+from .dependency import DependencyBase, DependencyInDBBase, DependencyUpdate
 
 
 # Shared properties
@@ -84,7 +84,10 @@ class FlowCreate(FlowBase):
 
 # Properties to receive via API on update
 class FlowUpdate(FlowCreate):
-    pass
+    id: UUID
+    task_operations: list[TaskOperationUpdate]
+    dependencies: list[DependencyUpdate]
+    modified_by_human: bool = True
 
 
 class FlowInDBBase(FlowBase):
@@ -96,6 +99,8 @@ class FlowInDBBase(FlowBase):
     created_by_email: EmailStr
     modified_by_email: EmailStr
     organization: Optional[UUID] = None
+    created_by_human: Optional[bool] = True
+    
 
     class Config:
         from_orm = True

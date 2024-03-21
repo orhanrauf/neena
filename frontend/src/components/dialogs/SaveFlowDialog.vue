@@ -24,7 +24,7 @@ import { useStore } from 'vuex';
 
 const store = useStore();
 
-const requestContent = computed(() => store.state.flowCreation.request.content);
+const requestContent = computed(() => store.state.flowCreation.flowRequest.request_instructions);
 const flowDescription = ref(`Flow for ${requestContent.value}`);
 
 watch(requestContent, (newValue) => {
@@ -32,9 +32,11 @@ watch(requestContent, (newValue) => {
 });
 
 const saveFlow = () => {
-    // Implement logic to save the flow
-    alert(`Flow saved: ${flowDescription.value}`);
-};
+    const flow = store.state.flowCreation.flow;
+    flow.name = flowDescription.value;
+    const response = store.dispatch('saveFlow');
+    console.log(response);
+    };
 </script>
 
 <style scoped>

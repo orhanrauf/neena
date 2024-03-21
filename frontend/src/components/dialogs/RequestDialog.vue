@@ -21,7 +21,7 @@ import { useStore } from 'vuex';
 const store = useStore();
 
 // Assuming the state variable is stored under the key 'request' in Vuex
-const requestContent = computed(() => store.state.flowCreation.request.request_instructions);
+const requestContent = computed(() => store.state.flowCreation.flowRequest.request_instructions);
 </script>
 
 <style scoped>

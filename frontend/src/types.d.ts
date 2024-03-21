@@ -8,8 +8,8 @@ export interface Dependency {
 export interface Dependency {
   id?: string;
   flow?: string;
-  source_node_id: int;
-  target_node_id: int;
+  source_drawflow_node_id: int;
+  target_drawflow_node_id: int;
   instructions: string;
   created_date?: string;
   modified_date?: string; 

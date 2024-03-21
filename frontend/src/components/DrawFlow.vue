@@ -41,6 +41,14 @@ const closeOnEsc = (event) => {
   }
 };
 
+const saveFlow = async () => {
+  const flow = store.state.flowCreation.flow;
+  const saveFlowResponse = store.dispatch('saveFlow', flow);
+  console.log(saveFlowResponse);
+  const updateFlowRequestResponse = store.dispatch('updateFlowRequest', flow);
+  console.log(updateFlowRequestResponse);
+};
+
 window.addEventListener('keydown', closeOnEsc);
 
 onMounted(() => {
@@ -72,15 +80,18 @@ onMounted(() => {
   
   editor.value.on("connectionCreated", (connection) => {
     // {output_id: '2', input_id: '1', output_class: 'output_1', input_class: 'input_1'}
-    const source_node_id = parseInt(connection.output_id);
-    const target_node_id = parseInt(connection.input_id);
-    
-    var dependency: Dependency = {
-      source_node_id: source_node_id,
-      target_node_id: target_node_id,
-      instructions: ''
-    }
-    store.commit('addDependency', dependency);
+    const sourceDrawFlowNodeId = parseInt(connection.output_id);
+    const targetDrawFlowNodeId = parseInt(connection.input_id);
+
+    const sourceTaskOperation = store.getters.getTaskOperationByNodeId(sourceDrawFlowNodeId);
+    const targetTaskOperation = store.getters.getTaskOperationByNodeId(targetDrawFlowNodeId);
+
+    store.commit('addDependencyIfNotExists', {
+      sourceDrawflowNodeId: sourceDrawFlowNodeId,
+      targetDrawflowNodeId: targetDrawFlowNodeId,
+      sourceTaskOperation: sourceTaskOperation,
+      targetTaskOperation: targetTaskOperation
+    });
   });
   
   editor.value.on('connectionDoubleClicked', (connection) => {
@@ -126,25 +137,33 @@ watch(() => store.state.flowCreation.flow, (newFlow, oldFlow) => {
           <!-- Left Group -->
           <div class="d-flex align-center gap">
             <!-- Add task button -->
-            <VBtn class="add-task-btn" @click="cardVisible = !cardVisible" prepend-icon="tabler-plus">
+            <VBtn class="add-task-btn"
+                  :disabled="store.state.flowCreation.isGenerating"
+                  :class="{ 'disabled-button': store.state.flowCreation.isGenerating }"
+                  @click="cardVisible = !cardVisible" prepend-icon="tabler-plus">
               Add Task
             </VBtn>
 
             <!-- Request icon -->
-            <el-button @click="requestTogglePopup" class="icon-container request-icon-container">
+            <el-button :disabled="store.state.flowCreation.isGenerating"
+                       :class="{ 'disabled-button': store.state.flowCreation.isGenerating }"
+                       @click="requestTogglePopup" class="icon-container request-icon-container">
               <v-icon color="#494949">tabler-message</v-icon>
             </el-button>
           </div>
 
-          <!-- Right Group -->
           <div class="d-flex align-center gap">
             <!-- Save icon -->
-            <el-button @click="saveWorkflowTogglePopup" class="icon-container save-icon-container">
+            <el-button :disabled="store.state.flowCreation.isGenerating"
+                       :class="{ 'disabled-button': store.state.flowCreation.isGenerating }"
+                       @click="saveWorkflowTogglePopup" class="icon-container save-icon-container">
               <v-icon color="#494949">tabler-device-floppy</v-icon>
             </el-button>
 
             <!-- Run Flow button -->
-            <VBtn class="run-flow-btn" prepend-icon="tabler-bolt">
+            <VBtn :disabled="store.state.flowCreation.isGenerating"
+                  :class="{ 'disabled-button': store.state.flowCreation.isGenerating }"
+                  class="run-flow-btn" prepend-icon="tabler-bolt">
               Run Flow
             </VBtn>
           </div>
@@ -181,6 +200,11 @@ watch(() => store.state.flowCreation.flow, (newFlow, oldFlow) => {
 
 
 <style scoped>
+
+.disabled-button {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 .loader {
   width: 100%;

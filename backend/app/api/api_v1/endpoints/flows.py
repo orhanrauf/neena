@@ -23,27 +23,39 @@ router = APIRouter()
 def create_flow(
     *,
     db: Session = Depends(deps.get_db),
-    flow_request: UUID = Body(...),
     name: str = Body(...),
     task_operations: list[schemas.TaskOperationBase] = Body(...),
+    dependencies: list[schemas.DependencyBase] = Body(...),
     current_user: Auth0User = Depends(auth.get_user),
 ) -> Any:
     """
     Create flow.
     """
 
-    flow_in = schemas.FlowCreate(flow_request=flow_request, name=name, task_operations=task_operations)
+    flow_in = schemas.FlowCreate(name=name, task_operations=task_operations, dependencies=dependencies)
 
-    # perform the complex validations
-    validation_messages = validate_flow(flow_in, db)
-    if validation_messages:
-        # the request data has validation errors
-        errors = [str(error) for error in validation_messages]
-        return JSONResponse(status_code=422, content={"user_error": True, "errors": errors})
+    #TODO: implement flow validation
 
     flow = crud.flow.create(db=db, flow=flow_in, current_user=current_user)
-    return flow
+    return schemas.Flow.from_orm(flow)
 
+
+@router.put("/", response_model=schemas.Flow)
+def update_flow(
+    *,
+    db: Session = Depends(deps.get_db),
+    id: str = Body(...),
+    name: str = Body(...),
+    task_operations: list[schemas.TaskOperationUpdate] = Body(...),
+    dependencies: list[schemas.DependencyUpdate] = Body(...),
+    current_user: Auth0User = Depends(auth.get_user),
+) -> Any:
+    """
+    Update flow.
+    """
+    flow_in = schemas.FlowUpdate(name=name, id=id, task_operations=task_operations, dependencies=dependencies)
+    flow = crud.flow.update(db=db, flow=flow_in, current_user=current_user)
+    return schemas.Flow.from_orm(flow)
 
 @router.get("/all", response_model=List[schemas.Flow])
 def read_all_flows(
@@ -58,7 +70,6 @@ def read_all_flows(
     """
 
     response = crud.flow.get_multi(db=db, skip=skip, limit=limit)
-    print(response)
     return response
 
 

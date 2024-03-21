@@ -13,11 +13,11 @@ export default [
   {
     title: 'Flows',
     icon: { icon: 'tabler-replace' },
-    to: 'apps-email'
+    to: 'flows'
   },
   {
     title: 'Tasks',
     icon: { icon: 'tabler-credit-card' },
-    to: 'apps-chat'
+    to: ''
   }
 ]

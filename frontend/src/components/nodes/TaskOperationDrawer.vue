@@ -57,14 +57,14 @@ const loadDependencies = () => {
     // For incoming dependencies
     const incomingDependencies = store.getters.getDependenciesByTargetNodeId(taskOp.value.drawflow_node_id);
     incomingDependencyTuples.value = incomingDependencies.map(dep => {
-      const sourceTaskOp = store.getters.getTaskOperationByNodeId(dep.source_node_id);
+      const sourceTaskOp = store.getters.getTaskOperationByNodeId(dep.source_drawflow_node_id);
       return { dependency: dep, taskOperation: sourceTaskOp };
     });
 
     // For outgoing dependencies
     const outgoingDependencies = store.getters.getDependenciesBySourceNodeId(taskOp.value.drawflow_node_id);
     outgoingDependencyTuples.value = outgoingDependencies.map(dep => {
-      const targetTaskOp = store.getters.getTaskOperationByNodeId(dep.target_node_id);
+      const targetTaskOp = store.getters.getTaskOperationByNodeId(dep.target_drawflow_node_id);
       return { dependency: dep, taskOperation: targetTaskOp };
     });
   }
