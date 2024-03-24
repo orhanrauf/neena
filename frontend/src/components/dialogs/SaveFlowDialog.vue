@@ -29,13 +29,15 @@ const flowDescription = ref(`Flow for ${requestContent.value}`);
 
 watch(requestContent, (newValue) => {
     flowDescription.value = `Flow for ${newValue}`;
+    store.state.flowCreation.flow.name = flowDescription.value;
 });
 
-const saveFlow = () => {
+const saveFlow = async () => {
     const flow = store.state.flowCreation.flow;
     flow.name = flowDescription.value;
-    const response = store.dispatch('saveFlow');
-    console.log(response);
+    await store.dispatch('saveFlow');
+    await store.dispatch('updateFlowRequestWithFlowId', flow);
+    store.state.flowCreation.isSaveWorkflowPopupVisible = false;
     };
 </script>
 

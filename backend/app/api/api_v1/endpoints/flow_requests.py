@@ -22,6 +22,21 @@ def create_flow_request(
     flow_request = crud.flow_request.create(db, obj_in=flow_request_in, current_user=current_user)
     return flow_request
 
+@router.put("/", response_model=schemas.FlowRequest)
+def update_flow_request(
+    *,
+    db: Session = Depends(deps.get_db),
+    flow_request_in: schemas.FlowRequestUpdate = Body(...),
+    current_user: Auth0User = Depends(auth.get_user),
+) -> Any:
+    """
+    Update flow request.
+    """
+    
+    flow_request = crud.flow_request.get(db, flow_request_in.id)
+    flow_request = crud.flow_request.update(db, db_obj=flow_request, obj_in=flow_request_in, current_user=current_user)
+    return flow_request
+
 
 @router.get("/all", response_model=List[schemas.FlowRequest])
 def read_all_flow_requests(
