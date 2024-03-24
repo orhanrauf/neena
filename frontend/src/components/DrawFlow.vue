@@ -11,7 +11,6 @@ import { useStore } from 'vuex';
 
 const store = useStore();
 const isRequestPopupVisible = ref(false);
-const isSaveWorkflowPopupVisible = ref(false);
 const showDrawer = ref(false);
 const selectedSourceNodeId = ref(0);
 const selectedTargetNodeId = ref(0);
@@ -30,7 +29,7 @@ const requestTogglePopup = () => {
 };
 
 const saveWorkflowTogglePopup = () => {
-  isSaveWorkflowPopupVisible.value = !isSaveWorkflowPopupVisible.value;
+  store.state.flowCreation.isSaveWorkflowPopupVisible = !store.state.flowCreation.isSaveWorkflowPopupVisible;
 };
 
 // Function to handle the ESC key press
@@ -43,10 +42,23 @@ const closeOnEsc = (event) => {
 
 const saveFlow = async () => {
   const flow = store.state.flowCreation.flow;
-  const saveFlowResponse = store.dispatch('saveFlow', flow);
-  console.log(saveFlowResponse);
-  const updateFlowRequestResponse = store.dispatch('updateFlowRequest', flow);
-  console.log(updateFlowRequestResponse);
+  try {
+    const saveFlowResponse = await store.dispatch('saveFlow', flow);
+    console.log(saveFlowResponse);
+    const updateFlowRequestResponse = await store.dispatch('updateFlowRequest', flow);
+    console.log(updateFlowRequestResponse);
+    console.log("zbatot energy")
+    isSaveWorkflowPopupVisible.value = false;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const executeFlow = async () => {
+  const flow = store.state.flowCreation.flow;
+  await saveFlow();
+  const executeFlowResponse = await store.dispatch('executeFlow', flow.id);
+  console.log(executeFlowResponse);
 };
 
 window.addEventListener('keydown', closeOnEsc);
@@ -160,13 +172,14 @@ watch(() => store.state.flowCreation.flow, (newFlow, oldFlow) => {
               <v-icon color="#494949">tabler-device-floppy</v-icon>
             </el-button>
 
-            <!-- Run Flow button -->
-            <VBtn :disabled="store.state.flowCreation.isGenerating"
-                  :class="{ 'disabled-button': store.state.flowCreation.isGenerating }"
-                  class="run-flow-btn" prepend-icon="tabler-bolt">
-              Run Flow
-            </VBtn>
-          </div>
+              <!-- Run Flow button -->
+              <VBtn :disabled="store.state.flowCreation.isGenerating"
+                    :class="{ 'disabled-button': store.state.flowCreation.isGenerating }"
+                    class="run-flow-btn" prepend-icon="tabler-bolt"
+                    @click="executeFlow">
+                Run Flow
+              </VBtn>
+            </div>
 
           <!-- Request pop-up component -->
           <div v-if="isRequestPopupVisible" class="request-popup-overlay" @click.self="requestTogglePopup">
@@ -174,7 +187,7 @@ watch(() => store.state.flowCreation.flow, (newFlow, oldFlow) => {
           </div>
 
           <!-- Save workflow pop-up component -->
-          <div v-if="isSaveWorkflowPopupVisible" class="request-popup-overlay" @click.self="saveWorkflowTogglePopup">
+          <div v-if="store.state.flowCreation.isSaveWorkflowPopupVisible" class="request-popup-overlay" @click.self="saveWorkflowTogglePopup">
             <SaveFlowDialog class="request-popup-container" @close="saveWorkflowTogglePopup"></SaveFlowDialog>
           </div>
 

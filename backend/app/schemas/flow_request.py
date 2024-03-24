@@ -20,6 +20,7 @@ class FlowRequestCreate(FlowRequestBase):
 
 # Properties to receive via API on update
 class FlowRequestUpdate(FlowRequestCreate):
+    id: UUID
     pass
 
 

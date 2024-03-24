@@ -102,7 +102,7 @@ class TaskPreparationGenerator:
                     
                     Finally you will receive outputs from previous Task Operations that were executed before, in the form of
                     JSON outputs. You will receive the TaskDefinition model that also includes the input parameters; some of them
-                    mandatory and some of them optional.
+                    mandatory and some of them optional. Do not fill in any non-mandatory parameters unless you have a good reason to do so.
                     
                     Your task will be to format the parameters for the next task operation in the execution stack, based on the
                     given request, previous outputs and the upcoming task definition that needs to be executed in the task operation. Usually this will

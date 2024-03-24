@@ -34,6 +34,7 @@ const store = createStore({
                 },
                 isGenerating: false,
                 error: null,
+                isSaveWorkflowPopupVisible: false,
             },
             taskDefinitions: [],
             integrations: [],
@@ -429,17 +430,22 @@ const store = createStore({
             } else {
                 response = await http.post('/flows/', flow);
             }
-
             // Update the flow in your state to reflect any changes from the server
             state.flowCreation.flow = response.data;
-
+            
             return response;
         },
-        updateFlowRequest: async ({ state, commit }, flowRequest) => {;
-            flowRequest.flow = state.flowCreation.flow.id;
+        updateFlowRequestWithFlowId: async ({ state, commit }, flow) => {;
+            var flowRequest = state.flowCreation.flowRequest;
+            flowRequest.flow = flow.id;
             const response = await http.put('/flow_requests/', flowRequest);
             return response;
         },
+        executeFlow: async ({ state, commit }, flowId) => {
+            const response = await http.post(`/flows/execute?id=${flowId}`);
+            state.flowCreation.flow = response.data;
+            return response;
+        }
     },
     plugins: [vuexPersist.plugin]
 });
