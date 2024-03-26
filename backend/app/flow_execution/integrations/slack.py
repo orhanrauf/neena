@@ -27,7 +27,6 @@ class SlackIntegration(BaseIntegration):
     Models implemented: message.
     """
 
-    key: str
     token: str
 
     def __init__(self, user: schemas.User) -> None:
@@ -61,7 +60,7 @@ class SlackIntegration(BaseIntegration):
         """
         Constructs the base query parameters for requests to the Slack API.
         """
-        return {"key": self.key, "token": self.token}
+        return {"token": self.token}
 
     def _model_to_query_params(self, model: BaseIntegrationActionModel) -> dict[str, Any]:
         """
