@@ -3,7 +3,7 @@ from datetime import datetime, date
 from typing import Optional, Union, Dict, Sequence, Any
 
 # from slack_sdk.models.metadata import Metadata
-from pydantic import StrictBool, StrictStr
+from pydantic import StrictBool, StrictStr, StrictInt, root_validator
 
 from app.flow_execution.models.base import BaseAPIModel, BaseIntegrationActionModel
 
@@ -82,6 +82,14 @@ class SlackChatMessage(BaseAPIModel):
         Change formatting behavior based on value for parse: 'none' or 'full'
         Defaults to 'full'.
         By default, URLs will be hyperlinked. Set parse to none to remove the hyperlinks.
+        """,
+    )
+    post_at: Optional[Union[StrictStr, StrictInt]] = Field(
+        default=None,
+        description="""
+        Unix timestamp representing the future time the message should post to Slack.
+        
+        Example: 299876400
         """,
     )
     reply_broadcast: Optional[StrictBool] = Field(
@@ -171,6 +179,12 @@ class SlackChatMessageSend(BaseIntegrationActionModel):
         """,
     )
 
+    @root_validator(pre=True)
+    def check_at_least_one_field(cls, values):
+        if not any(values.get(field) for field in ("text", "attachments", "blocks")):
+            raise ValueError("At least one of text, attachments, or blocks must be provided.")
+        return values
+
 
 class SlackChatMessageUpdate(BaseIntegrationActionModel):
     """
@@ -191,7 +205,7 @@ class SlackChatMessageUpdate(BaseIntegrationActionModel):
         Example: 1234567890.123456
         """,
     )
-    text: StrictStr = Field(
+    text: Optional[StrictStr] = Field(
         description="""
         The content of the message to be updated. The usage of the text field changes depending on whether you're using blocks.
         If you're using blocks, this is used as a fallback string to display in notifications. 
@@ -200,6 +214,28 @@ class SlackChatMessageUpdate(BaseIntegrationActionModel):
         The text field is not enforced as required when using blocks or attachments. 
         """,
     )
+    attachments: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        The message content in the form of a JSON-based array of structured attachments, 
+        presented as a URL-encoded string.
+        Example: [{"pretext": "pre-hello", "text": "text-world"}]
+        """,
+    )
+    blocks: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        The message content in the form of a JSON-based array of structured blocks, 
+        presented as a URL-encoded string.
+        Example: [{"type": "section", "text": {"type": "plain_text", "text": "Hello world"}}]
+        """,
+    )
+
+    @root_validator(pre=True)
+    def check_at_least_one_field(cls, values):
+        if not any(values.get(field) for field in ("text", "attachments", "blocks")):
+            raise ValueError("At least one of text, attachments, or blocks must be provided.")
+        return values
 
 
 class SlackChatMessageDelete(BaseIntegrationActionModel):
@@ -221,6 +257,66 @@ class SlackChatMessageDelete(BaseIntegrationActionModel):
         Example: 1234567890.123456
         """,
     )
+
+
+class SlackChatMessageSchedule(BaseIntegrationActionModel):
+    """
+    Action model for scheduling a message to be sent.
+    """
+
+    channel: StrictStr = Field(
+        description="""
+        Channel, private group, or IM channel containing the message to be scheduled for sending. 
+        Can be an encoded ID, or a name. 
+        
+        Example: C1234567890
+        """,
+    )
+    post_at: Union[StrictStr, StrictInt] = Field(
+        description="""
+        Unix timestamp representing the future time the message should post to Slack.
+        
+        Example: 299876400
+        """,
+    )
+    text: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        The content of the message to be sent. The usage of the text field changes depending on whether you're using blocks.
+        If you're using blocks, this is used as a fallback string to display in notifications. 
+        If you aren't, this is the main body text of the message. It can be formatted as plain text, 
+        or with the optional boolean argument mrkdwn.
+        The text field is not enforced as required when using blocks or attachments. 
+        """,
+    )
+    attachments: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        The message content in the form of a JSON-based array of structured attachments, 
+        presented as a URL-encoded string.
+        Example: [{"pretext": "pre-hello", "text": "text-world"}]
+        """,
+    )
+    blocks: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        The message content in the form of a JSON-based array of structured blocks, 
+        presented as a URL-encoded string.
+        Example: [{"type": "section", "text": {"type": "plain_text", "text": "Hello world"}}]
+        """,
+    )
+
+    @root_validator(pre=True)
+    def check_at_least_one_field(cls, values):
+        if not any(values.get(field) for field in ("text", "attachments", "blocks")):
+            raise ValueError("At least one of text, attachments, or blocks must be provided.")
+        return values
+
+
+class SlackChatMessageSchedule(BaseIntegrationActionModel):
+    """
+    Action
+    """
 
 
 class SlackChatMessageGetPermalink(BaseIntegrationActionModel):
