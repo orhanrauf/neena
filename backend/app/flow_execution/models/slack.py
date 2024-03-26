@@ -99,6 +99,12 @@ class SlackChatMessage(BaseAPIModel):
         to everyone in the channel or conversation. Defaults to false.
         """,
     )
+    scheduled_message_id: Optional[str] = Field(
+        default=None,
+        description="""
+        scheduled_message_id returned from call to chat.scheduleMessage (Slack Web API method), i.e., SlackChatMessageSchedule (Neena action model)
+        """,
+    )
     text: Optional[StrictStr] = Field(
         default=None,
         description="""
@@ -259,6 +265,33 @@ class SlackChatMessageDelete(BaseIntegrationActionModel):
     )
 
 
+class SlackChatMessageDeleteScheduled(BaseIntegrationActionModel):
+    """
+    Action model for deleting a pending scheduled message from the queue.
+    """
+
+    channel: StrictStr = Field(
+        description="""
+        The channel the scheduled_message is posting to. Can be an encoded ID, or a name. 
+        
+        Example: C1234567890
+        """,
+    )
+    scheduled_message_id: str = Field(
+        description="""
+        scheduled_message_id returned from call to chat.scheduleMessage (Slack Web API method), i.e., SlackChatMessageSchedule (Neena action model)
+
+        Example: Q1234ABCD
+        """,
+    )
+    as_user: Optional[StrictBool] = Field(
+        default=None,
+        description="""
+        Pass true to delete the message as the authed user with chat:write:user scope. Bot users in this context are considered authed users. If unused or false, the message will be deleted with chat:write:bot scope
+        """,
+    )
+
+
 class SlackChatMessageSchedule(BaseIntegrationActionModel):
     """
     Action model for scheduling a message to be sent.
@@ -313,22 +346,48 @@ class SlackChatMessageSchedule(BaseIntegrationActionModel):
         return values
 
 
-class SlackChatMessageSchedule(BaseIntegrationActionModel):
-    """
-    Action
-    """
-
-
 class SlackChatMessageGetPermalink(BaseIntegrationActionModel):
     """
     Action model for retrieving a permalink URL for a specific extant message.
     """
 
+    channel: StrictStr = Field(
+        description="""
+        Channel, private group, or IM channel containing the message. 
+        Can be an encoded ID, or a name. 
+        
+        Example: C1234567890
+        """,
+    )
+    message_ts: str = Field(
+        description="""
+        Timestamp of the message, uniquely identifying it within a channel.
+        
+        Example: 1234567890.123456
+        """,
+    )
+
 
 class SlackChatMessageSendMe(BaseIntegrationActionModel):
     """
-    Action model for sending a me message into a channel.
+    Action model for sharing a me message into a channel.
     """
+
+    channel: StrictStr = Field(
+        description="""
+        Channel to send message to. Can be a public channel, private group or IM channel. Can be an encoded ID, or a name.
+        
+        Example: C1234567890
+        """,
+    )
+    text: StrictStr = Field(
+        default=None,
+        description="""
+        The content of the message to be sent.
+
+        Example: Hello world
+        """,
+    )
 
 
 class SlackConversation(BaseAPIModel):
