@@ -29,6 +29,13 @@ class TaskRun(Base):
     result = Column(JSON, nullable=True)
 
     belongs_to_flow_run = relationship("FlowRun", back_populates="task_runs")
+    
+    created_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=False)
+    modified_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=False)
+    created_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    modified_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), server_onupdate=func.now(), nullable=False)
 
     task_prep_prompt: Mapped["TaskPrepPrompt"] = relationship("TaskPrepPrompt", back_populates="belongs_to_task_run")
     task_prep_answer: Mapped["TaskPrepAnswer"] = relationship("TaskPrepAnswer", back_populates="belongs_to_task_run")
+    
+    

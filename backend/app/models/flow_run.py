@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy import Column, String, DateTime, ForeignKey, Enum as SqlAlchemyEnum
@@ -19,6 +20,14 @@ class FlowRun(Base):
     triggered_time = Column(DateTime(timezone=True), default=func.now(), nullable=True)
     end_time = Column(DateTime(timezone=True), nullable=True)
     triggered_by = Column(String, ForeignKey("user.email"), nullable=True)
+    
+    created_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=False)
+    modified_by_email: Mapped[str] = mapped_column(String, ForeignKey("user.email"), nullable=False)
+    created_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    modified_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), server_onupdate=func.now(), nullable=False)
 
     task_runs = relationship("TaskRun", back_populates="belongs_to_flow_run", cascade="all, delete-orphan")
     belongs_to_flow = relationship("Flow", back_populates="flow_runs")
+    
+    created_by = relationship("User", back_populates="created_flow_runs")
+    modified_by = relationship("User", back_populates="modified_flow_runs")

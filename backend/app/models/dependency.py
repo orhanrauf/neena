@@ -1,5 +1,6 @@
+from datetime import datetime
 from typing import TYPE_CHECKING, Optional
-from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint, ForeignKeyConstraint
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint, ForeignKeyConstraint, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from uuid import uuid4
@@ -19,6 +20,8 @@ class Dependency(Base):
     source_task_operation: Mapped[Integer] = mapped_column(Integer, nullable=False)
     target_task_operation: Mapped[Integer] = mapped_column(Integer, nullable=False)
     instruction: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    created_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    modified_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), server_onupdate=func.now(), nullable=False)
 
     flow_reference: Mapped["Flow"] = relationship("Flow", back_populates="dependencies")
 

@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from . import TaskDefinition
     from . import Flow
     from . import TaskOperation
+    from. import FlowRun
 
 class User(Base):
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)
@@ -36,6 +37,9 @@ class User(Base):
     modified_flows: Mapped[list["Flow"]] = relationship(back_populates="modified_by", lazy="dynamic", foreign_keys='Flow.modified_by_email')
     created_task_operations: Mapped[list["TaskOperation"]] = relationship(back_populates="created_by", lazy="dynamic", foreign_keys='TaskOperation.created_by_email')
     modified_task_operations: Mapped[list["TaskOperation"]] = relationship(back_populates="modified_by", lazy="dynamic", foreign_keys='TaskOperation.modified_by_email')
+    
+    modified_flow_runs: Mapped[list["FlowRun"]] = relationship("FlowRun", back_populates="modified_by", foreign_keys='FlowRun.modified_by_email')
+    created_flow_runs: Mapped[list["FlowRun"]] = relationship("FlowRun", back_populates="created_by", foreign_keys='FlowRun.created_by_email')
     
     created_credentials: Mapped[list["IntegrationCredential"]] = relationship("IntegrationCredential", back_populates="creator", foreign_keys='IntegrationCredential.created_by_email')
     modified_credentials: Mapped[list["IntegrationCredential"]] = relationship("IntegrationCredential", back_populates="modifier", foreign_keys='IntegrationCredential.modified_by_email')
