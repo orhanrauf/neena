@@ -17,6 +17,10 @@ from app.flow_execution.models.slack import (
     SlackChatMessageSend,
     SlackChatMessageDelete,
     SlackChatMessageUpdate,
+    SlackChatMessageDeleteScheduled,
+    SlackChatMessageSchedule,
+    SlackChatMessageGetPermalink,
+    SlackChatMessageSendMe,
 )
 
 
@@ -103,3 +107,35 @@ class SlackIntegration(BaseIntegration):
         """
         params = self._model_to_query_params(message_to_delete)
         return self.client.chat_delete(**params)
+
+    @task(task_name="Delete Scheduled Message")
+    def delete_scheduled_message(self, scheduled_message_to_delete: SlackChatMessageDeleteScheduled) -> Any:
+        """
+        Deletes a pending scheduled message from the queue.
+        """
+        params = self._model_to_query_params(scheduled_message_to_delete)
+        return self.client.chat_deleteScheduledMessage(**params)
+
+    @task(task_name="Schedule Message")
+    def schedule_message(self, message_to_schedule: SlackChatMessageSchedule) -> Any:
+        """
+        Schedules a message to be sent to a channel.
+        """
+        params = self._model_to_query_params(message_to_schedule)
+        return self.client.chat_scheduleMessage(**params)
+
+    @task(task_name="Get Message Permalink")
+    def get_message_permalink(self, message: SlackChatMessageGetPermalink) -> Any:
+        """
+        Retrieve a permalink URL for a specific extant message
+        """
+        params = self._model_to_query_params(message)
+        return self.client.chat_getPermalink(**params)
+
+    @task(task_name="Send Me Message")
+    def send_me_message(self, message_to_send: SlackChatMessageSendMe) -> Any:
+        """
+        Share a me message into a channel.
+        """
+        params = self._model_to_query_params(message_to_send)
+        return self.client.chat_meMessage(**params)
