@@ -7,6 +7,7 @@ from pydantic import StrictBool, StrictStr, StrictInt, root_validator
 
 from app.flow_execution.models.base import BaseAPIModel, BaseIntegrationActionModel
 
+
 class BaseSlackResponse(BaseAPIModel):
     """
     Base model for Slack API responses. All Slack API responses should inherit from this model.
@@ -14,9 +15,12 @@ class BaseSlackResponse(BaseAPIModel):
 
     ok: StrictBool = Field(description="Indicates the success of the API call.")
     error: Optional[StrictStr] = Field(default=None, description="Error message if the API call was unsuccessful.")
-    warning: Optional[StrictStr] = Field(default=None, description="Warning message if the API call was successful but with warnings.")
+    warning: Optional[StrictStr] = Field(
+        default=None, description="Warning message if the API call was successful but with warnings."
+    )
     response_metadata: Optional[Dict] = Field(default=None, description="Metadata about the response.")
-    
+
+
 class SlackChatMessageSendResponse(BaseSlackResponse):
     """
     Model for the response of the chat.postMessage API method.
@@ -25,6 +29,7 @@ class SlackChatMessageSendResponse(BaseSlackResponse):
     channel: Optional[StrictStr] = Field(default=None, description="ID of the channel the message was posted in.")
     ts: Optional[StrictStr] = Field(default=None, description="Timestamp of the message.")
     message: Optional[dict] = Field(default=None, description="The message that was posted.")
+
 
 class SlackChatMessage(BaseAPIModel):
     """
@@ -425,6 +430,30 @@ class SlackConversations(BaseAPIModel):
     """
 
     channel: Optional[StrictStr] = Field(default=None, description="ID of a channel.")
+    cursor: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        Paginate through collections of data by setting the cursor parameter to 
+        a next_cursor attribute returned by a previous request's response_metadata. 
+        Default value fetches the first "page" of the collection
+
+        Example: dXNlcjpVMDYxTkZUVDI=
+        """,
+    )
+    exclude_archived: Optional[StrictBool] = Field(
+        default=None,
+        description="""
+        When listing conversations, set to True to exclude archived channels from the list. Default: False
+        """,
+    )
+    force: Optional[StrictBool] = Field(
+        default=None,
+        description="""
+        When inviting users to a channel, force set to True, and multiple user IDs are provided, 
+        continue inviting the valid user IDs while disregarding invalid IDs. 
+        Defaults to False.
+        """,
+    )
     include_all_metadata: Optional[StrictStr] = Field(
         default=None, description="Boolean indicating whether to return all metadata associated with a message or not."
     )
@@ -480,8 +509,42 @@ class SlackConversations(BaseAPIModel):
         Example: 1234567890.123456
         """,
     )
+    prevent_creation: Optional[StrictBool] = Field(
+        default=None,
+        description="""
+        When resuming a direct message (dm) or multi-person direct message (mpdm), 
+        do not create a dm or mpdm. 
+        This is used to see if there is an existing dm or mpdm.
+        """,
+    )
+    return_im: Optional[StrictBool] = Field(
+        default=None,
+        description="""
+        When opening or resuming a direct message or multi-person direct message, 
+        this boolean indicates you want the full IM channel definition in the response.
+        """,
+    )
     team_id: Optional[StrictStr] = Field(
         default=None, description="encoded team id to create the channel in, required if org token is used"
+    )
+    types: Optional[Union[StrictStr, Sequence[StrictStr]]] = Field(
+        default=None,
+        description="""
+        Mix and match channel types by providing a comma-separated list of any combination of public_channel, 
+        private_channel, mpim, im.
+
+        Default: public_channel
+
+        Example: public_channel,private_channel
+        """,
+    )
+    users: Optional[Union[StrictStr, Sequence[StrictStr]]] = Field(
+        default=None,
+        description="""
+        A comma separated list of user IDs. Up to 1000 users may be listed.
+
+        Example: W1234567890,U2345678901,U3456789012
+        """,
     )
 
 
@@ -553,7 +616,8 @@ class SlackConversationsHistory(BaseIntegrationActionModel):
     limit: Optional[StrictInt] = Field(
         default=None,
         description="""
-        The maximum number of items to return. Fewer than the requested number of items may be returned, even if the end of the conversation history hasn't been reached. Maximum of 999.
+        The maximum number of items to return. Fewer than the requested number of items may be returned, 
+        even if the end of the conversation history hasn't been reached. Maximum of 999.
 
         Default: 100
         """,
@@ -598,18 +662,28 @@ class SlackConversationsInvite(BaseIntegrationActionModel):
         Example: W1234567890,U2345678901,U3456789012
         """
     )
+    force: Optional[StrictBool] = Field(
+        default=None,
+        description="""
+        When set to True and multiple user IDs are provided, 
+        continue inviting the valid ones while disregarding invalid IDs. 
+        Defaults to False.
+        """,
+    )
 
 
 class SlackConversationsInviteShared(BaseIntegrationActionModel):
     """
-    ...
+    Action model for sending an invitation to a Slack Connect channel.
     """
 
 
 class SlackConversationsJoin(BaseIntegrationActionModel):
     """
-    ...
+    Action model for joining an existing conversation.
     """
+
+    channel: StrictStr = Field(description="ID of the public or private to join.")
 
 
 class SlackConversationsKick(BaseIntegrationActionModel):
@@ -626,61 +700,204 @@ class SlackConversationsLeave(BaseIntegrationActionModel):
 
 class SlackConversationsList(BaseIntegrationActionModel):
     """
-    ...
+    Action model for listing all channels in a Slack team.
     """
+
+    cursor: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        Paginate through collections of data by setting the cursor parameter to 
+        a next_cursor attribute returned by a previous request's response_metadata. 
+        Default value fetches the first "page" of the collection
+
+        Example: dXNlcjpVMDYxTkZUVDI=
+        """,
+    )
+    exclude_archived: Optional[StrictBool] = Field(
+        default=None, description="Set to True to exclude archived channels from the list. Default: False"
+    )
+    limit: Optional[StrictInt] = Field(
+        default=None,
+        description="""
+        The maximum number of items to return. Fewer than the requested number of items may be returned, 
+        even if the end of the list hasn't been reached. Must be an integer under 1000.
+
+        Default: 100
+        """,
+    )
+    team_id: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        Encoded team id to list channels in, required if token belongs to org-wide app.
+
+        Example: T1234567890
+        """,
+    )
+    types: Optional[Union[StrictStr, Sequence[StrictStr]]] = Field(
+        default=None,
+        description="""
+        Mix and match channel types by providing a comma-separated list of any combination of public_channel, 
+        private_channel, mpim, im.
+
+        Default: public_channel
+
+        Example: public_channel,private_channel
+        """,
+    )
 
 
 class SlackConversationsListConnectInvites(BaseIntegrationActionModel):
     """
-    ...
+    Action model for listing shared channel invites that have been generated
+    or received but have not yet been approved by all parties.
     """
 
 
 class SlackConversationsMark(BaseIntegrationActionModel):
     """
-    ...
+    Action model for setting the read cursor in a channel.
     """
 
 
 class SlackConversationsMembers(BaseIntegrationActionModel):
     """
-    ...
+    Action model for retrieving members of a conversation.
     """
+
+    channel: StrictStr = Field(description="ID of the conversation to retrieve members for.")
+    cursor: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        Paginate through collections of data by setting the cursor parameter to 
+        a next_cursor attribute returned by a previous request's response_metadata. 
+        Default value fetches the first "page" of the collection
+
+        Example: dXNlcjpVMDYxTkZUVDI=
+        """,
+    )
+    limit: Optional[StrictInt] = Field(
+        default=None,
+        description="""
+        The maximum number of items to return. Fewer than the requested number of items may be returned, 
+        even if the end of the list hasn't been reached. Must be an integer under 1000.
+
+        Default: 100
+        """,
+    )
 
 
 class SlackConversationsOpen(BaseIntegrationActionModel):
     """
-    ...
+    Action model for opening or resuming a direct message or multi-person direct message.
     """
+
+    channel: Optional[StrictStr] = Field(
+        description="""Resume a conversation by supplying an im or mpim's ID. Or provide the users field instead."""
+    )
+    prevent_creation: Optional[StrictBool] = Field(
+        default=None,
+        description="""
+        Do not create a direct message or multi-person direct message. 
+        This is used to see if there is an existing dm or mpdm.
+        """,
+    )
+    return_im: Optional[StrictBool] = Field(
+        default=None, description="""Boolean, indicates you want the full IM channel definition in the response."""
+    )
+    users: Optional[Union[StrictStr, Sequence[StrictStr]]] = Field(
+        default=None,
+        description="""
+        Comma separated lists of users. If only one user is included, 
+        this creates a 1:1 DM. The ordering of the users is preserved whenever a multi-person direct message is returned. 
+        Supply a channel when not supplying users.
+
+        Example: W1234567890,U2345678901,U3456789012
+        """,
+    )
 
 
 class SlackConversationsRename(BaseIntegrationActionModel):
     """
-    ...
+    Action model for renaming a conversation.
     """
+
+    channel: StrictStr = Field(description="ID of conversation to rename.")
+    name: StrictStr = Field(description="New name for conversation.")
 
 
 class SlackConversationsReplies(BaseIntegrationActionModel):
     """
-    ...
+    Action model for retrieving a thread of messages posted to a conversation.
     """
+
+    channel: StrictStr = Field(description="Conversation ID to fetch thread from.")
+    ts: StrictStr = Field(
+        description="""
+        Unique identifier of either a thread's parent message or a message in the thread. 
+        ts must be the timestamp of an existing message with 0 or more replies. 
+        If there are no replies then just the single message referenced by ts will return - it is just an ordinary, 
+        unthreaded message.
+
+        Example: 1234567890.123456
+        """
+    )
+    cursor: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        Paginate through collections of data by setting the cursor parameter to 
+        a next_cursor attribute returned by a previous request's response_metadata. 
+        Default value fetches the first "page" of the collection
+
+        Example: dXNlcjpVMDYxTkZUVDI=
+        """,
+    )
+    include_all_metadata: Optional[StrictBool] = Field(
+        default=None, description="Return all metadata associated with this message."
+    )
+    inclusive: Optional[StrictBool] = Field(
+        default=None,
+        description="Include messages with oldest or latest timestamps in results. Ignored unless either timestamp is specified.",
+    )
+    latest: Optional[StrictStr] = Field(
+        default=None,
+        description="""Only messages before this Unix timestamp will be included in results. Default: now""",
+    )
+    limit: Optional[StrictInt] = Field(
+        default=None,
+        description="""
+        The maximum number of items to return. Fewer than the requested number of items may be returned, 
+        even if the end of the conversation history hasn't been reached. Maximum of 999.
+
+        Default: 100
+        """,
+    )
+    oldest: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        Only messages after this Unix timestamp will be included in results.
+
+        Default: 0
+
+        Example: 1234567890.123456
+        """,
+    )
 
 
 class SlackConversationsSetPurpose(BaseIntegrationActionModel):
     """
-    ...
+    Action model for setting the purpose for a conversation.
     """
 
 
 class SlackConversationsSetTopic(BaseIntegrationActionModel):
     """
-    ...
+    Action model for setting the topic for a conversation.
     """
 
 
 class SlackConversationsUnarchive(BaseIntegrationActionModel):
     """
-    ...
+    Action model for reversing conversation archival.
     """
 
 
@@ -689,15 +906,11 @@ class SlackAdmin(BaseAPIModel):
     Slack API Admin model.
     """
 
-    pass
-
 
 class SlackTeam(BaseAPIModel):
     """
     Slack API Team model.
     """
-
-    pass
 
 
 class SlackUsers(BaseAPIModel):
@@ -705,15 +918,11 @@ class SlackUsers(BaseAPIModel):
     Slack API Users model.
     """
 
-    pass
-
 
 class SlackUsergroups(BaseAPIModel):
     """
     Slack API Usergroups model.
     """
-
-    pass
 
 
 class SlackViews(BaseAPIModel):
@@ -721,15 +930,11 @@ class SlackViews(BaseAPIModel):
     Slack API Views model.
     """
 
-    pass
-
 
 class SlackReminders(BaseAPIModel):
     """
     Slack API Reminders model.
     """
-
-    pass
 
 
 class SlackApps(BaseAPIModel):
@@ -737,12 +942,8 @@ class SlackApps(BaseAPIModel):
     Slack API Apps model.
     """
 
-    pass
-
 
 class SlackFiles(BaseAPIModel):
     """
     Slack API Files model.
     """
-
-    pass
