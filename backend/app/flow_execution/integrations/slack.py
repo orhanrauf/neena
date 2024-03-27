@@ -63,10 +63,11 @@ class SlackIntegration(BaseIntegration):
 
     def check_connectivity(self) -> bool:
         """
-        Checks if the Slack API is accessible and the SDK is working.
+        Checks if the Slack API is accessible by our application and the SDK is working.
         """
-        #TODO implememt this
-        raise NotImplementedError
+        max_no_conversations = 5
+        response = self.client.conversations_list(limit=max_no_conversations)
+        return response.status_code == 200
 
     @task(task_name="Send Message")
     def send_message(self, message_to_send: SlackChatMessageSend) -> SlackChatMessageSendResponse:
@@ -76,7 +77,7 @@ class SlackIntegration(BaseIntegration):
         params = self._model_to_query_params(message_to_send)
         response = self.client.chat_postMessage(**params)
         return SlackChatMessageSendResponse(**response.data)
-    
+
     @task(task_name="Update Message")
     def update_message(self, message_to_update: SlackChatMessageUpdate) -> BaseSlackResponse:
         """

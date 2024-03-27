@@ -154,9 +154,7 @@ class SlackChatMessage(BaseAPIModel):
     unfurl_media: Optional[StrictBool] = Field(
         default=None, description="Pass false to disable unfurling of media content."
     )
-    username: Optional[StrictStr] = Field(
-        default=None, description="Set bot's user name."
-    )  # TODO: Consider defaulting this to 'Neena'.
+    username: Optional[StrictStr] = Field(default=None, description="Set bot's user name.")
 
 
 class SlackChatMessageSend(BaseIntegrationActionModel):
