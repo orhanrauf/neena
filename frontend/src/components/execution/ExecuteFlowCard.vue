@@ -85,11 +85,6 @@ const getIconUrl = (integrationShortName) => {
   return `${import.meta.env.VITE_APP_BASE_URL}images/icons/integrations/${integrationShortName}.svg`;
 }
 
-const getAttributeIcon = (attribute) => {
-  // Your logic to determine the icon based on the attribute
-  return 'mdi-information-outline'; // Example placeholder icon
-};
-
 </script>
 
 <template>
@@ -136,12 +131,15 @@ const getAttributeIcon = (attribute) => {
                   placeholder="We need to get the user profile before we can process this person’s request. Use the customer’s email from the metadata to look up their account." v-model="taskOp.instructions">
                 </textarea>
 
-                <div class="parameters-box-header">
-                  <div class="parameters-box-header">Parameters</div>
-                </div>
+                <div class="parameters-box-header">Parameters</div>
                 <textarea class="parameters-box-input"
                   placeholder="We need to get the user profile before we can process this person’s request. Use the customer’s email from the metadata to look up their account." v-model="taskOp.instructions">
                 </textarea>
+
+                <div class="result-box-header">Task output</div>
+                <div class="result-box-input">
+                <JSONViewCard :jsonData="taskOp.taskRun.result" :objectName="taskOp.taskDefinition.output_type"/>
+                </div>
 
               </VCol>
             </template>
@@ -155,6 +153,39 @@ const getAttributeIcon = (attribute) => {
 
 <style scoped>
 
+
+.result-box-header {
+  color: var(--light-solid-color-light-gray-800-hover, #777471);
+  font-feature-settings: "clig" off, "liga" off;
+  flex-grow: 1;
+  margin-top: 16px;
+  white-space: nowrap;
+  font: 400 16px/133% Helvetica Neue, -apple-system, Roboto, Helvetica,
+    sans-serif;
+}
+
+.result-box-input {
+  border-radius: 4px;
+  border: 1.4px solid var(--light-solid-color-light-gray-800-hover, #787779);
+  background-color: var(--Light-Solid-Color-Extra-Card-Background, #fff);
+  display: flex;
+  margin-top: 4px;
+  flex-direction: column;
+  padding: 10px;
+  resize: both;
+  color: #454443;
+  /* Allows resizing on both width and height */
+  overflow: auto;
+  /* Necessary for 'resize' to work */
+  height: 400;
+  /* Minimum height */
+  max-height: 600px;
+  /* Optional: Constrain the max size */
+  min-width: 100%;
+  max-width: 100%;
+
+}
+
 .instruction-box-header {
   color: var(--light-solid-color-light-gray-800-hover, #777471);
   font-feature-settings: "clig" off, "liga" off;
@@ -163,7 +194,6 @@ const getAttributeIcon = (attribute) => {
   font: 400 16px/133% Helvetica Neue, -apple-system, Roboto, Helvetica,
     sans-serif;
 }
-
 
 .instructions-box-input {
   border-radius: 4px;

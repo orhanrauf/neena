@@ -1,5 +1,5 @@
 <template>
-    <JSONViewCard :jsonData="myJsonData" />
+    <JSONViewCard :jsonData="myJsonData" :objectName="myObject"/>
   </template>
   
   <script setup>
@@ -9,4 +9,6 @@
     number: 42,
     nested: { hello: "world" }
   };
+
+  const myObject = 'MyObject';
   </script>

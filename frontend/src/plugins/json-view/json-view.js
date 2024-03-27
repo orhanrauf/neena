@@ -12,13 +12,16 @@ const classes = {
 }
 
 function expandedTemplate(params = {}) {
-  const { key } = params;
+  const { key, depth, objectName } = params;
+  // Use "Your Object" for direct children of the root (depth 1)
+  const displayKey = depth === 0 ? objectName : key;
+
   return `
     <div class="line">
       <div class="caret-icon"><i class="fas fa-caret-right"></i></div>
-      <div class="json-key">${key}</div>
+      <div class="json-key">${displayKey}</div>
     </div>
-  `
+  `;
 }
 
 function notExpandedTemplate(params = {}) {
@@ -92,14 +95,15 @@ export function toggleNode(node) {
  * @param {object} node 
  * @return html element
  */
-function createNodeElement(node) {
+function createNodeElement(node, objectName) {
   let el = element('div');
-
 
   if (node.children.length > 0) {
     el.innerHTML = expandedTemplate({
       key: node.key,
-    })
+      depth: node.depth,
+      objectName: objectName
+    });
     const caretEl = el.querySelector('.' + classes.CARET_ICON);
     node.dispose = listen(caretEl, 'click', () => toggleNode(node));
   } else {
@@ -107,7 +111,7 @@ function createNodeElement(node) {
       key: node.key,
       value: node.value,
       type: node.value === '{}' ? 'object' : typeof node.value
-    })
+    });
   }
 
   const lineEl = el.children[0];
@@ -172,7 +176,8 @@ function createNode(opt = {}) {
  * @param {object} Json data
  * @param {object} node
  */
-function createSubnode(data, node) {
+function createSubnode(data
+  , node) {
   if (typeof data === 'object') {
     for (let key in data) {
       const child = createNode({
@@ -225,12 +230,13 @@ export function renderJSON(jsonData, targetElement) {
  * Render tree into DOM container
  * @param {object} tree
  * @param {htmlElement} targetElement
+ * @param {string} objectName 
  */
-export function render(tree, targetElement) {
+export function render(tree, targetElement, objectName) {
   const containerEl = createContainerElement();
 
   traverse(tree, function(node) {
-    node.el = createNodeElement(node);
+    node.el = createNodeElement(node, objectName);
     containerEl.appendChild(node.el);
   });
 

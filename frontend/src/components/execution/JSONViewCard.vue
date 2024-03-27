@@ -9,20 +9,24 @@ const props = defineProps({
     jsonData: {
         type: Object,
         required: true
+    },
+    objectName: {
+        type: String,
+        required: true
+    },
+    expanded: {
+        type: Boolean,
+        default: true
     }
 });
 
 onMounted(() => {
     const dataStr = JSON.stringify(props.jsonData);
-
-    // Create the JSON tree object
     const tree = jsonview.create(dataStr);
-
-    // Render the tree into the DOM element
-    jsonview.render(tree, document.querySelector('.root'));
-
-    // Optionally, expand the tree
-    jsonview.expand(tree);
+    jsonview.render(tree, document.querySelector('.root'), props.objectName);
+    if (props.expanded) {
+        jsonview.expand(tree);
+    }
 });
 </script>
 
