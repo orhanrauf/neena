@@ -131,7 +131,7 @@ class SlackIntegration(BaseIntegration):
         return SlackChatMessageGetPermalinkResponse(**response.data)
 
     @task(task_name="Send Me Message")
-    def send_me_message(self, message_to_send: SlackChatMessageSendMe) -> :
+    def send_me_message(self, message_to_send: SlackChatMessageSendMe) -> SlackChatMessageSendMeResponse:
         """
         Share a me message into a channel.
         """
