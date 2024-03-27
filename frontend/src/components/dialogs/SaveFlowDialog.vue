@@ -24,17 +24,21 @@ import { useStore } from 'vuex';
 
 const store = useStore();
 
-const requestContent = computed(() => store.state.flowCreation.request.content);
+const requestContent = computed(() => store.state.flowCreation.flowRequest.request_instructions);
 const flowDescription = ref(`Flow for ${requestContent.value}`);
 
 watch(requestContent, (newValue) => {
     flowDescription.value = `Flow for ${newValue}`;
+    store.state.flowCreation.flow.name = flowDescription.value;
 });
 
-const saveFlow = () => {
-    // Implement logic to save the flow
-    alert(`Flow saved: ${flowDescription.value}`);
-};
+const saveFlow = async () => {
+    const flow = store.state.flowCreation.flow;
+    flow.name = flowDescription.value;
+    await store.dispatch('saveFlow');
+    await store.dispatch('updateFlowRequestWithFlowId', flow);
+    store.state.flowCreation.isSaveWorkflowPopupVisible = false;
+    };
 </script>
 
 <style scoped>

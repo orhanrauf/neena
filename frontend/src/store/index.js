@@ -25,20 +25,22 @@ const store = createStore({
                 authDateTimestamp: null,
             },
             flowCreation: {
-                request: null, // flow request
+                flowRequest: {}, // flow request
                 drawflowEditor: null, // entire DrawFlow object
                 flow: {
-                    // flow object
+                    name: '',
                     task_operations: [],
                     dependencies: [],
                 },
                 isGenerating: false,
                 error: null,
+                isSaveWorkflowPopupVisible: false,
             },
             taskDefinitions: [],
             integrations: [],
             flowRequests: [],
             integrations: [],
+            flows: [],
         };
     },
     getters: {
@@ -91,13 +93,13 @@ const store = createStore({
         getDependenciesBySourceNodeId: (state) => (sourceNodeId) => {
             const dependencies = state.flowCreation.flow.dependencies;
             return dependencies.filter(
-                (dependency) => dependency.source_node_id === sourceNodeId
+                (dependency) => dependency.source_drawflow_node_id === sourceNodeId
             );
         },
         getDependenciesByTargetNodeId: (state) => (targetNodeId) => {
             const dependencies = state.flowCreation.flow.dependencies;
             return dependencies.filter(
-                (dependency) => dependency.target_node_id === targetNodeId
+                (dependency) => dependency.target_drawflow_node_id === targetNodeId
             );
         },
         getTaskOperationsThatThisTaskOperationDependsOn: (state) => (taskOperation) => {
@@ -106,10 +108,10 @@ const store = createStore({
             const dependencyIds = dependencies
                 .filter(
                     (dependency) =>
-                        dependency.target_node_id ===
+                        dependency.target_drawflow_node_id ===
                         taskOperation.drawflow_node_id
                 )
-                .map((dependency) => dependency.source_node_id);
+                .map((dependency) => dependency.source_drawflow_node_id);
             return task_operations.filter((operation) =>
                 dependencyIds.includes(operation.drawflow_node_id)
             );
@@ -120,10 +122,10 @@ const store = createStore({
             const dependencyIds = dependencies
                 .filter(
                     (dependency) =>
-                        dependency.source_node_id ===
+                        dependency.source_drawflow_node_id ===
                         taskOperation.drawflow_node_id
                 )
-                .map((dependency) => dependency.target_node_id);
+                .map((dependency) => dependency.target_drawflow_node_id);
             return task_operations.filter((operation) =>
                 dependencyIds.includes(operation.drawflow_node_id)
             );
@@ -132,13 +134,23 @@ const store = createStore({
             const dependencies = state.flowCreation.flow.dependencies;
             const index = dependencies.findIndex(
                 (dependency) =>
-                    dependency.source_node_id === sourceNodeId &&
-                    dependency.target_node_id === targetNodeId
+                    dependency.source_drawflow_node_id === sourceNodeId &&
+                    dependency.target_drawflow_node_id === targetNodeId
             );
             return dependencies[index];
         },
+        getDrawFlowNodeXandY: (state) => (drawflowNodeId) => {
+            const editor = state.flowCreation.drawflowEditor;
+            const exportData = editor.export();
+            const nodes = exportData.drawflow.Home.data;
+            const node = nodes[drawflowNodeId];
+            return { x: node.pos_x, y: node.pos_y };
+        }
     },
     mutations: {
+        setFlows(state, flows) {
+            state.flows = flows;
+        },
         startFlowGeneration(state) {
             state.flowCreation.isGenerating = true;
             state.flowCreation.flow = null;
@@ -171,8 +183,8 @@ const store = createStore({
             delete neenaData.auth;
             localStorage.setItem('neena', JSON.stringify(neenaData));
         },
-        setRequest(state, request) {
-            state.flowCreation.request = request;
+        setRequest(state, flowRequest) {
+            state.flowCreation.flowRequest = flowRequest;
         },
         setDrawflowEditor(state, drawflowEditor) {
             state.flowCreation.drawflowEditor = drawflowEditor;
@@ -182,6 +194,7 @@ const store = createStore({
         },
         // Task operation mutations
         addTaskOperation(state, taskOperation) {
+            taskOperation.index = getNewTaskOpIndex(state);
             state.flowCreation.flow.task_operations.push(taskOperation);
         },
         addDrawFlowNodeIdToTaskOperation(state, { taskOperationId, drawflowNodeId }) {
@@ -212,17 +225,30 @@ const store = createStore({
             console.log('Adding dependency', dependency);
             state.flowCreation.flow.dependencies.push(dependency);
         },
+        addDependencyIfNotExists: (state, payload) => {
+            const dependencies = state.flowCreation.flow.dependencies;
+            const { sourceDrawflowNodeId, targetDrawflowNodeId, sourceTaskOperation, targetTaskOperation } = payload;
+            if (!checkIfDependencyExists(state, sourceDrawflowNodeId, targetDrawflowNodeId)) {
+                const dependency = {
+                    source_drawflow_node_id: sourceDrawflowNodeId,
+                    target_drawflow_node_id: targetDrawflowNodeId,
+                    source_task_operation: sourceTaskOperation.index,
+                    target_task_operation: targetTaskOperation.index,
+                };
+                dependencies.push(dependency);
+            }
+        },
         deleteDependencyByTargetNodeId(state, targetNodeId) {
             const dependencies = state.flowCreation.flow.dependencies;
             const index = dependencies.findIndex(
-                (dependency) => dependency.target_node_id === targetNodeId
+                (dependency) => dependency.target_drawflow_node_id === targetNodeId
             );
             state.flowCreation.flow.dependencies.splice(index, 1);
         },
         deleteDependencyBySourceNodeId(state, sourceNodeId) {
             const dependencies = state.flowCreation.flow.dependencies;
             const index = dependencies.findIndex(
-                (dependency) => dependency.source_node_id === sourceNodeId
+                (dependency) => dependency.source_drawflow_node_id === sourceNodeId
             );
             state.flowCreation.flow.dependencies.splice(index, 1);
         },
@@ -232,9 +258,12 @@ const store = createStore({
         setFlowRequests(state, flowRequests) {
             state.flowRequests = flowRequests;
         },
+        setFlow(state, flow) {
+            state.flowCreation.flow = flow;
+        }
     },
     actions: {
-        buildDrawFlowFromApi: ({ state, commit }, flow) => {
+        buildDrawFlowFromApi: ({ state, commit, getters }, flow) => {
             const editor = state.flowCreation.drawflowEditor;
             const { task_operations, dependencies } = flow;
 
@@ -243,6 +272,8 @@ const store = createStore({
 
             var xPlus = 200;
             var yPlus = 100;
+
+            const coordinatesAreSet = task_operations.every((taskOperation) => taskOperation.x && taskOperation.y);
 
             task_operations.sort((a, b) => a.sorted_index - b.sorted_index);
 
@@ -259,8 +290,8 @@ const store = createStore({
                     taskOperation.name,
                     1, // inputs
                     1, // outputs
-                    taskOperation.x || Math.floor(Math.random() * 100) + xPlus,
-                    taskOperation.y || Math.floor(Math.random() * 100) + yPlus,
+                    taskOperation.x || (coordinatesAreSet ? taskOperation.x : Math.floor(Math.random() * 100) + xPlus),
+                    taskOperation.y || (coordinatesAreSet ? taskOperation.y : Math.floor(Math.random() * 100) + yPlus),
                     "node",
                     {},
                     "Node",
@@ -274,20 +305,19 @@ const store = createStore({
             setTimeout(() => {
                 // Add dependencies using the drawflow node IDs
                 dependencies.forEach((dependency) => {
-                    const sourceNodeId = store.getters.getTaskOperationByIndex(dependency.source_task_operation).drawflow_node_id;
-                    const targetNodeId = store.getters.getTaskOperationByIndex(dependency.target_task_operation).drawflow_node_id;
-                    if (sourceNodeId && targetNodeId) {
+                    const sourceNodeId = getters.getTaskOperationByIndex(dependency.source_task_operation).drawflow_node_id;
+                    const targetNodeId = getters.getTaskOperationByIndex(dependency.target_task_operation).drawflow_node_id;
+                    
+                    dependency.source_drawflow_node_id = sourceNodeId;
+                    dependency.target_drawflow_node_id = targetNodeId;
                     editor.addConnection(
                         sourceNodeId.toString(),
                         targetNodeId.toString(),
                         "output_1", // output index
                         "input_1", // input index
                     );
-                    }
                 });
-              }, 50);
-
-            
+              }, 200);
         },
         async generateFlow({ commit }, flowRequestId) {
             commit('startFlowGeneration');
@@ -304,6 +334,17 @@ const store = createStore({
                 const taskDefinitions = response.data;
                 commit('setTaskDefinitions', taskDefinitions);
             }
+        },
+        fetchFlows: async ({ commit, state }, id) => {
+            const response = await http.get(`/flows/all?limit=20`);
+            const flows = response.data;
+            commit('setFlows', flows);
+            return flows;
+        },
+        fetchFlowById: async ({ commit, state }, id) => {
+            const response = await http.get(`/flows/?id=${id}`);
+            state.flowCreation.flow = response.data;
+            return response.data;
         },
         fetchIntegrations: async ({ commit, state }) => {
             if (state.integrations.length === 0) {
@@ -373,9 +414,60 @@ const store = createStore({
             const response = await http.post('/flow_requests/', flow);
             return response;
         },
+        saveFlow: async ({ state, commit, getters }) => {
+            const flow = state.flowCreation.flow;
+            const taskOperations = flow.task_operations;
+            // Update x and y directly within the taskOperations array
+            taskOperations.forEach(taskOperation => {
+                const { x, y } = getters.getDrawFlowNodeXandY(taskOperation.drawflow_node_id);
+                taskOperation.x = x;
+                taskOperation.y = y;
+            });
+
+            let response;
+            if (flow.id) {
+                response = await http.put(`/flows/`, flow);
+            } else {
+                response = await http.post('/flows/', flow);
+            }
+            // Update the flow in your state to reflect any changes from the server
+            state.flowCreation.flow = response.data;
+            
+            return response;
+        },
+        updateFlowRequestWithFlowId: async ({ state, commit }, flow) => {;
+            var flowRequest = state.flowCreation.flowRequest;
+            flowRequest.flow = flow.id;
+            const response = await http.put('/flow_requests/', flowRequest);
+            return response;
+        },
+        executeFlow: async ({ state, commit }, flowId) => {
+            const response = await http.post(`/flows/execute?id=${flowId}`);
+            state.flowCreation.flow = response.data;
+            return response;
+        }
     },
     plugins: [vuexPersist.plugin]
 });
+
+function getNewTaskOpIndex(state) {
+    if (!state.flowCreation.flow.task_operations) {
+        return 0;
+    }
+    const task_operations = state.flowCreation.flow.task_operations;
+    return task_operations.length > 0
+        ? Math.max(...task_operations.map((op) => op.index)) + 1
+        : 0;
+}
+
+function checkIfDependencyExists(state, sourceDrawflowNodeId, targeDrawFlowtNodeId) {
+    const dependencies = state.flowCreation.flow.dependencies;
+    return dependencies.some(
+        (dependency) =>
+            dependency.source_drawflow_node_id === sourceDrawflowNodeId &&
+            dependency.target_drawflow_node_id === targeDrawFlowtNodeId
+    );
+}
 
 function getNewTaskOpName(state, taskDefinition) {
     const editor = state.flowCreation.drawflowEditor;

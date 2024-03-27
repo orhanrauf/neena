@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 from app.models import IntegrationCredential
@@ -40,8 +41,7 @@ class CRUDIntegrationCredential(
             )
             .first()
         )
-            
-
+        
     def update_by_integration_and_user_email(
         self, db: Session, modified_by_email: str, credential_update: IntegrationCredentialUpdate
     ) -> Optional[IntegrationCredential]:
@@ -51,6 +51,8 @@ class CRUDIntegrationCredential(
 
         credential = self.get_by_integration_and_user_email(db, credential_update.integration, modified_by_email)
         if credential:
+            credential.modified_by_email = modified_by_email
+            credential.modified_date = datetime.utcnow()
             for key, value in credential_update.dict(exclude_unset=True).items():
                 setattr(credential, key, value)
             db.commit()

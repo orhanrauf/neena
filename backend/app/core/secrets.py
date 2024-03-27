@@ -30,6 +30,14 @@ class AzureKeyVault:
         :param secret_value: The value of the secret.
         """
         self.client.set_secret(secret_name, secret_value)
+    
+    def delete_secret(self, secret_name: str) -> None:
+        """
+        Deletes a secret from Azure Key Vault.
+
+        :param secret_name: The name of the secret to delete.
+        """
+        self.client.begin_delete_secret(secret_name)
 
 key_vault = AzureKeyVault()
 

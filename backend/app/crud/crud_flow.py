@@ -1,5 +1,5 @@
 import datetime
-from typing import Any
+from typing import Any, Dict, Union
 
 from app.crud.base import CRUDBase
 from sqlalchemy.orm import Session
@@ -54,64 +54,85 @@ class CRUDFlow(CRUDBase[Flow, FlowCreate, FlowUpdate]):
 
         return db_flow
 
-    def update(self, db: Session, *, updated_flow: FlowUpdate, current_user: User):
-        # Retrieve the existing Flow object from the database
-        existing_flow = db.query(Flow).get(updated_flow.id)
-        existing_flow.name = updated_flow.name
-        existing_flow.modified_by_human = True
-        existing_flow.modified_by_email = current_user.email
-        existing_flow.modified_date = datetime.now()
+    def update(self, db: Session, *, flow: FlowUpdate, current_user: User) -> Flow:
+        db_flow = db.query(Flow).filter(Flow.id == flow.id).first()
+        flow = self._update_flow(db=db, db_obj=db_flow, obj_in=flow, current_user=current_user)
+        return flow
 
-        # Delete task operations that exist in the database but not in the updated Flow object
-        for task_op in existing_flow.task_operations:
-            if task_op not in flow.task_operations:
+    def _update_flow(
+        self,
+        db: Session,
+        *,
+        db_obj: Flow,
+        obj_in: Union[FlowUpdate, Dict[str, Any]],
+        current_user: User = None
+    ) -> Flow:
+        if not isinstance(obj_in, dict):
+            obj_in_data = obj_in.dict(exclude_unset=True)
+        else:
+            obj_in_data = obj_in
+
+        # Update the simple fields of Flow
+        for key, value in obj_in_data.items():
+            if key not in ['task_operations', 'dependencies'] and hasattr(db_obj, key):
+                setattr(db_obj, key, value)
+
+        # Handle TaskOperations
+        new_task_operations_data = [t for t in obj_in_data['task_operations'] if t.get('id') is None]
+        existing_task_operations_data = [t for t in obj_in_data['task_operations'] if t.get('id') is not None]
+        
+        # Update existing task operations
+        for task_op_data in existing_task_operations_data:
+            task_op = db.query(TaskOperation).get(task_op_data.get('id'))
+            if task_op:
+                for key, value in task_op_data.items():
+                    setattr(task_op, key, value)
+
+        # Add new task operations
+        for task_op_data in new_task_operations_data:
+            new_task_op = TaskOperation(**task_op_data)
+            new_task_op.created_by_email = current_user.email
+            new_task_op.modified_by_email = current_user.email
+            db_obj.task_operations.append(new_task_op)
+
+        # Delete task operations that are no longer present
+        updated_task_operations_ids = {task_op_data.get('id') for task_op_data in existing_task_operations_data if task_op_data.get('id') is not None}
+        for task_op in db_obj.task_operations[:]:
+            if task_op.id and task_op.id not in updated_task_operations_ids:
                 db.delete(task_op)
 
-        # Update task operations that exist in both the database and the updated Flow object
-        for task_op in updated_flow.task_operations:
-            task_op.flow = existing_flow.id
-            if any(task_op.index == updated_task.index for updated_task in existing_flow.task_operations):
+        # Handle Dependencies
+        new_dependencies_data = [d for d in obj_in_data['dependencies'] if d.get('id') is None]
+        existing_dependencies_data = [d for d in obj_in_data['dependencies'] if d.get('id') is not None]
 
-                # Retrieve the corresponding updated task operation
-                updated_task_op = next(
-                    updated_task
-                    for updated_task in existing_flow.task_operations
-                    if updated_task.index == task_op.index
-                )
+        # Update existing dependencies
+        for dep_data in existing_dependencies_data:
+            dep = db.query(Dependency).get(dep_data.get('id'))
+            if dep:
+                for key, value in dep_data.items():
+                    setattr(dep, key, value)
 
-                # Perform any necessary updates to the task operation
-                for attr, value in task_op.__dict__.items():
-                    if attr != "index":
-                        setattr(updated_task_op, attr, value)
+        # Add new dependencies
+        for dep_data in new_dependencies_data:
+            new_dep = Dependency(**dep_data)
+            new_dep.created_by_email = current_user.email
+            new_dep.modified_by_email = current_user.email
+            db_obj.dependencies.append(new_dep)
 
-        # Add new task operations that exist in the updated Flow object but not in the database
-        for task_op in updated_flow.task_operations:
-            if not any(task_op.index == existing_task_op.index for existing_task_op in existing_flow.task_operations):
-                db.add(task_op)
+        # Delete dependencies that are no longer present
+        updated_dependencies_ids = {dep_data.get('id') for dep_data in existing_dependencies_data if dep_data.get('id') is not None}
+        for dep in db_obj.dependencies[:]:
+            if dep.id and dep.id not in updated_dependencies_ids:
+                db.delete(dep)
 
-        for dependency in updated_flow.dependencies:
-            dependency.flow = existing_flow.id
-
-            existing_dependency = next(
-                (
-                    dep
-                    for dep in existing_flow.dependencies
-                    if dep.source_task_operation == dependency.source_task_operation
-                    and dep.target_task_operation == dependency.source_task_operation
-                ),
-                None,
-            )
-
-            if existing_dependency:
-                # Update existing dependency
-                for key, value in dependency.items():
-                    setattr(existing_dependency, key, value)
-            else:
-                # Create new dependency
-                new_dependency = Dependency(**dependency.model_dump())
-                db.add(new_dependency)
-
+        # Update modified_by_email and commit changes
+        if current_user:
+            db_obj.modified_by_email = current_user.email
+            
+        db.add(db_obj)
         db.commit()
+        db.refresh(db_obj)
 
+        return db_obj
 
 flow = CRUDFlow(Flow)

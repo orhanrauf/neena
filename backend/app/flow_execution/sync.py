@@ -2,7 +2,7 @@ import os
 import importlib
 import inspect
 import typing
-from typing import List, Dict, Type
+from typing import List, Dict, Type, get_args, get_origin
 from uuid import UUID, uuid4
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -66,17 +66,18 @@ def extract_parameters_from_model(model: Union[Type[BaseNeenaModel], List[Type[B
         raise ValueError("Model must be of type BaseNeenaModel or a list of BaseNeenaModel")
     
     parameters = []
-    # Use model.__annotations__ to get type information
     for i, (field_name, field_type) in enumerate(model.__annotations__.items()):
-        field_info = model.model_fields[field_name]
+        field_info = model.__fields__[field_name]  # Use __fields__ to access Pydantic model fields
         
+        optional = get_origin(field_type) is Union and type(None) in get_args(field_type)
+
         parameters.append(
             TaskParameter(
                 name=field_name,
                 data_type=str(field_type),
-                position=i, 
+                position=i,
                 doc_string=field_info.description or "",
-                optional=field_info.default is not None or field_info.default_factory is not None
+                optional=optional
             )
         )
     return parameters
