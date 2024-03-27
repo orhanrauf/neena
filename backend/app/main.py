@@ -77,6 +77,8 @@ async def exception_logging_middleware(request: Request, call_next):
         return response
     except Exception as exc:
         # Log the exception with traceback
+        
+        print(f"Unhandled exception: {exc}\n{traceback.format_exc()}")
         logger.error(f"Unhandled exception: {exc}\n{traceback.format_exc()}")
 
         # Return a generic error response
