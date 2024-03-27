@@ -30,7 +30,7 @@ class ExecutionContext:
     as well as managing the state of the flow run.
     """
 
-    def __init__(self, db: Session, user: schemas.User, flow: Flow, flow_run: FlowRun = None):
+    def __init__(self, db: Session, user: schemas.User, flow: Flow, flow_request: schemas.FlowRequest, flow_run: FlowRun = None):
         self.user = user
         self.flow = flow
         flow.topological_sort()
@@ -38,6 +38,7 @@ class ExecutionContext:
         self.db = SessionLocal() if not db else db
         self.path_to_integrations = "app.flow_execution.integrations"
         self.flow_run = flow_run
+        self.flow_request = flow_request
 
     def run_flow(self) -> FlowRun:
         """
@@ -117,6 +118,8 @@ class ExecutionContext:
 
         if isinstance(task_result.data, list):
             task_run.result = task_result.data
+        elif isinstance(task_result.data, dict):
+            task_run.result = task_result.data
         elif task_result.data is None:
             task_run.result = None
         else:
@@ -166,7 +169,7 @@ class ExecutionContext:
         Prepares a task for execution by generating a prompt and sending it to the TaskPreparationGenerator.
         """
         task_prep_prompt, task_prep_answer = task_preparation_generator.generate(
-            self.flow, self.flow_run, task_operation_index, task_definition
+            self.flow, self.flow_run, task_operation_index, task_definition, self.flow_request
         )
         return task_prep_prompt, task_prep_answer
 

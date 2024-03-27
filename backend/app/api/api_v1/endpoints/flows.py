@@ -124,7 +124,7 @@ def generate_flow_and_execute(
     user = crud.user.get_by_email(db, email=current_user.email)
     generate_flow_schema = schemas.Flow.from_orm(generated_flow_db)
 
-    execution_context = ExecutionContext(user=user, flow=generate_flow_schema)
+    execution_context = ExecutionContext(user=user, flow=generate_flow_schema, flow_request=flow_request)
     flow_run = execution_context.run_flow()
 
     return flow_run
@@ -154,20 +154,23 @@ def execute(
     *,
     background_tasks: BackgroundTasks,
     db: Session = Depends(deps.get_db),
-    id: str,
+    flow_id: str,
+    flow_request_id: str,
     current_user: Auth0User = Depends(auth.get_user),
 ) -> schemas.FlowRun:
     """
     Execute flow by given Flow ID.
     """
     user = crud.user.get_by_email(db, email=current_user.email)
-    flow_db = crud.flow.get(db=db, id=id)
+    flow_db = crud.flow.get(db=db, id=flow_id)
+    flow_request_db = crud.flow_request.get(db=db, id=flow_request_id)
     
     flow_schema = schemas.Flow.from_orm(flow_db)
-    user_schem = schemas.User.from_orm(user)    
+    user_schem = schemas.User.from_orm(user)
+    flow_request_schema = schemas.FlowRequest.from_orm(flow_request_db)
     flow_run_schema = _create_flow_run(db, flow_schema, user)
 
-    execution_context = ExecutionContext(db=db, user=user_schem, flow=flow_schema, flow_run=flow_run_schema)
+    execution_context = ExecutionContext(db=db, user=user_schem, flow=flow_schema, flow_request=flow_request_schema, flow_run=flow_run_schema)
     
     background_tasks.add_task(execution_context.run_flow)
 

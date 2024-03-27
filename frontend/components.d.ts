@@ -370,6 +370,8 @@ declare module 'vue' {
     DrawFlow: typeof import('./src/components/DrawFlow.vue')['default']
     EnableOneTimePasswordDialog: typeof import('./src/components/dialogs/EnableOneTimePasswordDialog.vue')['default']
     ErrorHeader: typeof import('./src/components/ErrorHeader.vue')['default']
+    ExecuteFlowCard: typeof import('./src/components/execution/ExecuteFlowCard.vue')['default']
+    FlowExecutionMetadataCard: typeof import('./src/components/execution/FlowExecutionMetadataCard.vue')['default']
     I18n: typeof import('./src/@core/components/I18n.vue')['default']
     MoreBtn: typeof import('./src/@core/components/MoreBtn.vue')['default']
     Node: typeof import('./src/components/nodes/Node.vue')['default']

@@ -8,7 +8,9 @@ import Drawflow from "../plugins/drawflow/drawflow.js";
 import { defineEmits, onMounted, shallowRef, h, getCurrentInstance, render, ref, ComponentInternalInstance, ShallowRef } from "vue";
 import Node from "./nodes/Node.vue";
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
+const router = useRouter()
 const store = useStore();
 const isRequestPopupVisible = ref(false);
 const showDrawer = ref(false);
@@ -36,19 +38,22 @@ const saveWorkflowTogglePopup = () => {
 const closeOnEsc = (event) => {
   if (event.key === 'Escape') {
     isRequestPopupVisible.value = false;
-    isSaveWorkflowPopupVisible.value = false;
+    store.state.flowCreation.isSaveWorkflowPopupVisible = false;
   }
 };
 
 const saveFlow = async () => {
   const flow = store.state.flowCreation.flow;
+
+
   try {
+
+    if(flow.name === '' || flow.name === null || flow.name === undefined || flow.name.includes('Placeholder')) {
+      flow.name = `Flow for ${store.state.flowCreation.flowRequest.request_instructions}`;
+    }
+
     const saveFlowResponse = await store.dispatch('saveFlow', flow);
-    console.log(saveFlowResponse);
-    const updateFlowRequestResponse = await store.dispatch('updateFlowRequest', flow);
-    console.log(updateFlowRequestResponse);
-    console.log("zbatot energy")
-    isSaveWorkflowPopupVisible.value = false;
+    const updateFlowRequestResponse = await store.dispatch('updateFlowRequestWithFlowId', flow);
   } catch (error) {
     console.error(error);
   }
@@ -57,9 +62,19 @@ const saveFlow = async () => {
 const executeFlow = async () => {
   const flow = store.state.flowCreation.flow;
   await saveFlow();
-  const executeFlowResponse = await store.dispatch('executeFlow', flow.id);
+  const updateFlowRequestResponse = await store.dispatch('updateFlowRequestWithFlowId', flow);
+  const executeFlowResponse = await store.dispatch('executeFlow', {
+    flowId: flow.id,
+    flowRequestId: store.state.flowCreation.flowRequest.id
+  });
+  
+  store.commit('setFlowRun', executeFlowResponse.data);
+  store.commit('setFlowForFlowExecution', store.state.flowCreation.flow);
+
   console.log(executeFlowResponse);
+  router.push('/execute-flow');
 };
+
 
 window.addEventListener('keydown', closeOnEsc);
 

@@ -5,12 +5,13 @@ import openai
 from app.core.config import settings
 from app.core.logging import logger
 from app.db.session import SessionLocal
-from app.schemas.task_prep_prompt import TaskPrepPromptBase
+from app.schemas.flow_request import FlowRequest
 from app.schemas.flow import Flow
 from app.schemas.flow_run import FlowRun
 from app.schemas.task_definition import TaskDefinition
 from app.schemas.task_operation import TaskOperationBase
 from app.schemas.task_prep_answer import TaskPrepAnswerBase
+from app.schemas.task_prep_prompt import TaskPrepPromptBase
 
 
 class TaskPreparationGenerator:
@@ -29,12 +30,12 @@ class TaskPreparationGenerator:
         self.database = SessionLocal()
 
     def generate(
-        self, flow: Flow, flow_run: FlowRun, task_operation_index: int, task_definition: TaskDefinition
+        self, flow: Flow, flow_run: FlowRun, task_operation_index: int, task_definition: TaskDefinition, flow_request: FlowRequest
     ) -> tuple[TaskPrepPromptBase, TaskPrepAnswerBase]:
         """
         Generates a prompt for the task preparation and sends it to the OpenAI API to generate an answer.
         """
-        task_prep_prompt = self._create_task_prep_prompt(flow, flow_run, task_operation_index, task_definition)
+        task_prep_prompt = self._create_task_prep_prompt(flow, flow_run, task_operation_index, task_definition, flow_request)
         task_prep_answer = self._create_task_prep_answer(task_prep_prompt)
 
         return task_prep_prompt, task_prep_answer
@@ -66,7 +67,7 @@ class TaskPreparationGenerator:
             logger.error(e.response)
 
     def _create_task_prep_prompt(
-        self, flow: Flow, flow_run: FlowRun, task_operation_index: int, task_definition: TaskDefinition
+        self, flow: Flow, flow_run: FlowRun, task_operation_index: int, task_definition: TaskDefinition, flow_request: FlowRequest
     ) -> TaskPrepPromptBase:
         """
         Creates a task preparation prompt based on the given flow, flow run, task operation index, and task definition.
@@ -183,7 +184,7 @@ class TaskPreparationGenerator:
             {
                 "role": "user",
                 "content": f"""
-                    Request: find and update the project planning card by adding the following item: "migrate database"
+                    Request: {flow_request.request_instructions}
 
                     This is task operation {task_operation_index} in the flow with name {task_operation.name}. In the sorted order this is number {task_operation.sorted_index} in the flow.
                     

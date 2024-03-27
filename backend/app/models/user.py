@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from . import TaskDefinition
     from . import Flow
     from . import TaskOperation
+    from . import FlowRun
 
 class User(Base):
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid4)

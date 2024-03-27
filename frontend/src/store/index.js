@@ -36,11 +36,16 @@ const store = createStore({
                 error: null,
                 isSaveWorkflowPopupVisible: false,
             },
+            flowExecution: {
+                flow: {},
+                flowRun: {},
+                latestUpdate: null,
+            },
             taskDefinitions: [],
             integrations: [],
             flowRequests: [],
-            integrations: [],
             flows: [],
+            flowRun: {},
         };
     },
     getters: {
@@ -192,6 +197,11 @@ const store = createStore({
         setTaskDefinitions(state, taskDefinitions) {
             state.taskDefinitions = taskDefinitions;
         },
+        setFlowRun(state, flowRun) {
+            state.flowExecution.flowRun = flowRun;
+            state.flowExecution.latestUpdate = Date.now();
+
+        },
         // Task operation mutations
         addTaskOperation(state, taskOperation) {
             taskOperation.index = getNewTaskOpIndex(state);
@@ -260,6 +270,9 @@ const store = createStore({
         },
         setFlow(state, flow) {
             state.flowCreation.flow = flow;
+        },
+        setFlowForFlowExecution(state, flow) {
+            state.flowExecution.flow = flow;
         }
     },
     actions: {
@@ -345,14 +358,6 @@ const store = createStore({
             const response = await http.get(`/flows/?id=${id}`);
             state.flowCreation.flow = response.data;
             return response.data;
-        },
-        fetchIntegrations: async ({ commit, state }) => {
-            if (state.integrations.length === 0) {
-                const response = await http.get('/integrations/all');
-                const integrations = response.data;
-                console.log('Integrations', integrations);
-                commit('setIntegrations', integrations);
-            }
         },
         fetchFlowRequests: async ({ commit, state }) => {
             const response = await http.get('/flow_requests/all');
@@ -441,11 +446,19 @@ const store = createStore({
             const response = await http.put('/flow_requests/', flowRequest);
             return response;
         },
-        executeFlow: async ({ state, commit }, flowId) => {
-            const response = await http.post(`/flows/execute?id=${flowId}`);
-            state.flowCreation.flow = response.data;
+        executeFlow: async ({ state, commit }, {flowId, flowRequestId}) => {
+            const response = await http.post(`/flows/execute?flow_id=${flowId}&flow_request_id=${flowRequestId}`);
+            state.flowExecution.flowRun = response.data;
             return response;
-        }
+        },
+        getFlowRun: async ({ commit }, flowRunId) => {
+            try {
+              const response = await http.get(`/flow_runs?id=${flowRunId}`);
+              commit('setFlowRun', response.data);
+            } catch (error) {
+              console.error(error);
+            }
+          },
     },
     plugins: [vuexPersist.plugin]
 });
