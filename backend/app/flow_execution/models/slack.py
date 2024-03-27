@@ -13,7 +13,7 @@ class BaseSlackResponse(BaseAPIModel):
     Base model for Slack API responses. All Slack API responses should inherit from this model.
     """
 
-    ok: StrictBool = Field(description="Indicates the success of the API call.")
+    ok: bool = Field(description="Indicates the success of the API call.")
     error: Optional[StrictStr] = Field(default=None, description="Error message if the API call was unsuccessful.")
     warning: Optional[StrictStr] = Field(
         default=None, description="Warning message if the API call was successful but with warnings."
@@ -23,12 +23,67 @@ class BaseSlackResponse(BaseAPIModel):
 
 class SlackChatMessageSendResponse(BaseSlackResponse):
     """
-    Model for the response of the chat.postMessage API method.
+    Response model for the chat.postMessage Slack API method.
     """
 
     channel: Optional[StrictStr] = Field(default=None, description="ID of the channel the message was posted in.")
     ts: Optional[StrictStr] = Field(default=None, description="Timestamp of the message.")
     message: Optional[dict] = Field(default=None, description="The message that was posted.")
+
+
+class SlackChatMessageUpdateResponse(BaseSlackResponse):
+    """
+    Response model for the chat.update Slack API method.
+    """
+
+    channel: Optional[StrictStr] = Field(default=None, description="Channel containing the updated message.")
+    ts: Optional[StrictStr] = Field(default=None, description="Timestamp of the updated message.")
+    text: Optional[StrictStr] = Field(default=None, description="Content of the message.")
+    message: Optional[dict] = Field(default=None, description="The updated message and corresponding user.")
+
+
+class SlackChatMessageDeleteResponse(BaseSlackResponse):
+    """
+    Response model for the chat.delete Slack API method.
+    """
+
+    channel: Optional[StrictStr] = Field(default=None, description="Channel containing the deleted message.")
+    ts: Optional[StrictStr] = Field(default=None, description="Timestamp of the deleted message.")
+
+
+class SlackChatMessageScheduleResponse(BaseSlackResponse):
+    """
+    Response model for the chat.scheduleMessage Slack API method.
+    """
+
+    channel: Optional[StrictStr] = Field(
+        default=None, description="Channel, private group, or DM channel the message was scheduled to be sent to."
+    )
+    scheduled_message_id: Optional[StrictStr] = Field(default=None, description="ID of the scheduled message.")
+    post_at: Optional[StrictStr] = Field(
+        default=None, description="Unix timestamp representing the future time the message should post to Slack."
+    )
+    message: Optional[dict] = Field(default=None, description="The scheduled message and its metadata.")
+
+
+class SlackChatMessageGetPermalinkResponse(BaseSlackResponse):
+    """
+    Response model for the chat.getPermalink Slack API method.
+    """
+
+    channel: Optional[StrictStr] = Field(
+        default=None, description="ID of the conversation or channel containing the message."
+    )
+    permalink: Optional[StrictStr] = Field(default=None, description="Permalink URL.")
+
+
+class SlackChatMessageSendMeResponse(BaseSlackResponse):
+    """
+    Response model for the chat.meMessage Slack API method.
+    """
+
+    channel: Optional[StrictStr] = Field(default=None, description="ID of the channel the Me message was posted in.")
+    ts: Optional[StrictStr] = Field(default=None, description="Timestamp of the posted Me message.")
 
 
 class SlackChatMessage(BaseAPIModel):

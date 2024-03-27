@@ -16,13 +16,18 @@ from app.flow_execution.models.slack import (
     BaseSlackResponse,
     SlackChatMessage,
     SlackChatMessageSend,
-    SlackChatMessageDelete,
     SlackChatMessageSendResponse,
-    SlackChatMessageUpdate,
+    SlackChatMessageDelete,
+    SlackChatMessageDeleteResponse,
     SlackChatMessageDeleteScheduled,
+    SlackChatMessageUpdate,
+    SlackChatMessageUpdateResponse,
     SlackChatMessageSchedule,
+    SlackChatMessageScheduleResponse,
     SlackChatMessageGetPermalink,
+    SlackChatMessageGetPermalinkResponse,
     SlackChatMessageSendMe,
+    SlackChatMessageSendMeResponse,
 )
 
 
@@ -79,49 +84,57 @@ class SlackIntegration(BaseIntegration):
         return SlackChatMessageSendResponse(**response.data)
 
     @task(task_name="Update Message")
-    def update_message(self, message_to_update: SlackChatMessageUpdate) -> BaseSlackResponse:
+    def update_message(self, message_to_update: SlackChatMessageUpdate) -> SlackChatMessageUpdateResponse:
         """
         Updates a message in a Slack channel.
         """
         params = self._model_to_query_params(message_to_update)
-        return self.client.chat_update(**params)
+        response = self.client.chat_update(**params)
+        return SlackChatMessageUpdateResponse(**response.data)
 
     @task(task_name="Delete Message")
-    def delete_message(self, message_to_delete: SlackChatMessageDelete) -> BaseSlackResponse:
+    def delete_message(self, message_to_delete: SlackChatMessageDelete) -> SlackChatMessageDeleteResponse:
         """
         Deletes a message in a Slack channel.
         """
         params = self._model_to_query_params(message_to_delete)
-        return self.client.chat_delete(**params)
+        response = self.client.chat_delete(**params)
+        return SlackChatMessageDeleteResponse(**response.data)
 
     @task(task_name="Delete Scheduled Message")
-    def delete_scheduled_message(self, scheduled_message_to_delete: SlackChatMessageDeleteScheduled) -> Any:
+    def delete_scheduled_message(
+        self, scheduled_message_to_delete: SlackChatMessageDeleteScheduled
+    ) -> BaseSlackResponse:
         """
         Deletes a pending scheduled message from the queue.
         """
         params = self._model_to_query_params(scheduled_message_to_delete)
-        return self.client.chat_deleteScheduledMessage(**params)
+        response = self.client.chat_deleteScheduledMessage(**params)
+        return BaseSlackResponse(**response.data)
 
     @task(task_name="Schedule Message")
-    def schedule_message(self, message_to_schedule: SlackChatMessageSchedule) -> Any:
+    def schedule_message(self, message_to_schedule: SlackChatMessageSchedule) -> SlackChatMessageScheduleResponse:
         """
         Schedules a message to be sent to a channel.
         """
         params = self._model_to_query_params(message_to_schedule)
-        return self.client.chat_scheduleMessage(**params)
+        response = self.client.chat_scheduleMessage(**params)
+        return SlackChatMessageScheduleResponse(**response.data)
 
     @task(task_name="Get Message Permalink")
-    def get_message_permalink(self, message: SlackChatMessageGetPermalink) -> Any:
+    def get_message_permalink(self, message: SlackChatMessageGetPermalink) -> SlackChatMessageGetPermalinkResponse:
         """
         Retrieve a permalink URL for a specific extant message
         """
         params = self._model_to_query_params(message)
-        return self.client.chat_getPermalink(**params)
+        response = self.client.chat_getPermalink(**params)
+        return SlackChatMessageGetPermalinkResponse(**response.data)
 
     @task(task_name="Send Me Message")
-    def send_me_message(self, message_to_send: SlackChatMessageSendMe) -> Any:
+    def send_me_message(self, message_to_send: SlackChatMessageSendMe) -> :
         """
         Share a me message into a channel.
         """
         params = self._model_to_query_params(message_to_send)
-        return self.client.chat_meMessage(**params)
+        response = self.client.chat_meMessage(**params)
+        return SlackChatMessageSendMeResponse(**response.data)
