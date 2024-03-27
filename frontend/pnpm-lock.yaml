@@ -37,6 +37,9 @@ dependencies:
   '@iconify/types':
     specifier: ^2.0.0
     version: 2.0.0
+  '@pgrabovets/json-view':
+    specifier: ^2.7.5
+    version: 2.7.5
   '@sindresorhus/is':
     specifier: ^6.0.1
     version: 6.1.0
@@ -1440,6 +1443,10 @@ packages:
   /@open-draft/until@1.0.3:
     resolution: {integrity: sha512-Aq58f5HiWdyDlFffbbSjAlv596h/cOnt2DO1w3DOC7OJ5EHs0hd/nycJfiu9RJbT6Yk6F1knnRRXNSpxoIVZ9Q==}
     dev: true
+
+  /@pgrabovets/json-view@2.7.5:
+    resolution: {integrity: sha512-5ewaHFwjjG9h2rzkkeqRZUTUK5fmnWWq0qCzv8IiZT2pU10jI6nrKPuxzzrKdD22U2PcHVKzWdeX6hPyGcyeiQ==}
+    dev: false
 
   /@pkgr/core@0.1.0:
     resolution: {integrity: sha512-Zwq5OCzuwJC2jwqmpEQt7Ds1DTi6BWSwoGkbb1n9pO3hzb35BoJELx7c0T23iDkBGkh2e7tvOtjF3tr3OaQHDQ==}

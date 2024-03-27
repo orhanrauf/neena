@@ -373,6 +373,7 @@ declare module 'vue' {
     ExecuteFlowCard: typeof import('./src/components/execution/ExecuteFlowCard.vue')['default']
     FlowExecutionMetadataCard: typeof import('./src/components/execution/FlowExecutionMetadataCard.vue')['default']
     I18n: typeof import('./src/@core/components/I18n.vue')['default']
+    JSONViewCard: typeof import('./src/components/execution/JSONViewCard.vue')['default']
     MoreBtn: typeof import('./src/@core/components/MoreBtn.vue')['default']
     Node: typeof import('./src/components/nodes/Node.vue')['default']
     Notifications: typeof import('./src/@core/components/Notifications.vue')['default']

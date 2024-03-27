@@ -20,6 +20,7 @@
     "@iconify-json/fa": "^1.1.5",
     "@iconify-json/tabler": "^1.1.96",
     "@iconify/types": "^2.0.0",
+    "@pgrabovets/json-view": "^2.7.5",
     "@sindresorhus/is": "^6.0.1",
     "@tiptap/extension-highlight": "^2.1.12",
     "@tiptap/extension-image": "^2.1.12",
