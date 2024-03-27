@@ -390,7 +390,7 @@ class SlackChatMessageSendMe(BaseIntegrationActionModel):
     )
 
 
-class SlackConversation(BaseAPIModel):
+class SlackConversations(BaseAPIModel):
     """
     Slack API Conversation model.
     tl;dr: Conversations are about managing the broader contexts (channels,
@@ -406,7 +406,264 @@ class SlackConversation(BaseAPIModel):
     than the chat messages themselves.
     """
 
-    pass
+    channel: Optional[StrictStr] = Field(default=None, description="ID of a channel.")
+    include_all_metadata: Optional[StrictStr] = Field(
+        default=None, description="Boolean indicating whether to return all metadata associated with a message or not."
+    )
+    include_locale: Optional[StrictBool] = Field(
+        default=None,
+        description="""
+        When fetching conversation information, set this to True to receive the locale for this conversation. 
+        Defaults to False.
+        """,
+    )
+    include_num_members: Optional[StrictBool] = Field(
+        default=None,
+        description="""
+        When fetching conversation information, set to True to include the member count for the specified conversation. 
+        Defaults to False.
+        """,
+    )
+    inclusive: Optional[StrictBool] = Field(
+        default=None,
+        description="""
+        Boolean indicating whether to include messages with oldest or latest timestamps in results when fetching conversation history. 
+        Ignored unless either timestamp (latest or oldest) is specified.
+        """,
+    )
+    is_private: Optional[StrictBool] = Field(
+        default=None, description="Boolean indicating whether a channel private (True) or public (False)"
+    )
+    latest: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        When fetching conversation history, only messages before this Unix timestamp will be included in results. 
+        Default is the current time.
+        """,
+    )
+    limit: Optional[StrictInt] = Field(
+        default=None,
+        description="""
+        The maximum number of items to return when fetching conversations history. 
+        Fewer than the requested number of items may be returned, 
+        even if the end of the conversation history hasn't been reached. Maximum of 999.
+
+        Default: 100
+        """,
+    )
+    name: Optional[StrictStr] = Field(default=None, description="Name of the public or private channel.")
+    oldest: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        When fetching conversation history, only messages after this Unix timestamp will be included in results.
+
+        Default: 0
+
+        Example: 1234567890.123456
+        """,
+    )
+    team_id: Optional[StrictStr] = Field(
+        default=None, description="encoded team id to create the channel in, required if org token is used"
+    )
+
+
+class SlackConversationsAcceptSharedInvite(BaseIntegrationActionModel):
+    """
+    Action model for accepting an invitation to a Slack Connect channel.
+    """
+
+
+class SlackConversationsApproveSharedInvite(BaseIntegrationActionModel):
+    """
+    Action model for approving an invitation to a Slack Connect channel.
+    """
+
+
+class SlackConversationsArchive(BaseIntegrationActionModel):
+    """
+    Action model for archiving a conversation.
+    """
+
+    channel: StrictStr = Field(description="ID of conversation to archive. Example: C1234567890")
+
+
+class SlackConversationsClose(BaseIntegrationActionModel):
+    """
+    Action model for closing a direct message or multi-person direct message.
+    """
+
+    channel: StrictStr = Field(description="Conversation to close.")
+
+
+class SlackConversationsCreate(BaseIntegrationActionModel):
+    """
+    Action model for initiating a public or private channel-based conversation/
+    """
+
+    name: StrictStr = Field(description="Name of the public or private channel to create. Example: mychannel")
+    is_private: Optional[StrictBool] = Field(
+        default=None, description="Create a private channel instead of a public one"
+    )
+    team_id: Optional[StrictStr] = Field(
+        default=None, description="""encoded team id to create the channel in, required if org token is used"""
+    )
+
+
+class SlackConversationsDeclineSharedInvite(BaseIntegrationActionModel):
+    """
+    Action model for declining a Slack Connect channel invite.
+    """
+
+
+class SlackConversationsHistory(BaseIntegrationActionModel):
+    """
+    Action model for fetching a conversation's history of messages and events.
+    """
+
+    channel: StrictStr = Field(description="Conversation ID to fetch history for.")
+    include_all_metadata: Optional[StrictBool] = Field(
+        default=None, description="Return all metadata associated with this message."
+    )
+    inclusive: Optional[StrictBool] = Field(
+        default=None,
+        description="Include messages with oldest or latest timestamps in results. Ignored unless either timestamp is specified.",
+    )
+    latest: Optional[StrictStr] = Field(
+        default=None,
+        description="""Only messages before this Unix timestamp will be included in results. Default is the current time.""",
+    )
+    limit: Optional[StrictInt] = Field(
+        default=None,
+        description="""
+        The maximum number of items to return. Fewer than the requested number of items may be returned, even if the end of the conversation history hasn't been reached. Maximum of 999.
+
+        Default: 100
+        """,
+    )
+    oldest: Optional[StrictStr] = Field(
+        default=None,
+        description="""
+        Only messages after this Unix timestamp will be included in results.
+
+        Default: 0
+
+        Example: 1234567890.123456
+        """,
+    )
+
+
+class SlackConversationsInfo(BaseIntegrationActionModel):
+    """
+    Retrieve information about a conversation.
+    """
+
+    channel: StrictStr = Field(description="Conversation ID to fetch information about.")
+    include_locale: Optional[StrictBool] = Field(
+        default=None, description="Set this to True to receive the locale for this conversation. Defaults to False"
+    )
+    include_num_members: Optional[StrictBool] = Field(
+        default=None,
+        description="Set to true to include the member count for the specified conversation. Defaults to false",
+    )
+
+
+class SlackConversationsInvite(BaseIntegrationActionModel):
+    """
+    Invites users to a channel.
+    """
+
+    channel: StrictStr = Field(description="ID of the public or private to invite(s) user to.")
+    users: Union[StrictStr, Sequence[StrictStr]] = Field(
+        description="""
+        A comma separated list of user IDs. Up to 1000 users may be listed.
+
+        Example: W1234567890,U2345678901,U3456789012
+        """
+    )
+
+
+class SlackConversationsInviteShared(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsJoin(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsKick(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsLeave(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsList(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsListConnectInvites(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsMark(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsMembers(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsOpen(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsRename(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsReplies(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsSetPurpose(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsSetTopic(BaseIntegrationActionModel):
+    """
+    ...
+    """
+
+
+class SlackConversationsUnarchive(BaseIntegrationActionModel):
+    """
+    ...
+    """
 
 
 class SlackAdmin(BaseAPIModel):
