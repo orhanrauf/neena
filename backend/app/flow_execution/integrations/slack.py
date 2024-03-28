@@ -15,40 +15,40 @@ from app.flow_execution.decorators import task
 from app.flow_execution.models.slack import (
     BaseSlackResponse,
     SlackChatMessage,
-    SlackChatMessageSend,
-    SlackChatMessageSendResponse,
-    SlackChatMessageDelete,
-    SlackChatMessageDeleteResponse,
-    SlackChatMessageDeleteScheduled,
-    SlackChatMessageUpdate,
-    SlackChatMessageUpdateResponse,
-    SlackChatMessageSchedule,
-    SlackChatMessageScheduleResponse,
-    SlackChatMessageGetPermalink,
-    SlackChatMessageGetPermalinkResponse,
-    SlackChatMessageSendMe,
-    SlackChatMessageSendMeResponse,
+    SlackChatSendMessageAction,
+    SlackChatSendMessageResponse,
+    SlackChatDeleteMessageAction,
+    SlackChatDeleteMessageResponse,
+    SlackChatDeleteScheduledMessageAction,
+    SlackChatUpdateMessageAction,
+    SlackChatUpdateMessageResponse,
+    SlackChatScheduleMessageAction,
+    SlackChatScheduleMessageResponse,
+    SlackChatGetPermalinkAction,
+    SlackChatGetPermalinkResponse,
+    SlackChatSendMeMessageAction,
+    SlackChatSendMeMessageResponse,
     SlackConversations,
-    SlackConversationsArchive,
-    SlackConversationsCreate,
+    SlackConversationsArchiveAction,
+    SlackConversationsCreateAction,
     SlackConversationsCreateResponse,
-    SlackConversationsHistory,
+    SlackConversationsHistoryAction,
     SlackConversationsHistoryResponse,
-    SlackConversationsInfo,
+    SlackConversationsInfoAction,
     SlackConversationsInfoResponse,
-    SlackConversationsInvite,
+    SlackConversationsInviteAction,
     SlackConversationsInviteResponse,
-    SlackConversationsJoin,
+    SlackConversationsJoinAction,
     SlackConversationsJoinResponse,
-    SlackConversationsList,
+    SlackConversationsListAction,
     SlackConversationsListResponse,
-    SlackConversationsMembers,
+    SlackConversationsMembersAction,
     SlackConversationsMembersResponse,
-    SlackConversationsOpen,
+    SlackConversationsOpenAction,
     SlackConversationsOpenResponse,
-    SlackConversationsRename,
+    SlackConversationsRenameAction,
     SlackConversationsRenameResponse,
-    SlackConversationsReplies,
+    SlackConversationsRepliesAction,
     SlackConversationsRepliesResponse,
 )
 
@@ -92,176 +92,192 @@ class SlackIntegration(BaseIntegration):
         """
         Checks if the Slack API is accessible by our application and the SDK is working.
         """
-        max_no_conversations = 5
-        response = self.client.conversations_list(limit=max_no_conversations)
+        max_no_conversations_to_list = 5
+        response = self.client.conversations_list(limit=max_no_conversations_to_list)
         return response.status_code == 200
 
     @task(task_name="Send Message")
-    def send_message(self, message_to_send: SlackChatMessageSend) -> SlackChatMessageSendResponse:
+    def send_message(self, send_message_action: SlackChatSendMessageAction) -> SlackChatSendMessageResponse:
         """
         Sends a message to a Slack channel.
         """
-        params = self._model_to_query_params(message_to_send)
+        params = self._model_to_query_params(send_message_action)
         response = self.client.chat_postMessage(**params)
-        return SlackChatMessageSendResponse(**response.data)
+        return SlackChatSendMessageResponse(**response.data)
 
     @task(task_name="Update Message")
-    def update_message(self, message_to_update: SlackChatMessageUpdate) -> SlackChatMessageUpdateResponse:
+    def update_message(self, update_message_action: SlackChatUpdateMessageAction) -> SlackChatUpdateMessageResponse:
         """
         Updates a message in a Slack channel.
         """
-        params = self._model_to_query_params(message_to_update)
+        params = self._model_to_query_params(update_message_action)
         response = self.client.chat_update(**params)
-        return SlackChatMessageUpdateResponse(**response.data)
+        return SlackChatUpdateMessageResponse(**response.data)
 
     @task(task_name="Delete Message")
-    def delete_message(self, message_to_delete: SlackChatMessageDelete) -> SlackChatMessageDeleteResponse:
+    def delete_message(self, delete_message_action: SlackChatDeleteMessageAction) -> SlackChatDeleteMessageResponse:
         """
         Deletes a message in a Slack channel.
         """
-        params = self._model_to_query_params(message_to_delete)
+        params = self._model_to_query_params(delete_message_action)
         response = self.client.chat_delete(**params)
-        return SlackChatMessageDeleteResponse(**response.data)
+        return SlackChatDeleteMessageResponse(**response.data)
 
     @task(task_name="Delete Scheduled Message")
     def delete_scheduled_message(
-        self, scheduled_message_to_delete: SlackChatMessageDeleteScheduled
+        self, delete_scheduled_message_action: SlackChatDeleteScheduledMessageAction
     ) -> BaseSlackResponse:
         """
         Deletes a pending scheduled message from the queue.
         """
-        params = self._model_to_query_params(scheduled_message_to_delete)
+        params = self._model_to_query_params(delete_scheduled_message_action)
         response = self.client.chat_deleteScheduledMessage(**params)
         return BaseSlackResponse(**response.data)
 
     @task(task_name="Schedule Message")
-    def schedule_message(self, message_to_schedule: SlackChatMessageSchedule) -> SlackChatMessageScheduleResponse:
+    def schedule_message(self, schedule_message: SlackChatScheduleMessageAction) -> SlackChatScheduleMessageResponse:
         """
         Schedules a message to be sent to a channel.
         """
-        params = self._model_to_query_params(message_to_schedule)
+        params = self._model_to_query_params(schedule_message)
         response = self.client.chat_scheduleMessage(**params)
-        return SlackChatMessageScheduleResponse(**response.data)
+        return SlackChatScheduleMessageResponse(**response.data)
 
     @task(task_name="Get Message Permalink")
-    def get_message_permalink(self, message: SlackChatMessageGetPermalink) -> SlackChatMessageGetPermalinkResponse:
+    def get_message_permalink(
+        self, get_permalink_message: SlackChatGetPermalinkAction
+    ) -> SlackChatGetPermalinkResponse:
         """
         Retrieves a permalink URL for a specific extant message
         """
-        params = self._model_to_query_params(message)
+        params = self._model_to_query_params(get_permalink_message)
         response = self.client.chat_getPermalink(**params)
-        return SlackChatMessageGetPermalinkResponse(**response.data)
+        return SlackChatGetPermalinkResponse(**response.data)
 
     @task(task_name="Send Me Message")
-    def send_me_message(self, message_to_send: SlackChatMessageSendMe) -> SlackChatMessageSendMeResponse:
+    def send_me_message(self, send_me_message_action: SlackChatSendMeMessageAction) -> SlackChatSendMeMessageResponse:
         """
         Shares a Me message into a channel.
         """
-        params = self._model_to_query_params(message_to_send)
+        params = self._model_to_query_params(send_me_message_action)
         response = self.client.chat_meMessage(**params)
-        return SlackChatMessageSendMeResponse(**response.data)
+        return SlackChatSendMeMessageResponse(**response.data)
 
     @task(task_name="Archive Conversation")
-    def archive_conversation(self, conversation_to_archive: SlackConversationsArchive) -> BaseSlackResponse:
+    def archive_conversation(self, archive_conversation_action: SlackConversationsArchiveAction) -> BaseSlackResponse:
         """
         Archives a conversation.
         """
-        params = self._model_to_query_params(conversation_to_archive)
+        params = self._model_to_query_params(archive_conversation_action)
         response = self.client.conversations_archive(**params)
         return BaseSlackResponse(**response.data)
 
     @task(task_name="Create Conversation")
-    def create_conversation(self, conversation_to_create: SlackConversationsCreate) -> SlackConversationsCreateResponse:
+    def create_conversation(
+        self, create_conversation_action: SlackConversationsCreateAction
+    ) -> SlackConversationsCreateResponse:
         """
         Initiates a public or private channel-based conversation
         """
-        params = self._model_to_query_params(conversation_to_create)
+        params = self._model_to_query_params(create_conversation_action)
         response = self.client.conversations_create(**params)
         return SlackConversationsCreateResponse(**response.data)
 
     @task(task_name="Get Conversation History")
     def get_conversation_history(
-        self, conversation_history: SlackConversationsHistory
+        self, get_conversation_history_action: SlackConversationsHistoryAction
     ) -> SlackConversationsHistoryResponse:
         """
         Fetches a conversation's history of messages and events.
         """
-        params = self._model_to_query_params(conversation_history)
+        params = self._model_to_query_params(get_conversation_history_action)
         response = self.client.conversations_history(**params)
         return SlackConversationsHistoryResponse(**response.data)
 
     @task(task_name="Get Conversation Info")
-    def get_conversation_info(self, conversation_info: SlackConversationsInfo) -> SlackConversationsInfoResponse:
+    def get_conversation_info(
+        self, get_conversation_info_action: SlackConversationsInfoAction
+    ) -> SlackConversationsInfoResponse:
         """
         Retrieve information about a conversation.
         """
-        params = self._model_to_query_params(conversation_info)
+        params = self._model_to_query_params(get_conversation_info_action)
         response = self.client.conversations_info(**params)
         return SlackConversationsInfoResponse(**response.data)
 
     @task(task_name="Invite Users To Channel")
     def invite_users_to_channel(
-        self, conversations_invite: SlackConversationsInvite
+        self, invite_conversation_action: SlackConversationsInviteAction
     ) -> SlackConversationsInviteResponse:
         """
         Invites users to a channel.
         """
-        params = self._model_to_query_params(conversations_invite)
+        params = self._model_to_query_params(invite_conversation_action)
         response = self.client.conversations_invite(**params)
         return SlackConversationsInviteResponse(**response.data)
 
     @task(task_name="Join Conversation")
-    def join_conversation(self, join_conversation: SlackConversationsJoin) -> SlackConversationsJoinResponse:
+    def join_conversation(
+        self, join_conversation_action: SlackConversationsJoinAction
+    ) -> SlackConversationsJoinResponse:
         """
         Joins an existing conversation.
         """
-        params = self._model_to_query_params(join_conversation)
+        params = self._model_to_query_params(join_conversation_action)
         response = self.client.conversations_join(**params)
         return SlackConversationsJoinResponse(**response.data)
 
     @task(task_name="List All Channels in Team")
-    def list_all_channels_in_team(self, conversations_list: SlackConversationsList) -> SlackConversationsListResponse:
+    def list_all_channels_in_team(
+        self, list_conversations_action: SlackConversationsListAction
+    ) -> SlackConversationsListResponse:
         """
         Lists all channels in a Slack team.
         """
-        params = self._model_to_query_params(conversations_list)
+        params = self._model_to_query_params(list_conversations_action)
         response = self.client.conversations_list(**params)
         return SlackConversationsListResponse(**response.data)
 
     @task(task_name="Get Members")
-    def get_members(self, conversation_members: SlackConversationsMembers) -> BaseSlackResponse:
+    def get_members(
+        self, get_conversation_members_action: SlackConversationsMembersAction
+    ) -> SlackConversationsMembersResponse:
         """
         Retrieve members of a conversation.
         """
-        params = self._model_to_query_params(conversation_members)
+        params = self._model_to_query_params(get_conversation_members_action)
         response = self.client.conversations_members(**params)
-        return BaseSlackResponse(**response.data)
+        return SlackConversationsMembersResponse(**response.data)
 
     @task(task_name="Open Conversation")
-    def open_conversation(self, conversation_open_model: SlackConversationsOpen) -> SlackConversationsOpenResponse:
+    def open_conversation(
+        self, open_conversation_action: SlackConversationsOpenAction
+    ) -> SlackConversationsOpenResponse:
         """
         Opens or resumes a direct message or multi-person direct message.
         """
-        params = self._model_to_query_params(conversation_open_model)
+        params = self._model_to_query_params(open_conversation_action)
         response = self.client.conversations_open(**params)
         return SlackConversationsOpenResponse(**response.data)
 
     @task(task_name="Rename Conversation")
     def rename_conversation(
-        self, conversation_rename_model: SlackConversationsRename
+        self, rename_conversation_action: SlackConversationsRenameAction
     ) -> SlackConversationsRenameResponse:
         """
         Renames a conversation.
         """
-        params = self._model_to_query_params(conversation_rename_model)
+        params = self._model_to_query_params(rename_conversation_action)
         response = self.client.conversations_rename(**params)
         return SlackConversationsRenameResponse(**response.data)
 
     @task(task_name="Get Replies")
-    def get_replies(self, conversation_replies_model: SlackConversationsReplies) -> SlackConversationsRepliesResponse:
+    def get_replies(
+        self, get_conversation_replies_action: SlackConversationsRepliesAction
+    ) -> SlackConversationsRepliesResponse:
         """
         Retrieve a thread of messages posted to a conversation.
         """
-        params = self._model_to_query_params(conversation_replies_model)
+        params = self._model_to_query_params(get_conversation_replies_action)
         response = self.client.conversations_replies(**params)
         return SlackConversationsRepliesResponse(**response.data)

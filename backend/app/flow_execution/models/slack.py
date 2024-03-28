@@ -21,7 +21,7 @@ class BaseSlackResponse(BaseAPIModel):
     response_metadata: Optional[dict] = Field(default=None, description="Metadata about the response.")
 
 
-class SlackChatMessageSendResponse(BaseSlackResponse):
+class SlackChatSendMessageResponse(BaseSlackResponse):
     """
     Response model for the chat.postMessage Slack API method.
     """
@@ -31,7 +31,7 @@ class SlackChatMessageSendResponse(BaseSlackResponse):
     message: Optional[dict] = Field(default=None, description="The message that was posted.")
 
 
-class SlackChatMessageUpdateResponse(BaseSlackResponse):
+class SlackChatUpdateMessageResponse(BaseSlackResponse):
     """
     Response model for the chat.update Slack API method.
     """
@@ -42,7 +42,7 @@ class SlackChatMessageUpdateResponse(BaseSlackResponse):
     message: Optional[dict] = Field(default=None, description="The updated message and corresponding user.")
 
 
-class SlackChatMessageDeleteResponse(BaseSlackResponse):
+class SlackChatDeleteMessageResponse(BaseSlackResponse):
     """
     Response model for the chat.delete Slack API method.
     """
@@ -51,7 +51,7 @@ class SlackChatMessageDeleteResponse(BaseSlackResponse):
     ts: Optional[StrictStr] = Field(default=None, description="Timestamp of the deleted message.")
 
 
-class SlackChatMessageScheduleResponse(BaseSlackResponse):
+class SlackChatScheduleMessageResponse(BaseSlackResponse):
     """
     Response model for the chat.scheduleMessage Slack API method.
     """
@@ -66,7 +66,7 @@ class SlackChatMessageScheduleResponse(BaseSlackResponse):
     message: Optional[dict] = Field(default=None, description="The scheduled message and its metadata.")
 
 
-class SlackChatMessageGetPermalinkResponse(BaseSlackResponse):
+class SlackChatGetPermalinkResponse(BaseSlackResponse):
     """
     Response model for the chat.getPermalink Slack API method.
     """
@@ -77,7 +77,7 @@ class SlackChatMessageGetPermalinkResponse(BaseSlackResponse):
     permalink: Optional[StrictStr] = Field(default=None, description="Permalink URL.")
 
 
-class SlackChatMessageSendMeResponse(BaseSlackResponse):
+class SlackChatSendMeMessageResponse(BaseSlackResponse):
     """
     Response model for the chat.meMessage Slack API method.
     """
@@ -323,7 +323,7 @@ class SlackChatMessage(BaseAPIModel):
     username: Optional[StrictStr] = Field(default=None, description="Set bot's user name.")
 
 
-class SlackChatMessageSend(BaseIntegrationActionModel):
+class SlackChatSendMessageAction(BaseIntegrationActionModel):
     """
     Action model for sending a message to a channel.
     """
@@ -379,7 +379,7 @@ class SlackChatMessageSend(BaseIntegrationActionModel):
         return values
 
 
-class SlackChatMessageUpdate(BaseIntegrationActionModel):
+class SlackChatUpdateMessageAction(BaseIntegrationActionModel):
     """
     Action model for updating a message.
     """
@@ -431,7 +431,7 @@ class SlackChatMessageUpdate(BaseIntegrationActionModel):
         return values
 
 
-class SlackChatMessageDelete(BaseIntegrationActionModel):
+class SlackChatDeleteMessageAction(BaseIntegrationActionModel):
     """
     Action model for deleting a message.
     """
@@ -452,7 +452,7 @@ class SlackChatMessageDelete(BaseIntegrationActionModel):
     )
 
 
-class SlackChatMessageDeleteScheduled(BaseIntegrationActionModel):
+class SlackChatDeleteScheduledMessageAction(BaseIntegrationActionModel):
     """
     Action model for deleting a pending scheduled message from the queue.
     """
@@ -479,7 +479,7 @@ class SlackChatMessageDeleteScheduled(BaseIntegrationActionModel):
     )
 
 
-class SlackChatMessageSchedule(BaseIntegrationActionModel):
+class SlackChatScheduleMessageAction(BaseIntegrationActionModel):
     """
     Action model for scheduling a message to be sent.
     """
@@ -533,7 +533,7 @@ class SlackChatMessageSchedule(BaseIntegrationActionModel):
         return values
 
 
-class SlackChatMessageGetPermalink(BaseIntegrationActionModel):
+class SlackChatGetPermalinkAction(BaseIntegrationActionModel):
     """
     Action model for retrieving a permalink URL for a specific extant message.
     """
@@ -555,7 +555,7 @@ class SlackChatMessageGetPermalink(BaseIntegrationActionModel):
     )
 
 
-class SlackChatMessageSendMe(BaseIntegrationActionModel):
+class SlackChatSendMeMessageAction(BaseIntegrationActionModel):
     """
     Action model for sharing a me message into a channel.
     """
@@ -712,19 +712,19 @@ class SlackConversations(BaseAPIModel):
     )
 
 
-class SlackConversationsAcceptSharedInvite(BaseIntegrationActionModel):
+class SlackConversationsAcceptSharedInviteAction(BaseIntegrationActionModel):
     """
     Action model for accepting an invitation to a Slack Connect channel.
     """
 
 
-class SlackConversationsApproveSharedInvite(BaseIntegrationActionModel):
+class SlackConversationsApproveSharedInviteAction(BaseIntegrationActionModel):
     """
     Action model for approving an invitation to a Slack Connect channel.
     """
 
 
-class SlackConversationsArchive(BaseIntegrationActionModel):
+class SlackConversationsArchiveAction(BaseIntegrationActionModel):
     """
     Action model for archiving a conversation.
     """
@@ -732,7 +732,7 @@ class SlackConversationsArchive(BaseIntegrationActionModel):
     channel: StrictStr = Field(description="ID of conversation to archive. Example: C1234567890")
 
 
-class SlackConversationsClose(BaseIntegrationActionModel):
+class SlackConversationsCloseAction(BaseIntegrationActionModel):
     """
     Action model for closing a direct message or multi-person direct message.
     """
@@ -740,7 +740,7 @@ class SlackConversationsClose(BaseIntegrationActionModel):
     channel: StrictStr = Field(description="Conversation to close.")
 
 
-class SlackConversationsCreate(BaseIntegrationActionModel):
+class SlackConversationsCreateAction(BaseIntegrationActionModel):
     """
     Action model for initiating a public or private channel-based conversation/
     """
@@ -754,13 +754,13 @@ class SlackConversationsCreate(BaseIntegrationActionModel):
     )
 
 
-class SlackConversationsDeclineSharedInvite(BaseIntegrationActionModel):
+class SlackConversationsDeclineSharedInviteAction(BaseIntegrationActionModel):
     """
     Action model for declining a Slack Connect channel invite.
     """
 
 
-class SlackConversationsHistory(BaseIntegrationActionModel):
+class SlackConversationsHistoryAction(BaseIntegrationActionModel):
     """
     Action model for fetching a conversation's history of messages and events.
     """
@@ -798,7 +798,7 @@ class SlackConversationsHistory(BaseIntegrationActionModel):
     )
 
 
-class SlackConversationsInfo(BaseIntegrationActionModel):
+class SlackConversationsInfoAction(BaseIntegrationActionModel):
     """
     Retrieve information about a conversation.
     """
@@ -813,7 +813,7 @@ class SlackConversationsInfo(BaseIntegrationActionModel):
     )
 
 
-class SlackConversationsInvite(BaseIntegrationActionModel):
+class SlackConversationsInviteAction(BaseIntegrationActionModel):
     """
     Invites users to a channel.
     """
@@ -836,13 +836,13 @@ class SlackConversationsInvite(BaseIntegrationActionModel):
     )
 
 
-class SlackConversationsInviteShared(BaseIntegrationActionModel):
+class SlackConversationsInviteSharedAction(BaseIntegrationActionModel):
     """
     Action model for sending an invitation to a Slack Connect channel.
     """
 
 
-class SlackConversationsJoin(BaseIntegrationActionModel):
+class SlackConversationsJoinAction(BaseIntegrationActionModel):
     """
     Action model for joining an existing conversation.
     """
@@ -850,19 +850,19 @@ class SlackConversationsJoin(BaseIntegrationActionModel):
     channel: StrictStr = Field(description="ID of the public or private to join.")
 
 
-class SlackConversationsKick(BaseIntegrationActionModel):
+class SlackConversationsKickAction(BaseIntegrationActionModel):
     """
     ...
     """
 
 
-class SlackConversationsLeave(BaseIntegrationActionModel):
+class SlackConversationsLeaveAction(BaseIntegrationActionModel):
     """
     ...
     """
 
 
-class SlackConversationsList(BaseIntegrationActionModel):
+class SlackConversationsListAction(BaseIntegrationActionModel):
     """
     Action model for listing all channels in a Slack team.
     """
@@ -910,20 +910,20 @@ class SlackConversationsList(BaseIntegrationActionModel):
     )
 
 
-class SlackConversationsListConnectInvites(BaseIntegrationActionModel):
+class SlackConversationsListConnectInvitesAction(BaseIntegrationActionModel):
     """
     Action model for listing shared channel invites that have been generated
     or received but have not yet been approved by all parties.
     """
 
 
-class SlackConversationsMark(BaseIntegrationActionModel):
+class SlackConversationsMarkAction(BaseIntegrationActionModel):
     """
     Action model for setting the read cursor in a channel.
     """
 
 
-class SlackConversationsMembers(BaseIntegrationActionModel):
+class SlackConversationsMembersAction(BaseIntegrationActionModel):
     """
     Action model for retrieving members of a conversation.
     """
@@ -950,7 +950,7 @@ class SlackConversationsMembers(BaseIntegrationActionModel):
     )
 
 
-class SlackConversationsOpen(BaseIntegrationActionModel):
+class SlackConversationsOpenAction(BaseIntegrationActionModel):
     """
     Action model for opening or resuming a direct message or multi-person direct message.
     """
@@ -980,7 +980,7 @@ class SlackConversationsOpen(BaseIntegrationActionModel):
     )
 
 
-class SlackConversationsRename(BaseIntegrationActionModel):
+class SlackConversationsRenameAction(BaseIntegrationActionModel):
     """
     Action model for renaming a conversation.
     """
@@ -989,7 +989,7 @@ class SlackConversationsRename(BaseIntegrationActionModel):
     name: StrictStr = Field(description="New name for conversation.")
 
 
-class SlackConversationsReplies(BaseIntegrationActionModel):
+class SlackConversationsRepliesAction(BaseIntegrationActionModel):
     """
     Action model for retrieving a thread of messages posted to a conversation.
     """
@@ -1047,19 +1047,19 @@ class SlackConversationsReplies(BaseIntegrationActionModel):
     )
 
 
-class SlackConversationsSetPurpose(BaseIntegrationActionModel):
+class SlackConversationsSetPurposeAction(BaseIntegrationActionModel):
     """
     Action model for setting the purpose for a conversation.
     """
 
 
-class SlackConversationsSetTopic(BaseIntegrationActionModel):
+class SlackConversationsSetTopicAction(BaseIntegrationActionModel):
     """
     Action model for setting the topic for a conversation.
     """
 
 
-class SlackConversationsUnarchive(BaseIntegrationActionModel):
+class SlackConversationsUnarchiveAction(BaseIntegrationActionModel):
     """
     Action model for reversing conversation archival.
     """

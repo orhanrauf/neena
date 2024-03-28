@@ -13,7 +13,7 @@ from app import crud
 from app.core.config import settings
 
 from app.flow_execution.integrations.slack import SlackIntegration
-from app.flow_execution.models.slack import SlackChatMessage, SlackChatMessageSend
+from app.flow_execution.models.slack import SlackChatMessage, SlackChatSendMessageAction
 
 
 def main() -> None:
@@ -59,10 +59,12 @@ def main() -> None:
     connected = slack_integration.check_connectivity()
     print(f"Connected: {connected}")
 
-    slack_chat_send_message = SlackChatMessageSend(channel="#random", text="We are so back, baby.")
-    response = slack_integration.send_message(message_to_send=slack_chat_send_message)
+    pdb.set_trace()
+
+    slack_chat_send_message = SlackChatSendMessageAction(channel="#random", text="Dit is een testbericht.")
+    response = slack_integration.send_message(send_message_action=slack_chat_send_message)
     print(response.data["message"])
-    assert response.data["message"]["text"] == "We are so back, baby."
+    assert response.data["message"]["text"] == "Dit is een testbericht."
 
 
 if __name__ == "__main__":

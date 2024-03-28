@@ -15,7 +15,7 @@ from app.schemas.task_operation import TaskOperationBase
 from app.flow_execution.integrations.trello import TrelloIntegration
 from app.flow_execution.integrations.slack import SlackIntegration
 
-from app.flow_execution.models.slack import SlackChatMessageSend
+from app.flow_execution.models.slack import SlackChatSendMessageAction
 
 
 # Assuming your .env file is in the current directory or specify the path
@@ -39,9 +39,9 @@ user = crud.user.get_by_email(db, email=settings.FIRST_SUPERUSER)
 
 slack_integration_class = SlackIntegration(user)
 
-message_to_send = SlackChatMessageSend(channel="general", text="Test message")
+message_to_send = SlackChatSendMessageAction(channel="general", text="Test message")
 
-response = slack_integration_class.send_message(message_to_send=message_to_send)
+response = slack_integration_class.send_message(send_message_action=message_to_send)
 
 print(response)
 
