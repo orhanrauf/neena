@@ -135,11 +135,13 @@ class SlackIntegration(BaseIntegration):
         return BaseSlackResponse(**response.data)
 
     @task(task_name="Schedule Message")
-    def schedule_message(self, schedule_message: SlackChatScheduleMessageAction) -> SlackChatScheduleMessageResponse:
+    def schedule_message(
+        self, schedule_message_action: SlackChatScheduleMessageAction
+    ) -> SlackChatScheduleMessageResponse:
         """
         Schedules a message to be sent to a channel.
         """
-        params = self._model_to_query_params(schedule_message)
+        params = self._model_to_query_params(schedule_message_action)
         response = self.client.chat_scheduleMessage(**params)
         return SlackChatScheduleMessageResponse(**response.data)
 

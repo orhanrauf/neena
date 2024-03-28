@@ -210,6 +210,8 @@ class SlackChatMessage(BaseAPIModel):
     multi-party direct messages (MPDMs), or private groups.
     The chat API methods are specifically designed for creating or
     manipulating messages.
+
+    TODO: This base API model for Slack Chat methods is currently unused. Find generalizable use for it, or remove it.
     """
 
     channel: StrictStr = Field(
@@ -591,6 +593,8 @@ class SlackConversations(BaseAPIModel):
     invite users to a conversation, or fetch a list of conversations a user is
     a part of. It's about managing the spaces where chats can happen rather
     than the chat messages themselves.
+
+    TODO: This base API model for Slack Conversation methods is currently unused. Find generalizable use for it, or remove it.
     """
 
     channel: Optional[StrictStr] = Field(default=None, description="ID of a channel.")
