@@ -1,6 +1,6 @@
 from pydantic.fields import Field
 from datetime import datetime, date
-from typing import Optional, Union, Dict, Sequence, Any
+from typing import Optional, Union, Sequence, Any
 
 # from slack_sdk.models.metadata import Metadata
 from pydantic import StrictBool, StrictStr, StrictInt, root_validator
@@ -18,7 +18,7 @@ class BaseSlackResponse(BaseAPIModel):
     warning: Optional[StrictStr] = Field(
         default=None, description="Warning message if the API call was successful but with warnings."
     )
-    response_metadata: Optional[Dict] = Field(default=None, description="Metadata about the response.")
+    response_metadata: Optional[dict] = Field(default=None, description="Metadata about the response.")
 
 
 class SlackChatMessageSendResponse(BaseSlackResponse):
@@ -86,6 +86,117 @@ class SlackChatMessageSendMeResponse(BaseSlackResponse):
     ts: Optional[StrictStr] = Field(default=None, description="Timestamp of the posted Me message.")
 
 
+class SlackConversationsCreateResponse(BaseSlackResponse):
+    """
+    Response model for the conversations.create Slack API method.
+    """
+
+    channel: Optional[dict] = Field(default=None, description="Created channel ID and its metadata.")
+
+
+class SlackConversationsHistoryResponse(BaseSlackResponse):
+    """
+    Response model for the conversations.history Slack API method.
+    """
+
+    latest: Optional[StrictStr] = Field(
+        default=None, description="Unix timestamp of latest message in conversation history."
+    )
+    messages: Optional[dict] = Field(default=None, description="Conversation's messages.")
+    has_more: Optional[bool] = Field(
+        default=None, description="Boolean indicating whether conversation has more messages than those returned."
+    )
+    pin_count: Optional[int] = Field(
+        default=None, description="The number of messages that have been pinned in the conversation"
+    )
+    response_metadata: Optional[dict] = Field(default=None, description="Metadata about the response.")
+
+
+class SlackConversationsInfoResponse(BaseSlackResponse):
+    """
+    Response model for the conversations.info Slack API method.
+    """
+
+    channel: Optional[dict] = Field(default=None, description="Channel ID and its metadata.")
+
+
+class SlackConversationsInviteResponse(BaseSlackResponse):
+    """
+    Response model for the conversations.invite Slack API method.
+    """
+
+    channel: Optional[dict] = Field(default=None, description="Channel ID and its metadata.")
+
+
+class SlackConversationsJoinResponse(BaseSlackResponse):
+    """
+    Response model the conversations.join Slack API method.
+    """
+
+    channel: Optional[dict] = Field(default=None, description="Channel ID and its metadata.")
+    warning: Optional[str] = Field(
+        default=None, description="Warning message indicating, e.g., whether already in channel."
+    )
+    response_metadata: Optional[dict] = Field(default=None, description="Metadata about the response.")
+
+
+class SlackConversationsListResponse(BaseSlackResponse):
+    """
+    Response model for the conversations.list Slack API method.
+    """
+
+    channel: Optional[list[dict]] = Field(default=None, description="Channels and their metadata.")
+    response_metadata: Optional[dict] = Field(default=None, description="Metadata about the response.")
+
+
+class SlackConversationsMembersResponse(BaseSlackResponse):
+    """
+    Response model for the conversations.members Slack API method.
+    """
+
+    members: Optional[list[StrictStr]] = Field(default=None, description="List of member IDs in conversation.")
+    response_metadata: Optional[dict] = Field(default=None, description="Metadata about the response.")
+
+
+class SlackConversationsOpenResponse(BaseSlackResponse):
+    """
+    Response model for the conversations.open Slack API method.
+    """
+
+    channel: Optional[dict] = Field(default=None, description="Channel ID and its metadata.")
+    no_op: Optional[bool] = Field(
+        default=None,
+        description="""
+        No operation; boolean indicating that the conversations.open method was called, but no action was taken because 
+        the requested operation was not needed. This is likely because the direct message or multi-person direct message 
+        that was attempted to be opened or resumed was already open.
+        """,
+    )
+    already_open: Optional[bool] = Field(
+        default=None, description="Boolean indicating whether conversation was already open."
+    )
+
+
+class SlackConversationsRenameResponse(BaseSlackResponse):
+    """
+    Response model for the conversations.rename Slack API method.
+    """
+
+    channel: Optional[dict] = Field(default=None, description="Channel ID and its metadata.")
+
+
+class SlackConversationsRepliesResponse(BaseSlackResponse):
+    """
+    Response model for the conversations.replies Slack API method.
+    """
+
+    messages: Optional[dict] = Field(default=None, description="Conversation's messages.")
+    has_more: Optional[bool] = Field(
+        default=None, description="Boolean indicating whether conversation has more messages than those returned."
+    )
+    response_metadata: Optional[dict] = Field(default=None, description="Metadata about the response.")
+
+
 class SlackChatMessage(BaseAPIModel):
     """
     Slack API Chat model.
@@ -141,7 +252,7 @@ class SlackChatMessage(BaseAPIModel):
         Example: 1234567890.123456
         """,
     )
-    metadata: Optional[Union[Dict, Any]] = Field(
+    metadata: Optional[Union[dict, Any]] = Field(
         # TODO: type hint Any should actually be slack_sdk.models.metadata.Metadata
         default=None,
         description="""
